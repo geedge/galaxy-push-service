@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nis.galaxy.web.dao.NetflowTopNDao">
+    <!--5分钟内活跃IP流量TOP10 5min-->
+    <select id="getIpActiveStatisticOf5mOnly" resultType="com.nis.galaxy.domain.IpActiveInt" parameterType="String">
+       SELECT  #{start} time,area_id area,ip_addr IP,SUM(c2s_byte_len)+SUM(s2c_byte_len) COUNT
+       FROM traffic_ip_active_statistic
+       WHERE stat_time between #{start} AND #{end}
+       GROUP BY ip_addr ,area_id
+       ORDER BY COUNT desc
+       LIMIT 10;
+    </select>
+</mapper>
