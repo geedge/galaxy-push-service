@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nis.galaxy.web.dao.DictDao">
+    <select id="getUiSysDictInfo" resultType="com.nis.galaxy.domain.dict.UiSysDictInfo">
+        SELECT item_code sysDictId,item_value itemValue,item_desc itemDesc,item_type itemType
+        FROM ui_sys_dict_info;
+    </select>
+    <select id="getNtcServiceDict" resultType="com.nis.galaxy.domain.dict.NtcServiceDict">
+        SELECT service_code serviceCode,service_name_zh serviceNameZh,service_name_en serviceNameEn,service_name_ru serviceNameRu
+        FROM ntc_service_dic;
+    </select>
+    <select id="getProtocolDict" resultType="com.nis.galaxy.domain.dict.ProtocolDict">
+      SELECT view_code viewCode,protocol_type protocolType
+          FROM ui_code_protocol_type_dic;
+    </select>
+    <select id="getUiTagDicInfo" resultType="com.nis.galaxy.domain.dict.UiTagDicInfo">
+      SELECT service_dict_id serviceDictId,item_type itemType,item_value itemValue
+      FROM ui_service_dict_info;
+    </select>
+    <select id="getAreaDict" resultType="com.nis.galaxy.domain.dict.AreaDict">
+       SELECT area_id areaId,area_name areaName
+       FROM area;
+    </select>
+</mapper>

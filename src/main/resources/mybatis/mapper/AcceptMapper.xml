@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nis.galaxy.web.dao.AcceptDao">
+    <insert id="toTrafficNmsserverStatistic" parameterType="Map">
+      INSERT into traffic_nmsserver_statistic 
+            (commit_time,area,total,normal,abnormal)
+        VALUES (#{commit_time},#{area},#{total},#{normal},#{abnormal});
+    </insert>
+    <insert id="toTrafficAbnormalMachine" parameterType="Map">
+        INSERT into traffic_abnormal_machine
+              (nmsServer_Id,hostname,ip)
+        VALUES (#{nmsService_Id},#{hostname},#{ip});
+    </insert>
+</mapper>
