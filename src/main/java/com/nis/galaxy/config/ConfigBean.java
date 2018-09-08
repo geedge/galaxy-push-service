@@ -38,7 +38,9 @@ public class ConfigBean {
                 .register("https", SSLConnectionSocketFactory.getSocketFactory())
                 .build();
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
+        //连接池最大连接数
         connectionManager.setMaxTotal(10);
+        //每个主机的并发
         connectionManager.setDefaultMaxPerRoute(10);
 
         RequestConfig requestConfig = RequestConfig.custom()

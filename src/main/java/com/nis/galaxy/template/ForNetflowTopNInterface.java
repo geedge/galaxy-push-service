@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,7 @@ public class ForNetflowTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.5min.ip.active.waterflow", contentValue);
         logger.info("开始推送=======>>5分钟内活跃IP流量TOP10 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_NETFLOW, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
+        logger.info("5分钟内活跃IP流量TOP10\t推送返回结果"+response);
     }
 }

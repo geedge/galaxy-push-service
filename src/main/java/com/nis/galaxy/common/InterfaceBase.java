@@ -2,6 +2,8 @@ package com.nis.galaxy.common;
 
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.JsonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import java.util.Map;
  * @data 2018/8/27 11:51
  */
 public class InterfaceBase {
+
     //响应成功状态码
     private static int success = 200;
     //设置传送失败后120s后再次推送数据
@@ -28,7 +31,7 @@ public class InterfaceBase {
      * @param url        接口地址
      * @param httpEntity 请求头
      */
-    public static void pushStart(RestTemplate restTemplate, String url, HttpEntity httpEntity) {
+    public static ResponseEntity<String> pushStart(RestTemplate restTemplate, String url, HttpEntity httpEntity) {
         ResponseEntity<String> response = null;
         try {
             response = restTemplate.postForEntity(url, httpEntity, String.class);
@@ -67,7 +70,7 @@ public class InterfaceBase {
                 e1.printStackTrace();
             }
         } finally {
-            System.out.println("第1次推送响应结果：" + response);
+            return response;
         }
     }
 

@@ -45,8 +45,10 @@ public class ForBlockingTopNInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAreaBlockTop10ProtocolOf24h/"+start, List.class);
         //请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.area.protocol.block", contentValue);
-        logger.info("开始推送======>>>24小时区域阻断协议TOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>24小时区域阻断协议TOP10\t请求头和请求体："+httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("24小时区域阻断协议TOP10\t推送返回结果"+response);
+
     }
     /**
      * 1小时内全国阻断URLTOP10
@@ -62,7 +64,8 @@ public class ForBlockingTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.1hour.url.top_10", contentValue);
         logger.info("开始推送======>>>1小时内全国阻断URLTOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("1小时内全国阻断URLTOP10\t推送返回结果"+response);
     }
 
     /**
@@ -79,8 +82,10 @@ public class ForBlockingTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.1hour.website.top_10", contentValue);
         logger.info("开始推送======>>>1小时内全国阻断网站TOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
-    }
+       ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+       logger.info("1小时内全国阻断网站TOP10\t推送返回结果"+response);
+
+   }
 
     /**
      * 24小时内封堵标签TOP10
@@ -96,7 +101,9 @@ public class ForBlockingTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.1hour.keyword.top_10", contentValue);
         logger.info("开始推送======>>>24小时内封堵标签TOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("24小时内封堵标签TOP10\t推送返回结果"+response);
+
     }
 
 
@@ -114,7 +121,9 @@ public class ForBlockingTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.5minute.url.top_10", contentValue);
         logger.info("开始推送======>>>5分钟内全国阻断URLTOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("5分钟内全国阻断URLTOP10\t推送返回结果"+response);
+
     }
 
     /**
@@ -131,7 +140,9 @@ public class ForBlockingTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.5minute.website.top_10", contentValue);
         logger.info("开始推送======>>>5分钟内全国阻断websiteTOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("5分钟内全国阻断websiteTOP10\t推送返回结果"+response);
+
     }
     /**
      * 5分钟内全国阻断标签TOP10  5min
@@ -147,6 +158,7 @@ public class ForBlockingTopNInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.5min.keyword.top_10", contentValue);
         logger.info("开始推送======>>>5分钟内全国阻断标签TOP10 请求头和请求体："+httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("5分钟内全国阻断标签TOP10\t推送返回结果"+response);
     }
 }

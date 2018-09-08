@@ -11,6 +11,7 @@ import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowDao;
 import com.nis.galaxy.web.service.NetflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,19 +24,22 @@ public class NetflowServiceImpl implements NetflowService {
     NetflowDao netflowDao;
     @Autowired
     MyLoad myLoad;
+    @Value("${Language.Chose}")
+    private int languageChose;
 
     //协议表
     public HashMap<String, String> listProtocolDict() {
         return myLoad.listProtocolDict;
     }
 
-    //地域表
-    public HashMap<String, AreaDict> listAreaDict() {
-        return myLoad.listAreaDict;
+    //局点表
+    public HashMap<String, UiSysDictInfo> listDictUiSys() {
+        return myLoad.listDictUiSys;
     }
 
     /**
      * 5分钟内网络流量统计
+     *
      * @param start
      * @param end
      * @return
@@ -83,7 +87,7 @@ public class NetflowServiceImpl implements NetflowService {
     }
 
     /**
-     * 5分钟内活跃ip信息
+     * 5分钟内活跃IP信息
      *
      * @param start
      * @param end
@@ -93,15 +97,24 @@ public class NetflowServiceImpl implements NetflowService {
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
         List<IpActiveInfo> list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
         List<IpActiveInfo> result = new ArrayList<>();
-        HashMap<String, AreaDict> listAreaDict = myLoad.listAreaDict;
+        HashMap<String, UiSysDictInfo> listDictUiSys = myLoad.listDictUiSys;
         for (IpActiveInfo ipActiveInfo : list) {
             String area = ipActiveInfo.getArea();
-            if (area != null && listAreaDict != null) {
-                AreaDict dict = listAreaDict.get(area);
-                if (dict != null) {
-                    //ip对应地域表字段
-                    ipActiveInfo.setArea(dict.getAreaName());
-                    result.add(ipActiveInfo);
+            if (area != null && listDictUiSys != null) {
+                UiSysDictInfo dict = listDictUiSys.get(area);
+                //item_type=1表示地域
+                if (dict != null && dict.getItemType()==1) {
+                    if (languageChose == 2) {
+                        //英文
+                        ipActiveInfo.setArea(dict.getItemValue());
+                        result.add(ipActiveInfo);
+                    }else if(languageChose==1){
+                        ipActiveInfo.setArea(dict.getItemDesc());
+                        result.add(ipActiveInfo);
+                    }else {
+                        ipActiveInfo.setArea(dict.getItemValue());
+                        result.add(ipActiveInfo);
+                    }
                 }
             }
         }

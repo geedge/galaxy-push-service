@@ -10,9 +10,9 @@ Configuration:
     - name: log.level.galaxy
       value: debug
     - name: log.path
-      value: /opt/logs/galaxy_push
+      value: /home/mesasoft/galaxyPush/logs
     - name: project.name
-      value: galaxy_push_service
+      value: galaxy-push-service
   Appenders:
     Console:  #输出到控制台
       name: CONSOLE
@@ -26,7 +26,7 @@ Configuration:
     RollingFile: # 输出到文件，超过128MB归档
     - name: ROLLING_FILE
       ignoreExceptions: false
-      fileName: galaxy.log
+      fileName: ${log.path}/${project.name}.log
       filePattern: "${log.path}/$${date:yyyy-MM}/${project.name}-%d{yyyy-MM-dd}-%i.log.gz"
       PatternLayout:
         pattern: "%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n"

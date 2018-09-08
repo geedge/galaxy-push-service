@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nis.galaxy.web.dao.MonitorDao">
+    <select id="getMonitorOf1m01" resultType="com.nis.galaxy.domain.NmsServiceBeanTmp">
+      SELECT commit_time time,area area,total,normal,abnormal,id
+      FROM traffic_nmsserver_statistic
+      ORDER BY id DESC
+      LIMIT 1;
+    </select>
+    <select id="getMonitorOf1m02" resultType="com.nis.galaxy.domain.AbnormalBean">
+      SELECT hostname name,ip
+      FROM traffic_abnormal_machine
+      WHERE nmsServer_Id = #{nmsServiceId};
+    </select>
+
+</mapper>

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -45,8 +46,9 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAllBlockInformation/" + start, List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.global", contentValue);
-        logger.info("开始推送======>>>封堵信息整体显示5m/次 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>封堵信息整体显示\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("封堵信息整体显示\t推送返回结果"+response);
     }
 
     /**
@@ -61,8 +63,10 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getDisBlockInformation/" + start, List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.area", contentValue);
-        logger.info("开始推送======>>>封堵信息分布显示 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>封堵信息分布显示\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("封堵信息分布显示\t推送返回结果"+response);
+
     }
 
     /**
@@ -78,8 +82,10 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getDNSDeceiveInformation/" + start, List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.dns.deceive", contentValue);
-        logger.info("开始推送======>>>DNS欺骗信息显示 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>DNS欺骗信息显示\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("DNS欺骗信息显示\t推送返回结果"+response);
+
     }
 
     /**
@@ -95,8 +101,10 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/get24hAllBlockEachProtocol/" + start, List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.global.protocol.block", contentValue);
-        logger.info("开始推送======>>>24小时全国范围阻断协议信息 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>24小时全国范围阻断协议信息\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("24小时全国范围阻断协议信息\t推送返回结果"+response);
+
     }
 
     /**
@@ -112,8 +120,10 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAllHotStatistis/" + start, List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.thermodynamic", contentValue);
-        logger.info("开始推送======>>>24h全国热力图 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>24h全国热力图\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("24h全国热力图\t推送返回结果"+response);
+
     }
 
     /**
@@ -128,8 +138,10 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getPointMapOf10s", List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.realtime.point", contentValue);
-        logger.info("开始推送======>>>实时全国热力图10s 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>实时全国热力图10s\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("实时全国热力图10s\t推送返回结果"+response);
+
     }
 
     /**
@@ -145,8 +157,9 @@ public class ForBlockingInterface {
         List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getDisBlockMap/" + start, List.class);
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.thermodynamic", contentValue);
-        logger.info("开始推送======>>>热力图 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("开始推送======>>>热力图\t请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("热力图\t推送返回结果"+response);
     }
 
     /**
@@ -162,6 +175,8 @@ public class ForBlockingInterface {
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.global.protocol.config", contentValue);
         logger.info("开始推送======>>>全国协议配置信息 请求头和请求体：" + httpEntity);
-        InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH+SERVICE_PATH_BLOCKING, httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
+        logger.info("全国协议配置信息\t推送返回结果"+response);
+
     }
 }

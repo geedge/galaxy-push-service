@@ -19,8 +19,4 @@
       SELECT service_dict_id serviceDictId,item_type itemType,item_value itemValue
       FROM ui_service_dict_info;
     </select>
-    <select id="getAreaDict" resultType="com.nis.galaxy.domain.dict.AreaDict">
-       SELECT area_id areaId,area_name areaName
-       FROM area;
-    </select>
 </mapper>

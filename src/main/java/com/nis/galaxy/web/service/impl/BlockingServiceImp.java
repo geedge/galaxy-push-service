@@ -49,15 +49,30 @@ public class BlockingServiceImp implements BlockingService {
         }
         NtcTotalReport listParams = list.get(0);
         List<NtcTypeCount> listNtcTypeCount = new CopyOnWriteArrayList<>();
-        listNtcTypeCount.add(new NtcTypeCount("管控数量", listParams.getRejectNum()));
-        listNtcTypeCount.add(new NtcTypeCount("监测数量", listParams.getMonitorNum()));
-        listNtcTypeCount.add(new NtcTypeCount("网络流量数量", (listParams.getS2cByteLen() + listParams.getC2sByteLen())));
-        listNtcTypeCount.add(new NtcTypeCount("上行数量", listParams.getC2sByteLen()));
-        listNtcTypeCount.add(new NtcTypeCount("下行数量", listParams.getS2cByteLen()));
-        listNtcTypeCount.add(new NtcTypeCount("新建连接数", listParams.getNewUniConnNum()));
-        listNtcTypeCount.add(new NtcTypeCount("活跃连接数", listParams.getLiveConnNum()));
-        listNtcTypeCount.add(new NtcTypeCount("丢弃连接数", listParams.getDropConnNum()));
-        listNtcTypeCount.add(new NtcTypeCount("回流链接数", listParams.getLoopConnNum()));
+        if (languageChose == 2) {
+            listNtcTypeCount.add(new NtcTypeCount("CONTROL NUMBER", listParams.getRejectNum()));
+            listNtcTypeCount.add(new NtcTypeCount("MONITOR NUMBER", listParams.getMonitorNum()));
+            listNtcTypeCount.add(new NtcTypeCount("NETWORK WATERFLOW", (listParams.getS2cByteLen() + listParams.getC2sByteLen())));
+            listNtcTypeCount.add(new NtcTypeCount("UP BPS", listParams.getC2sByteLen()));
+            listNtcTypeCount.add(new NtcTypeCount("DOWN BPS", listParams.getS2cByteLen()));
+            listNtcTypeCount.add(new NtcTypeCount("NEW CONNECTION NUMBER", listParams.getNewUniConnNum()));
+            listNtcTypeCount.add(new NtcTypeCount("ACTIVE CONNECTIONS", listParams.getLiveConnNum()));
+            listNtcTypeCount.add(new NtcTypeCount("DISCARD CONNECTIONS", listParams.getDropConnNum()));
+            listNtcTypeCount.add(new NtcTypeCount("REFLUX LINK NUMBER", listParams.getLoopConnNum()));
+        }
+        if (languageChose == 1) {
+            listNtcTypeCount.add(new NtcTypeCount("管控数量", listParams.getRejectNum()));
+            listNtcTypeCount.add(new NtcTypeCount("监测数量", listParams.getMonitorNum()));
+            listNtcTypeCount.add(new NtcTypeCount("网络流量数量", (listParams.getS2cByteLen() + listParams.getC2sByteLen())));
+            listNtcTypeCount.add(new NtcTypeCount("上行数量", listParams.getC2sByteLen()));
+            listNtcTypeCount.add(new NtcTypeCount("下行数量", listParams.getS2cByteLen()));
+            listNtcTypeCount.add(new NtcTypeCount("新建连接数", listParams.getNewUniConnNum()));
+            listNtcTypeCount.add(new NtcTypeCount("活跃连接数", listParams.getLiveConnNum()));
+            listNtcTypeCount.add(new NtcTypeCount("丢弃连接数", listParams.getDropConnNum()));
+            listNtcTypeCount.add(new NtcTypeCount("回流链接数", listParams.getLoopConnNum()));
+        }
+
+
         return listNtcTypeCount;
     }
 
@@ -138,15 +153,21 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<NtcDisReport> getDisBlockInformation(String start, String end) {
-        List<NtcDisReport> list = blockingDao.getDisBlockInformationOnly(start, end);
+        List<NtcDisReport> list1 = blockingDao.getDisBlockInformationOnly01(start, end);
+        List<NtcDisReport> list2 = blockingDao.getDisBlockInformationOnly02(start, end);
+        //查询总结果list
+        ArrayList<NtcDisReport> list = new ArrayList<>();
+        list.addAll(list1);
+        list.addAll(list2);
+
         List<NtcDisReport> result = new ArrayList<>();
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         for (NtcDisReport ntcDisReport : list) {
             //从字典表中拿出该对象映射的相关字段
             UiSysDictInfo uiSysDictInfo = listDictUiSys.get(ntcDisReport.getArea());
-            //item_type=2表示地域
-            if (uiSysDictInfo != null && uiSysDictInfo.getItemType() == 2) {
+            //item_type=1表示地域
+            if (uiSysDictInfo != null && uiSysDictInfo.getItemType() == 1) {
                 //从业务表中拿出该对象的相关字段
                 NtcServiceDict ntcServiceDict = listNtcService.get(ntcDisReport.getType());
                 if (ntcServiceDict != null) {
@@ -261,15 +282,19 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<AreaCount> getDisBlockMap(String start, String end) {
-        List<AreaCount> list = blockingDao.getDisBlockMapOnly(start, end);
+        List<AreaCount> list1 = blockingDao.getDisBlockMapOnly01(start, end);
+        List<AreaCount> list2 = blockingDao.getDisBlockMapOnly02(start, end);
+        List<AreaCount> list = new ArrayList<>();
+        list.addAll(list1);
+        list.addAll(list2);
         ArrayList<AreaCount> result = new ArrayList<>();
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         for (AreaCount areaCount : list) {
             //查对应的局点表
             UiSysDictInfo uiSysDictInfo = listDictUiSys.get(areaCount.getArea());
             if (uiSysDictInfo != null) {
-                //2表示地域
-                if (uiSysDictInfo.getItemType() == 2) {
+                //1表示地域
+                if (uiSysDictInfo.getItemType() == 1) {
                     if (languageChose == 2) {
                         //英文
                         areaCount.setArea(uiSysDictInfo.getItemValue());

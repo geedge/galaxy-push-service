@@ -12,9 +12,7 @@ import java.util.List;
 public interface BlockingDao {
     List<NtcTotalReport> getAllBlockInformation(@Param("start") String start, @Param("end") String end);
 
-    List<NtcDisReport> getDisBlockInformationOnly(@Param("start") String start, @Param("end") String end);
 
-    List<AreaCount> getDisBlockMapOnly(@Param("start") String start, @Param("end") String end);
 
 
     List<NtcEntranceReport> getDNSDeceiveInformationOnly(@Param("start") String start, @Param("end") String end);
@@ -28,4 +26,12 @@ public interface BlockingDao {
     List<PointMap> getPointMapOf10sOnly();
 
     List<CfgTypeCount> getAllCfgInfo();
+
+    List<NtcDisReport> getDisBlockInformationOnly01(@Param("start") String start, @Param("end") String end);
+
+    List<NtcDisReport> getDisBlockInformationOnly02(@Param("start") String start, @Param("end") String end);
+
+    List<AreaCount> getDisBlockMapOnly01(@Param("start") String start, @Param("end") String end);
+
+    List<AreaCount> getDisBlockMapOnly02(@Param("start") String start, @Param("end") String end);
 }

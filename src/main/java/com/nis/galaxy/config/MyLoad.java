@@ -31,14 +31,10 @@ public class MyLoad implements CommandLineRunner {
     //协议表
     public HashMap<String, String> listProtocolDict = null;
     //标签表
-    public HashMap<String , UiTagDicInfo> listUiTagDicInfo = null;
-    //地域表的加载
-    public HashMap<String, AreaDict>  listAreaDict = null;
+    public HashMap<String, UiTagDicInfo> listUiTagDicInfo = null;
 
 
-    public HashMap<String, AreaDict> getListAreaDict() {
-        return listAreaDict;
-    }
+
 
     public HashMap<String, UiTagDicInfo> getListUiTagDicInfo() {
         return listUiTagDicInfo;
@@ -77,24 +73,16 @@ public class MyLoad implements CommandLineRunner {
         listProtocolDict = new HashMap<>();
         List<ProtocolDict> protocolDict = dictService.getProtocolDict();
         for (ProtocolDict dict : protocolDict) {
-            listProtocolDict.put(String.valueOf(dict.getViewCode()),dict.getProtocolType());
+            listProtocolDict.put(String.valueOf(dict.getViewCode()), dict.getProtocolType());
         }
         logger.info("协议字典表的预加载\t" + listProtocolDict);
 
         listUiTagDicInfo = new HashMap<>();
         List<UiTagDicInfo> uiTagDicInfo = dictService.getUiTagDicInfo();
         for (UiTagDicInfo tagDicInfo : uiTagDicInfo) {
-            listUiTagDicInfo.put(String.valueOf(tagDicInfo.getServiceDictId()),tagDicInfo);
+            listUiTagDicInfo.put(String.valueOf(tagDicInfo.getServiceDictId()), tagDicInfo);
         }
         logger.info("标签字典表的预加载\t" + listProtocolDict);
-
-        listAreaDict =new  HashMap<>();
-
-        List<AreaDict> areaDict = dictService.getAreaDict();
-        for (AreaDict dict : areaDict) {
-            listAreaDict.put(dict.getAreaId(),dict);
-        }
-        logger.info("地域字典表的预加载\t" + listProtocolDict);
 
         logger.info("初始化字典表操作执行完成");
     }

@@ -23,6 +23,14 @@ public class ForTest {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @RequestMapping(value = "/v1/blocking",method = RequestMethod.POST)
     public void acceptInterface(@RequestBody Map<String,Object> map){
-        System.out.println("接收数据\t"+map);
+        System.out.println("接收数据\n"+map);
+    }
+    @RequestMapping(value = "/v1/netflow",method = RequestMethod.POST)
+    public void net(@RequestBody Map<String,Object> map){
+        System.out.println("接收数据\n"+map);
+    }
+    @RequestMapping(value = "v1/system_monitoring",method = RequestMethod.POST)
+    public void monitor(@RequestBody Map<String,Object> map){
+        System.out.println("接收数据\n"+map);
     }
 }
