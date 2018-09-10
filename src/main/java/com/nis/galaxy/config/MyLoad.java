@@ -1,6 +1,7 @@
 package com.nis.galaxy.config;
 
 import com.nis.galaxy.domain.dict.*;
+import com.nis.galaxy.template.ForBlockingInterface;
 import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,5 +86,6 @@ public class MyLoad implements CommandLineRunner {
         logger.info("标签字典表的预加载\t" + listProtocolDict);
 
         logger.info("初始化字典表操作执行完成");
+
     }
 }

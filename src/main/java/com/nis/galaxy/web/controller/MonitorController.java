@@ -23,7 +23,7 @@ public class MonitorController {
     MonitorService monitorService;
 
     @RequestMapping(value = "/getMonitorOf1m", method = RequestMethod.GET)
-    public List<NmsServerBean> getNetflowStatistic5m() {
+    public List<NmsServerBean> getMonitorOf1m() {
         return monitorService.getMonitorOf1m();
     }
 

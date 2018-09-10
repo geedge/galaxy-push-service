@@ -11,24 +11,14 @@
         where report_time between #{start} and #{end}
     </select>
 
-    <!--封堵信息分布显示_____映射1-->
-    <select id="getDisBlockInformationOnly01" resultType="com.nis.galaxy.domain.NtcDisReport">
+    <!--封堵信息分布显示_____映射-->
+    <select id="getDisBlockInformationOnly" resultType="com.nis.galaxy.domain.NtcDisReport">
       	SELECT #{end} time,entrance_id area,service type,SUM(sum) count
       	FROM ntc_entrance_report
       	  WHERE report_time BETWEEN #{start} AND #{end}
-	          AND  service in (16,17,18,19,20,21,22,23,24,26,27,30,31,33,34,35,36,64,65)
+	          AND  service between #{a} and #{b}
 	    GROUP BY entrance_id,service;
     </select>
-    <!--封堵信息分布显示_____映射2-->
-    <select id="getDisBlockInformationOnly02" resultType="com.nis.galaxy.domain.NtcDisReport">
-      	SELECT #{end} time,entrance_id area,service type,SUM(sum) count
-      	FROM ntc_entrance_report
-      	  WHERE report_time BETWEEN #{start} AND #{end}
-	          AND  service in (256,257,258,259,260,267,261,262,263,264,265,266,
-            512,513,521,528,544,560,576)
-	    GROUP BY entrance_id,service;
-    </select>
-
     <!--DNS欺骗信息显示 5min/条、粒度5min______映射局点表-->
     <select id="getDNSDeceiveInformationOnly" resultType="com.nis.galaxy.domain.NtcEntranceReport">
         SELECT entrance_id type,sum(sum) count
@@ -61,22 +51,12 @@
         LIMIT 100;
     </select>
 
-
-    <!--热力图接口 5min/次 粒度5min_____映射1 -->
-    <select id="getDisBlockMapOnly01" resultType="com.nis.galaxy.domain.AreaCount">
+    <!--热力图接口 5min/次 粒度5min_____映射 -->
+    <select id="getDisBlockMapOnly" resultType="com.nis.galaxy.domain.AreaCount">
        SELECT #{end} time, entrance_id area,sum(sum) count
        FROM ntc_entrance_report a
          WHERE  a.report_time between #{start} and #{end}
-            AND service in (16,17,18,19,20,21,22,23,24,26,27,30,31,33,34,35,36,64,65)
-        GROUP BY entrance_id;
-    </select>
-    <!--热力图接口 5min/次 粒度5min_____映射2 -->
-    <select id="getDisBlockMapOnly02" resultType="com.nis.galaxy.domain.AreaCount">
-       SELECT #{end} time, entrance_id area,sum(sum) count
-       FROM ntc_entrance_report a
-         WHERE  a.report_time between #{start} and #{end}
-            AND service in ( 256,257,258,259,260,267,261,262,263,264,265,266,
-            512,513,521,528,544,560,576)
+            AND service between #{a} and #{b}
         GROUP BY entrance_id;
     </select>
 
@@ -88,13 +68,4 @@
       GROUP BY service_id
       ORDER BY count desc;
     </select>
-    <!--留存 全国协议配置信息_________做映射用-->
-    <select id="getAllCfgInfo" resultType="com.nis.galaxy.domain.CfgTypeCount">
-        SELECT cfg_type type,count(cfg_state) count
-          FROM ui_cfg_num_statistics
-          WHERE cfg_state=1
-          GROUP  BY cfg_type
-          ORDER BY count desc ;
-    </select>
-
 </mapper>

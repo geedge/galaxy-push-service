@@ -4,6 +4,7 @@ import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.NtcServiceDict;
 import com.nis.galaxy.domain.dict.UiSysDictInfo;
+import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.BlockingDao;
 import com.nis.galaxy.web.service.BlockingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,11 @@ public class BlockingServiceImp implements BlockingService {
     BlockingDao blockingDao;
     @Autowired
     MyLoad myLoad;
+    //业务类型：0x10-0x41、0x100-0x10A、0x200-0x240
+    private int a = 16, b = 65;
+    private int c = 256, d = 266;
+    private int e = 512, f = 576;
+
 
     //局点表
     public HashMap<String, UiSysDictInfo> listDictUiSys() {
@@ -71,8 +77,10 @@ public class BlockingServiceImp implements BlockingService {
             listNtcTypeCount.add(new NtcTypeCount("丢弃连接数", listParams.getDropConnNum()));
             listNtcTypeCount.add(new NtcTypeCount("回流链接数", listParams.getLoopConnNum()));
         }
-
-
+        //若查询结果为空，查询上时间段的数据
+        if(listNtcTypeCount.size()==0){
+            return getAllBlockInformation(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         return listNtcTypeCount;
     }
 
@@ -103,6 +111,10 @@ public class BlockingServiceImp implements BlockingService {
                     result.add(ntcEntranceReport);
                 }
             }
+        }
+        //如果此次没有查询到数据查上一个5min的数据
+        if(result.size()==0){
+            return getDNSDeceiveInformation(DateUtils.getBeforeNminOfTime(start,-5), DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }
@@ -141,6 +153,10 @@ public class BlockingServiceImp implements BlockingService {
                 }
             }
         }
+        //若查询结果为空，查询上时间段的数据
+        if(result.size()==0){
+            return get24hAllBlockEachProtocol(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5));
+        }
         return result;
     }
 
@@ -153,42 +169,50 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<NtcDisReport> getDisBlockInformation(String start, String end) {
-        List<NtcDisReport> list1 = blockingDao.getDisBlockInformationOnly01(start, end);
-        List<NtcDisReport> list2 = blockingDao.getDisBlockInformationOnly02(start, end);
-        //查询总结果list
-        ArrayList<NtcDisReport> list = new ArrayList<>();
+        List<NtcDisReport> list1 = blockingDao.getDisBlockInformationOnly(start, end, a, b);
+        List<NtcDisReport> list2 = blockingDao.getDisBlockInformationOnly(start, end, c, d);
+        List<NtcDisReport> list3 = blockingDao.getDisBlockInformationOnly(start, end, e, f);
+        List<NtcDisReport> list = new ArrayList<>();
         list.addAll(list1);
         list.addAll(list2);
-
+        list.addAll(list3);
         List<NtcDisReport> result = new ArrayList<>();
+        //业务表
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
+        //局点表
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         for (NtcDisReport ntcDisReport : list) {
             //从字典表中拿出该对象映射的相关字段
             UiSysDictInfo uiSysDictInfo = listDictUiSys.get(ntcDisReport.getArea());
-            //item_type=1表示地域
-            if (uiSysDictInfo != null && uiSysDictInfo.getItemType() == 1) {
-                //从业务表中拿出该对象的相关字段
-                NtcServiceDict ntcServiceDict = listNtcService.get(ntcDisReport.getType());
-                if (ntcServiceDict != null) {
-                    if (languageChose == 2) {
-                        //设置type和area为英文名称字段
-                        ntcDisReport.setArea(uiSysDictInfo.getItemValue());
-                        ntcDisReport.setType(ntcServiceDict.getServiceNameEn());
-                        result.add(ntcDisReport);
-                    } else if (languageChose == 1) {
-                        //中文
-                        ntcDisReport.setArea(uiSysDictInfo.getItemDesc());
-                        ntcDisReport.setType(ntcServiceDict.getServiceNameZh());
-                        result.add(ntcDisReport);
-                    } else {
-                        //俄文
-                        ntcDisReport.setArea(uiSysDictInfo.getItemValue());
-                        ntcDisReport.setType(ntcServiceDict.getServiceNameRu());
-                        result.add(ntcDisReport);
+            if(uiSysDictInfo!=null){
+                //item_type=1表示地域
+                if (uiSysDictInfo != null && uiSysDictInfo.getItemType() == 1) {
+                    //从业务表中拿出该对象的相关字段
+                    NtcServiceDict ntcServiceDict = listNtcService.get(ntcDisReport.getType());
+                    if (ntcServiceDict != null) {
+                        if (languageChose == 2) {
+                            //设置type和area为英文名称字段
+                            ntcDisReport.setArea(uiSysDictInfo.getItemValue());
+                            ntcDisReport.setType(ntcServiceDict.getServiceNameEn());
+                            result.add(ntcDisReport);
+                        } else if (languageChose == 1) {
+                            //中文
+                            ntcDisReport.setArea(uiSysDictInfo.getItemDesc());
+                            ntcDisReport.setType(ntcServiceDict.getServiceNameZh());
+                            result.add(ntcDisReport);
+                        } else {
+                            //俄文
+                            ntcDisReport.setArea(uiSysDictInfo.getItemValue());
+                            ntcDisReport.setType(ntcServiceDict.getServiceNameRu());
+                            result.add(ntcDisReport);
+                        }
                     }
                 }
             }
+        }
+        //若查询结果为空，查询上时间段的数据
+        if(result.size()==0){
+            return getDisBlockInformation(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }
@@ -212,6 +236,7 @@ public class BlockingServiceImp implements BlockingService {
                 NtcServiceDict ntcServiceDict = listNtcService.get(type);
                 UiSysDictInfo uiSysDictInfo = listDictUiSys.get(area);
                 if (uiSysDictInfo != null && ntcServiceDict != null) {
+                    //item=2是运营商
                     int itemType = uiSysDictInfo.getItemType();
                     if (itemType == 2) {
                         if (languageChose == 2) {
@@ -234,6 +259,10 @@ public class BlockingServiceImp implements BlockingService {
                     }
                 }
             }
+        }
+        //如果此次没有查询到数据查上一个5min的数据
+        if(result.size()==0){
+            return getAllHotStatistis(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
 
@@ -282,12 +311,16 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<AreaCount> getDisBlockMap(String start, String end) {
-        List<AreaCount> list1 = blockingDao.getDisBlockMapOnly01(start, end);
-        List<AreaCount> list2 = blockingDao.getDisBlockMapOnly02(start, end);
-        List<AreaCount> list = new ArrayList<>();
+        List<AreaCount> list1 = blockingDao.getDisBlockMapOnly(start, end, a, b);
+        List<AreaCount> list2 = blockingDao.getDisBlockMapOnly(start, end, c, d);
+        List<AreaCount> list3 = blockingDao.getDisBlockMapOnly(start, end, e, f);
+        ArrayList<AreaCount> list = new ArrayList<>();
         list.addAll(list1);
         list.addAll(list2);
+        list.addAll(list3);
+
         ArrayList<AreaCount> result = new ArrayList<>();
+        //局点表
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         for (AreaCount areaCount : list) {
             //查对应的局点表
@@ -309,6 +342,10 @@ public class BlockingServiceImp implements BlockingService {
                     }
                 }
             }
+        }
+        //如果此次没有查询到数据查上一个5min的数据
+        if(result.size()==0){
+            return getDisBlockMap(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }
@@ -342,6 +379,5 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         return result;
-        //return blockingDao.getAllCfgInfo();
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -60,6 +61,9 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
+        if(result.size()==0){
+            return getNetflowStatistic5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         return result;
     }
 
@@ -82,6 +86,9 @@ public class NetflowServiceImpl implements NetflowService {
                 netflowProtocol.setType(listProtocolDict.get(type));
                 result.add(netflowProtocol);
             }
+        }
+        if(result.size()==0){
+            return getProtocolStatisticOf1h(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }
@@ -117,6 +124,9 @@ public class NetflowServiceImpl implements NetflowService {
                     }
                 }
             }
+        }
+        if(result.size()==0){
+            return getIpActiveInfoOf5min(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }

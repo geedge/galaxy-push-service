@@ -89,6 +89,19 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
          return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
     }
+    /**
+     * 获取距离time时间minute分钟的时间,之前需加符号-、之后为正+
+     * @param time
+     * @param minute
+     * @return
+     */
+    public static String getBeforeNminOfTime(String time,int minute) {
+         Date date = DateUtils.parseDate(time);
+         GregorianCalendar gc = new GregorianCalendar();
+         gc.setTime(date);
+         gc.add(Calendar.MINUTE, minute);
+         return DateUtils.formatDateTime(gc.getTime());
+    }
 
     /**
      * time after 5min
@@ -102,7 +115,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
        gc.setTime(date);
        gc.add(Calendar.DATE, 1);
        return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-12-01 00:00:00";
+       // return "2018-12-01 00:00:00";
     }
 
     /**

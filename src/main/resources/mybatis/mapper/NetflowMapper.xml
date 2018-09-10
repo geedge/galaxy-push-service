@@ -24,12 +24,4 @@
         FROM traffic_ip_active_statistic
         where stat_time between #{start} and #{end};
     </select>
-    <!--留存__有ip数量___5分钟内活跃IP信息 5min __映射-->
-    <select id="getIpActiveInfoOf5min" resultType="com.nis.galaxy.domain.IpActiveInfoCount">
-       SELECT  #{end} time,ip_addr ip,count(ip_addr) count,area_id area,max(link_num) links,sum(c2s_pkt_num)+sum(s2c_pkt_num) packets,
-        sum(c2s_byte_len)+sum(s2c_byte_len) bytes
-        FROM traffic_ip_active_statistic
-        WHERE stat_time BETWEEN #{start} AND #{end}
-	    GROUP BY ip_addr,area_id
-    </select>
 </mapper>

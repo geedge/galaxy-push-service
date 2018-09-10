@@ -54,6 +54,9 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 }
             }
         }
+        if(result.size()==0){
+            return getIpActiveStatisticOf5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         return result;
 
      }

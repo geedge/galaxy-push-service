@@ -36,7 +36,6 @@ public class ForBlockingTopNInterface {
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
     public void getAreaBlockTop10ProtocolOf24h() {
-        System.out.println(restTemplate);
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable) ) {
             return;
         }

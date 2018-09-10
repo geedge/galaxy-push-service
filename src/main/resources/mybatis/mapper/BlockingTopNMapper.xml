@@ -10,7 +10,6 @@
        SELECT #{end} time,entrance_id area,service type,sum(sum) count
         FROM ntc_entrance_report
        WHERE report_time between  #{start} AND #{end}
-        AND entrance_id in (#{area1EntranceId},#{area2EntranceId})
 		GROUP BY service , entrance_id
 		ORDER BY count desc
 		LIMIT 10;
@@ -21,7 +20,6 @@
       SELECT  #{end} time,entrance_id area,service type,sum(sum) count
           FROM ntc_entrance_stat_daily
       WHERE report_time between  #{start} AND #{end}
-        AND entrance_id in ( #{area1EntranceId},#{area2EntranceId})
 	  GROUP BY service ,entrance_id
 	  ORDER BY count desc
 	  LIMIT 10;

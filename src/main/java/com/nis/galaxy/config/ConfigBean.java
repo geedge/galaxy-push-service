@@ -10,6 +10,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -20,6 +21,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class ConfigBean {
+
+    @Value("${RestTemplate.MaxTotal}")
+    private int MaxTotal;
+    @Value("${RestTemplate.DefaultMaxPerRoute}")
+    private int DefaultMaxPerRoute;
 
     @Bean
     public ClientHttpRequestFactory httpRequestFactory() {
@@ -39,9 +45,9 @@ public class ConfigBean {
                 .build();
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(registry);
         //连接池最大连接数
-        connectionManager.setMaxTotal(10);
+        connectionManager.setMaxTotal(MaxTotal);
         //每个主机的并发
-        connectionManager.setDefaultMaxPerRoute(10);
+        connectionManager.setDefaultMaxPerRoute(DefaultMaxPerRoute);
 
         RequestConfig requestConfig = RequestConfig.custom()
                 .setSocketTimeout(8000)
