@@ -25,7 +25,8 @@ public class BlockingController {
     @RequestMapping(value = "/getAllBlockInformation/{start}",method = RequestMethod.GET)
     public List<NtcTypeCount> getAllBlockInformation(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingService.getAllBlockInformation(start,end);
+        int times = 1;
+        return blockingService.getAllBlockInformation(start,end,times);
     }
 
     /**
@@ -35,7 +36,8 @@ public class BlockingController {
     @RequestMapping(value = "/getDisBlockInformation/{start}",method = RequestMethod.GET)
     public List<NtcDisReport> getDisBlockInformation(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingService.getDisBlockInformation(start,end);
+        int times=1;
+        return blockingService.getDisBlockInformation(start,end,times);
     }
 
 
@@ -46,7 +48,8 @@ public class BlockingController {
     @RequestMapping(value = "/getDNSDeceiveInformation/{start}",method = RequestMethod.GET)
     public List<NtcEntranceReport> getDNSDeceiveInformation(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingService.getDNSDeceiveInformation(start,end);
+        int times =1;
+        return blockingService.getDNSDeceiveInformation(start,end,times);
     }
 
     /**
@@ -56,7 +59,8 @@ public class BlockingController {
     @RequestMapping(value = "/get24hAllBlockEachProtocol/{start}",method = RequestMethod.GET)
     public List<TimeTypeCount > get24hAllBlockEachProtocol(@PathVariable("start")String  start){
         String end = DateUtils.getAfter5min(start);
-        return blockingService.get24hAllBlockEachProtocol(start,end);
+        int times =1;
+        return blockingService.get24hAllBlockEachProtocol(start,end,times);
     }/**
      /**
      * 24h全国热力图 5min
@@ -65,7 +69,8 @@ public class BlockingController {
     @RequestMapping(value = "/getAllHotStatistis/{start}",method = RequestMethod.GET)
     public List<HotStatistic > getAllHotStatistis(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingService.getAllHotStatistis(start,end);
+        int times =1;
+        return blockingService.getAllHotStatistis(start,end,times);
 
     }
 
@@ -82,7 +87,8 @@ public class BlockingController {
     @RequestMapping(value = "/getDisBlockMap/{start}", method = RequestMethod.GET)
     public List<AreaCount> getDisBlockMap(@PathVariable("start") String start) {
         String end = DateUtils.getAfter5min(start);
-        List<AreaCount> disBlockMap = blockingService.getDisBlockMap(start, end);
+        int times= 1;
+        List<AreaCount> disBlockMap = blockingService.getDisBlockMap(start, end,times);
         return disBlockMap;
     }
     /**

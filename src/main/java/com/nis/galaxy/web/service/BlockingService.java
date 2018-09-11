@@ -10,19 +10,19 @@ import org.springframework.ui.ModelMap;
 
 public interface BlockingService {
 
-    List getAllBlockInformation(String start,String end);
+    List getAllBlockInformation(String start,String end,int times);
 
-    List<NtcEntranceReport> getDNSDeceiveInformation(String start,String end);
+    List<NtcEntranceReport> getDNSDeceiveInformation(String start,String end,int times);
 
-    List<TimeTypeCount > get24hAllBlockEachProtocol(String start,String end);
+    List<TimeTypeCount > get24hAllBlockEachProtocol(String start,String end,int times);
 
-    List<NtcDisReport> getDisBlockInformation(String start,String end);
+    List<NtcDisReport> getDisBlockInformation(String start,String end,int times);
 
-    List<HotStatistic> getAllHotStatistis(String start,String end);
+    List<HotStatistic> getAllHotStatistis(String start,String end,int times);
 
     List<PointMap> getPointMapOf10s();
 
-    List<AreaCount> getDisBlockMap(String start,String end);
+    List<AreaCount> getDisBlockMap(String start,String end,int times);
 
     List<CfgTypeCount> getAllCfgInfo();
 }

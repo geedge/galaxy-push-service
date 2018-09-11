@@ -27,8 +27,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
-
-
+    private int max = 3;
 
     //局点表
     public HashMap<String, UiSysDictInfo> listDictUiSys() {
@@ -37,42 +36,49 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
 
     /**
      * 5分钟内活跃IP流量TOP10
+     *
      * @param start
      * @param end
      * @return
      */
     @Override
-    public List<IpActiveInt> getIpActiveStatisticOf5m(String start,String end) {
+    public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end, int times) {
+        List<IpActiveInt> result = new ArrayList<>();
+        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         List<IpActiveInt> list = null;
-        try{
-        list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
-        }catch (Exception e){
+        try {
+            list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
+        } catch (Exception e) {
             e.printStackTrace();
             logger.info("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl");
         }
-        if(list==null || list.size()==0){
-            getIpActiveStatisticOf5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        if (list == null || list.size() == 0) {
+            if (times >= max) {
+                return null;
+            }
+            getIpActiveStatisticOf5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
-        List<IpActiveInt> result = new ArrayList<>();
-        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
-        for (IpActiveInt ipActiveInt : list) {
-            String area = ipActiveInt.getArea();
-            if(area!=null && listDictUiSys!=null){
-                UiSysDictInfo dict = listDictUiSys.get(area);
-                if(dict!=null && dict.getItemType()==1){
-                    if(languageChose==2){
-                        ipActiveInt.setArea(dict.getItemValue());
-                        result.add(ipActiveInt);
-                    }else if(languageChose==1){
-                        ipActiveInt.setArea(dict.getItemDesc());
-                        result.add(ipActiveInt);
-                    }else{
-                        ipActiveInt.setArea(dict.getItemDesc());
-                        result.add(ipActiveInt);
+        if (list != null && list.size() != 0) {
+            for (IpActiveInt ipActiveInt : list) {
+                String area = ipActiveInt.getArea();
+                if (area != null && listDictUiSys != null) {
+                    UiSysDictInfo dict = listDictUiSys.get(area);
+                    if (dict != null && dict.getItemType() == 1) {
+                        if (languageChose == 2) {
+                            ipActiveInt.setArea(dict.getItemValue());
+                            result.add(ipActiveInt);
+                        } else if (languageChose == 1) {
+                            ipActiveInt.setArea(dict.getItemDesc());
+                            result.add(ipActiveInt);
+                        } else {
+                            ipActiveInt.setArea(dict.getItemDesc());
+                            result.add(ipActiveInt);
+                        }
                     }
                 }
             }
+
         }
         return result;
-     }
+    }
 }

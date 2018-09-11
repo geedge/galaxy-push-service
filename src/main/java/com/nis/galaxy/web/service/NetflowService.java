@@ -8,9 +8,9 @@ import com.nis.galaxy.domain.TimeTypeCount;
 import java.util.List;
 
 public interface NetflowService {
-    List<TimeTypeCount> getNetflowStatistic5m(String start,String end);
+    List<TimeTypeCount> getNetflowStatistic5m(String start,String end,int times);
 
-    List<NetflowProtocol> getProtocolStatisticOf1h(String start,String end);
+    List<NetflowProtocol> getProtocolStatisticOf1h(String start,String end,int times);
 
-    List<IpActiveInfo> getIpActiveInfoOf5min(String start,String end);
+    List<IpActiveInfo> getIpActiveInfoOf5min(String start,String end,int times);
 }

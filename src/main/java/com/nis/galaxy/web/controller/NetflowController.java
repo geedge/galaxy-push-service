@@ -29,7 +29,8 @@ public class NetflowController {
     @RequestMapping(value = "/getNetflowStatistic5m/{start}", method = RequestMethod.GET)
     public List<TimeTypeCount> getNetflowStatistic5m(@PathVariable("start") String start) {
         String end = DateUtils.getAfter5min(start);
-        return netflowService.getNetflowStatistic5m(start,end);
+        int times =1;
+        return netflowService.getNetflowStatistic5m(start,end,times);
     }
 
     /**
@@ -40,7 +41,8 @@ public class NetflowController {
     @RequestMapping(value = "/getProtocolStatisticOf1h/{start}", method = RequestMethod.GET)
     public List<NetflowProtocol> getProtocolStatisticOf1h(@PathVariable("start") String start) {
         String end = DateUtils.getAfter5min(start);
-        return netflowService.getProtocolStatisticOf1h(start,end);
+        int times =1;
+        return netflowService.getProtocolStatisticOf1h(start,end,times);
     }
     /**
      * 5分钟内活跃IP信息
@@ -48,7 +50,8 @@ public class NetflowController {
     @RequestMapping(value = "/getIpActiveInfoOf5min/{start}", method = RequestMethod.GET)
     public List<IpActiveInfo> getIpActiveInfoOf5min(@PathVariable("start") String start) {
         String end = DateUtils.getAfter5min(start);
-        return netflowService.getIpActiveInfoOf5min(start,end);
+        int times =1;
+        return netflowService.getIpActiveInfoOf5min(start,end,times);
     }
 
 }

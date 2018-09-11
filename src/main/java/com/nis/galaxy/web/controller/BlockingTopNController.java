@@ -25,7 +25,8 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getBlockTop10URLOf1h/{start}",method = RequestMethod.GET)
     public List<NtcRejectUrlStatistic> getBlockTop10URLOf1h(@PathVariable("start") String start){
         String end = DateUtils.getAfter1h(start);
-        return blockingTopNService.getBlockTop10URLOf1h(start,end);
+        int times =1;
+        return blockingTopNService.getBlockTop10URLOf1h(start,end,times);
     }
 
     /**
@@ -35,7 +36,8 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getBlockTop10WebsiteOf1h/{start}",method = RequestMethod.GET)
     public List<NtcRejectWebsiteStatistic> getBlockTop10WebsiteOf1h(@PathVariable("start") String start){
         String end = DateUtils.getAfter1h(start);
-        return blockingTopNService.getBlockTop10WebsiteOf1h(start,end);
+        int times =1;
+        return blockingTopNService.getBlockTop10WebsiteOf1h(start,end,times);
     }
 
     /**
@@ -45,7 +47,8 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getBlockTop10Tag24h/{start}",method = RequestMethod.GET)
     public List<NtcTagReport> getBlockTop10Tag24h(@PathVariable("start") String start){
         String end = DateUtils.getAfter1h(start);
-        return blockingTopNService.getBlockTop10Tag24h(start,end);
+        int times =1;
+        return blockingTopNService.getBlockTop10Tag24h(start,end,times);
     } /**
      * 5min内封堵标签TOP10
      * @return
@@ -53,7 +56,8 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getBlockTop10Tag5m/{start}",method = RequestMethod.GET)
     public List<NtcTagReport> getBlockTop10Tag5m(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingTopNService.getBlockTop10Tag5m(start,end);
+        int times =1;
+        return blockingTopNService.getBlockTop10Tag5m(start,end,times);
     }
 
     /**
@@ -63,7 +67,8 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getAreaBlockTop10ProtocolOf24h/{start}",method = RequestMethod.GET)
     public List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24(@PathVariable("start") String start){
         String end = DateUtils.getAfter24h(start);
-        return blockingTopNService.getAreaBlockTop10ProtocolOf24(start,end);
+        int times =1;
+        return blockingTopNService.getAreaBlockTop10ProtocolOf24(start,end,times);
     }
 
     /**
@@ -73,7 +78,8 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getBlockTop10URLOf5m/{start}",method = RequestMethod.GET)
     public List<NtcUrlIpCount> getBlockTop10URLOf5m(@PathVariable("start")String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingTopNService.getBlockTop10URLOf5m(start,end);
+        int times =1;
+        return blockingTopNService.getBlockTop10URLOf5m(start,end,times);
     }
     /**
      * 5分钟内全国阻断website TOP10
@@ -82,8 +88,7 @@ public class BlockingTopNController {
     @RequestMapping(value = "/getBlockTop10WebsiteOf5m/{start}",method = RequestMethod.GET)
     public List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return blockingTopNService.getBlockTop10WebsiteOf5m(start,end);
+        int times=1;
+        return blockingTopNService.getBlockTop10WebsiteOf5m(start,end,times);
     }
-
-
 }

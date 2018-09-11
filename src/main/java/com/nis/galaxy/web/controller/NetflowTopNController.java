@@ -19,6 +19,7 @@ public class NetflowTopNController {
     @RequestMapping(value = "/getIpActiveStatisticOf5m/{start}")
     public List<IpActiveInt> get(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
-        return netflowTopNService.getIpActiveStatisticOf5m(start,end);
+        int times =1;
+        return netflowTopNService.getIpActiveStatisticOf5m(start,end,times);
     }
 }

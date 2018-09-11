@@ -32,6 +32,8 @@ public class NetflowServiceImpl implements NetflowService {
     @Value("${Language.Chose}")
     private int languageChose;
 
+    private int max = 3;
+
     //协议表
     public HashMap<String, String> listProtocolDict() {
         return myLoad.listProtocolDict;
@@ -50,27 +52,33 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<TimeTypeCount> getNetflowStatistic5m(String start, String end) {
-        List<TimeTypeCount> list =null;
-        try{
-        list = netflowDao.getNetflowStatistic5mOnly(start, end);
-        }catch (Exception e){
+    public List<TimeTypeCount> getNetflowStatistic5m(String start, String end, int times) {
+        List<TimeTypeCount> result = new ArrayList<>();
+        HashMap<String, String> listProtocolDict = listProtocolDict();
+        List<TimeTypeCount> list = null;
+        try {
+            list = netflowDao.getNetflowStatistic5mOnly(start, end);
+        } catch (Exception e) {
             e.printStackTrace();
             logger.info("5分钟内网络流量统计\t查询异常\tserviceImpl");
         }
-        if(list==null || list.size()==0){
-            getNetflowStatistic5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        if (list == null || list.size() == 0) {
+            if (times >= max) {
+                return null;
+            }
+            return getNetflowStatistic5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
-        List<TimeTypeCount> result = new ArrayList<>();
-        HashMap<String, String> listProtocolDict = listProtocolDict();
-        for (TimeTypeCount timeTypeCount : list) {
-            String type = timeTypeCount.getType();
-            if (type != null && listProtocolDict != null) {
-                String s = listProtocolDict.get(type);
-                if (s != null) {
-                    //协议类型字典表
-                    timeTypeCount.setType(s);
-                    result.add(timeTypeCount);
+        if (list != null && list.size() != 0) {
+
+            for (TimeTypeCount timeTypeCount : list) {
+                String type = timeTypeCount.getType();
+                if (type != null && listProtocolDict != null) {
+                    String s = listProtocolDict.get(type);
+                    if (s != null) {
+                        //协议类型字典表
+                        timeTypeCount.setType(s);
+                        result.add(timeTypeCount);
+                    }
                 }
             }
         }
@@ -85,25 +93,29 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end) {
+    public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end,int times) {
+        List<NetflowProtocol> result = new ArrayList<>();
+        HashMap<String, String> listProtocolDict = listProtocolDict();
         List<NetflowProtocol> list = null;
-        try{
-        list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
-        }catch (Exception e){
+        try {
+            list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
+        } catch (Exception e) {
             e.printStackTrace();
             logger.info("1小时内网络协议统计\t查询异常\tserviceImpl");
         }
-        if(list==null || list.size()==0){
-            getProtocolStatisticOf1h(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        if (list == null || list.size() == 0) {
+            if(times>=max){
+            return getProtocolStatisticOf1h(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5),++times);
+            }
         }
-        HashMap<String, String> listProtocolDict = listProtocolDict();
-        List<NetflowProtocol> result = new ArrayList<>();
-        for (NetflowProtocol netflowProtocol : list) {
-            String type = netflowProtocol.getType();
-            if (type != null && listProtocolDict != null) {
-                //与协议类型的字典对应
-                netflowProtocol.setType(listProtocolDict.get(type));
-                result.add(netflowProtocol);
+        if(list!=null && list.size()!=0){
+            for (NetflowProtocol netflowProtocol : list) {
+                String type = netflowProtocol.getType();
+                if (type != null && listProtocolDict != null) {
+                    //与协议类型的字典对应
+                    netflowProtocol.setType(listProtocolDict.get(type));
+                    result.add(netflowProtocol);
+                }
             }
         }
         return result;
@@ -117,36 +129,41 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
+    public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end,int times) {
+        List<IpActiveInfo> result = new ArrayList<>();
+        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         List<IpActiveInfo> list = null;
-        try{
-        list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
+        try {
+            list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             logger.info("5分钟内活跃IP信息\t查询异常\tserviceImpl");
         }
-        if(list==null || list.size()==0){
-            getIpActiveInfoOf5min(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        if (list == null || list.size() == 0) {
+            if(times>=max){
+                return null;
+            }
+            return getIpActiveInfoOf5min(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5),++times);
         }
-        List<IpActiveInfo> result = new ArrayList<>();
-        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
-        for (IpActiveInfo ipActiveInfo : list) {
-            String area = ipActiveInfo.getArea();
-            if (area != null && listDictUiSys != null) {
-                UiSysDictInfo dict = listDictUiSys.get(area);
-                //item_type=1表示地域
-                if (dict != null && dict.getItemType()==1) {
-                    if (languageChose == 2) {
-                        //英文
-                        ipActiveInfo.setArea(dict.getItemValue());
-                        result.add(ipActiveInfo);
-                    }else if(languageChose==1){
-                        ipActiveInfo.setArea(dict.getItemDesc());
-                        result.add(ipActiveInfo);
-                    }else {
-                        ipActiveInfo.setArea(dict.getItemValue());
-                        result.add(ipActiveInfo);
+        if(list !=null && list.size()!=0){
+            for (IpActiveInfo ipActiveInfo : list) {
+                String area = ipActiveInfo.getArea();
+                if (area != null && listDictUiSys != null) {
+                    UiSysDictInfo dict = listDictUiSys.get(area);
+                    //item_type=1表示地域
+                    if (dict != null && dict.getItemType() == 1) {
+                        if (languageChose == 2) {
+                            //英文
+                            ipActiveInfo.setArea(dict.getItemValue());
+                            result.add(ipActiveInfo);
+                        } else if (languageChose == 1) {
+                            ipActiveInfo.setArea(dict.getItemDesc());
+                            result.add(ipActiveInfo);
+                        } else {
+                            ipActiveInfo.setArea(dict.getItemValue());
+                            result.add(ipActiveInfo);
+                        }
                     }
                 }
             }
