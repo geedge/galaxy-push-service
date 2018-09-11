@@ -41,11 +41,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeTimeOf5min30s() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.MINUTE, -5);
-        gc.add(Calendar.SECOND, -30);
-        return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-01-01 00:00:00";
+        //GregorianCalendar gc = new GregorianCalendar();
+        //gc.add(Calendar.MINUTE, -5);
+        //gc.add(Calendar.SECOND, -30);
+        //return DateUtils.formatDateTime(gc.getTime());
+        return "2018-01-01 00:00:00";
 
     }
 
@@ -55,11 +55,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeTimeOf1h30s() {
-       GregorianCalendar gc = new GregorianCalendar();
-       gc.add(Calendar.HOUR, -1);
-       gc.add(Calendar.SECOND, -30);
-       return DateUtils.formatDateTime(gc.getTime());
-       //return "2018-01-01 00:00:00";
+       //GregorianCalendar gc = new GregorianCalendar();
+       //gc.add(Calendar.HOUR, -1);
+       //gc.add(Calendar.SECOND, -30);
+       //return DateUtils.formatDateTime(gc.getTime());
+       return "2018-01-01 00:00:00";
     }
 
     /**
@@ -68,26 +68,26 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeTimeOf24h30s() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.DATE, -1);
-        gc.add(Calendar.SECOND, -30);
-        return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-01-01 00:00:00";
+        //GregorianCalendar gc = new GregorianCalendar();
+        //gc.add(Calendar.DATE, -1);
+        //gc.add(Calendar.SECOND, -30);
+        //return DateUtils.formatDateTime(gc.getTime());
+        return "2018-01-01 00:00:00";
     }
 
     /**
-     * time after 5min
+     * 距time 5min之后
      *
      * @param time
      * @return
      */
     public static String getAfter5min(String time) {
-         Date date = DateUtils.parseDate(time);
-         GregorianCalendar gc = new GregorianCalendar();
-         gc.setTime(date);
-         gc.add(Calendar.MINUTE, 5);
-         return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-12-01 00:00:00";
+        //Date date = DateUtils.parseDate(time);
+        //GregorianCalendar gc = new GregorianCalendar();
+        //gc.setTime(date);
+        //gc.add(Calendar.MINUTE, 5);
+        //return DateUtils.formatDateTime(gc.getTime());
+        return "2018-12-01 00:00:00";
     }
     /**
      * 获取距离time时间minute分钟的时间,之前需加符号-、之后为正+
@@ -104,33 +104,33 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * time after 5min
+     * 距time 24h之后
      *
      * @param time
      * @return
      */
     public static String getAfter24h(String time) {
-       Date date = DateUtils.parseDate(time);
-       GregorianCalendar gc = new GregorianCalendar();
-       gc.setTime(date);
-       gc.add(Calendar.DATE, 1);
-       return DateUtils.formatDateTime(gc.getTime());
-       // return "2018-12-01 00:00:00";
+       //Date date = DateUtils.parseDate(time);
+       //GregorianCalendar gc = new GregorianCalendar();
+       //gc.setTime(date);
+       //gc.add(Calendar.DATE, 1);
+       //return DateUtils.formatDateTime(gc.getTime());
+        return "2018-12-01 00:00:00";
     }
 
     /**
-     * 1小时之后的时间
+     * 距time 1小时之后的时间
      *
      * @param time
      * @return
      */
     public static String getAfter1h(String time) {
-        Date date = DateUtils.parseDate(time);
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(date);
-        gc.add(Calendar.HOUR, 1);
-        return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-12-01 00:00:00";
+       // Date date = DateUtils.parseDate(time);
+       // GregorianCalendar gc = new GregorianCalendar();
+       // gc.setTime(date);
+       // gc.add(Calendar.HOUR, 1);
+       // return DateUtils.formatDateTime(gc.getTime());
+        return "2018-12-01 00:00:00";
     }
 
 

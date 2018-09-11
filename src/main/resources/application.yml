@@ -11,4 +11,4 @@ spring:
     url: jdbc:mariadb://192.168.10.204:3306/galaxy_ww    # 数据库名称
     username: ENC(L0d9FkUJX6BIaxPyy57bqQ==)
     password: ENC(0WPm6y8me4cavVjpk2BuBQ==)
-
+    maxWait: 20000

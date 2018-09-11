@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +21,8 @@ import java.util.List;
  * @data 2018/9/8 15:59
  */
 @Component
-public class ForMonitorInterface {
+@Order(8)
+public class ForMonitorInterface implements CommandLineRunner {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     RestTemplate restTemplate;
@@ -33,6 +36,12 @@ public class ForMonitorInterface {
     @Value("${scheduled.monitor.enable}")
     private String scheduledMonitorEnable;
 
+
+    @Override
+    public void run(String... args) throws Exception {
+        getIpActiveInfoOf5min();
+    }
+
     /**
      * 系统监控
      */
@@ -41,11 +50,17 @@ public class ForMonitorInterface {
         if (!Boolean.parseBoolean(scheduledMonitorEnable)) {
             return;
         }
-        List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getMonitorOf1m/", List.class);
+        List contentValue = null;
+        try {
+            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getMonitorOf1m/", List.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("系统监控\t查询异常\trestTemplate");
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("system_monitoring.global.gis", contentValue);
-        logger.info("开始推送======>>>系统监控\t请求头和请求体："+httpEntity);
+        logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity);
-        logger.info("系统监控\t推送返回结果"+response);
+        logger.info("系统监控\t推送返回结果" + response);
     }
 }

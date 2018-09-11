@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -15,8 +17,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Component
-@Async
-public class ForNetflowInterface {
+@Order(9)
+public class ForNetflowInterface implements CommandLineRunner {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -31,6 +33,13 @@ public class ForNetflowInterface {
     @Value("${SERVICE_PATH_NETFLOW}")
     private String SERVICE_PATH_NETFLOW;
 
+    @Override
+    public void run(String... args) throws Exception {
+        getNetflowStatistic5m();
+        getProtocolStatisticOf1h();
+        getIpActiveInfoOf5min();
+    }
+
 
     /**
      * 5分钟内网络流量统计
@@ -41,8 +50,15 @@ public class ForNetflowInterface {
             return;
         }
        String start = DateUtils.getBeforeTimeOf5min30s();
-       //获取并封装数据
-        List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getNetflowStatistic5m/"+start, List.class);
+       List contentValue = null;
+       try{
+               //获取并封装数据
+        contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getNetflowStatistic5m/"+start, List.class);
+
+       }catch (Exception e){
+           e.printStackTrace();
+           logger.info("5分钟内网络流量统计\t查询异常\trestTemplate");
+       }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.5min.waterflow", contentValue);
         logger.info("开始推送========>>>5分钟内网络流量统计 请求头和请求体："+httpEntity);
@@ -59,8 +75,14 @@ public class ForNetflowInterface {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
-        //获取并封装数据
-        List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getProtocolStatisticOf1h/"+start, List.class);
+        List contentValue = null;
+        try{
+                //获取并封装数据
+        contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getProtocolStatisticOf1h/"+start, List.class);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("1小时内网络协议统计\t查询异常\trestTemplate");
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.1hour.protocol", contentValue);
         logger.info("开始推送======>>>1小时内网络协议统计 请求头和请求体："+httpEntity);
@@ -77,8 +99,15 @@ public class ForNetflowInterface {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
-        //获取并封装推送数据
-        List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getIpActiveInfoOf5min/"+start, List.class);
+        List contentValue = null;
+        try{
+                //获取并封装推送数据
+        contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getIpActiveInfoOf5min/"+start, List.class);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("5分钟内活跃IP信息\t查询异常\trestTemplate");
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.1hour.protocol", contentValue);
         logger.info("开始推送======>>>5分钟内活跃IP信息 请求头和请求体："+httpEntity);
@@ -86,5 +115,6 @@ public class ForNetflowInterface {
         logger.info("5分钟内活跃IP信息\t推送返回结果"+response);
 
     }
+
 
 }

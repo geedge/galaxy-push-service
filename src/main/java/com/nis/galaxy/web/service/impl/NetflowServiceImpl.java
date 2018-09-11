@@ -10,6 +10,8 @@ import com.nis.galaxy.domain.dict.UiSysDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowDao;
 import com.nis.galaxy.web.service.NetflowService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.List;
 
 @Service
 public class NetflowServiceImpl implements NetflowService {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     NetflowDao netflowDao;
     @Autowired
@@ -47,8 +51,17 @@ public class NetflowServiceImpl implements NetflowService {
      */
     @Override
     public List<TimeTypeCount> getNetflowStatistic5m(String start, String end) {
+        List<TimeTypeCount> list =null;
+        try{
+        list = netflowDao.getNetflowStatistic5mOnly(start, end);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("5分钟内网络流量统计\t查询异常\tserviceImpl");
+        }
+        if(list==null || list.size()==0){
+            getNetflowStatistic5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         List<TimeTypeCount> result = new ArrayList<>();
-        List<TimeTypeCount> list = netflowDao.getNetflowStatistic5mOnly(start, end);
         HashMap<String, String> listProtocolDict = listProtocolDict();
         for (TimeTypeCount timeTypeCount : list) {
             String type = timeTypeCount.getType();
@@ -60,9 +73,6 @@ public class NetflowServiceImpl implements NetflowService {
                     result.add(timeTypeCount);
                 }
             }
-        }
-        if(result.size()==0){
-            return getNetflowStatistic5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }
@@ -76,7 +86,16 @@ public class NetflowServiceImpl implements NetflowService {
      */
     @Override
     public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end) {
-        List<NetflowProtocol> list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
+        List<NetflowProtocol> list = null;
+        try{
+        list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("1小时内网络协议统计\t查询异常\tserviceImpl");
+        }
+        if(list==null || list.size()==0){
+            getProtocolStatisticOf1h(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         HashMap<String, String> listProtocolDict = listProtocolDict();
         List<NetflowProtocol> result = new ArrayList<>();
         for (NetflowProtocol netflowProtocol : list) {
@@ -86,9 +105,6 @@ public class NetflowServiceImpl implements NetflowService {
                 netflowProtocol.setType(listProtocolDict.get(type));
                 result.add(netflowProtocol);
             }
-        }
-        if(result.size()==0){
-            return getProtocolStatisticOf1h(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }
@@ -102,9 +118,19 @@ public class NetflowServiceImpl implements NetflowService {
      */
     @Override
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
-        List<IpActiveInfo> list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
+        List<IpActiveInfo> list = null;
+        try{
+        list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("5分钟内活跃IP信息\t查询异常\tserviceImpl");
+        }
+        if(list==null || list.size()==0){
+            getIpActiveInfoOf5min(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         List<IpActiveInfo> result = new ArrayList<>();
-        HashMap<String, UiSysDictInfo> listDictUiSys = myLoad.listDictUiSys;
+        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         for (IpActiveInfo ipActiveInfo : list) {
             String area = ipActiveInfo.getArea();
             if (area != null && listDictUiSys != null) {
@@ -124,9 +150,6 @@ public class NetflowServiceImpl implements NetflowService {
                     }
                 }
             }
-        }
-        if(result.size()==0){
-            return getIpActiveInfoOf5min(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
         }
         return result;
     }

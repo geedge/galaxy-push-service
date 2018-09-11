@@ -7,8 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import sun.reflect.annotation.ExceptionProxy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 
 
 @Component
+@Order(5)
 public class MyLoad implements CommandLineRunner {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -33,8 +36,6 @@ public class MyLoad implements CommandLineRunner {
     public HashMap<String, String> listProtocolDict = null;
     //标签表
     public HashMap<String, UiTagDicInfo> listUiTagDicInfo = null;
-
-
 
 
     public HashMap<String, UiTagDicInfo> getListUiTagDicInfo() {
@@ -53,39 +54,74 @@ public class MyLoad implements CommandLineRunner {
         return listNtcService;
     }
 
+
     @Override
     public void run(String... args) throws Exception {
-        logger.info("执行初始化加载数据：\t局点字典表\t业务字典表\t协议字典表\t标签字典表\t地域字典表");
+        logger.info("执行初始化加载数据：\t局点字典表\t业务字典表\t协议字典表\t标签字典表");
+
         //局点表的预加载(中英俄)
         listDictUiSys = new HashMap<>();
-        List<UiSysDictInfo> uiSysDictInfo = dictService.getUiSysDictInfo();
-        for (UiSysDictInfo uiSysDictInfoZh : uiSysDictInfo) {
-            listDictUiSys.put(String.valueOf(uiSysDictInfoZh.getSysDictId()), uiSysDictInfoZh);
+        List<UiSysDictInfo> uiSysDictInfo = null;
+        try {
+            uiSysDictInfo = dictService.getUiSysDictInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("局点表预加载出现异常");
         }
-        logger.info("局点表的预加载\t" + listDictUiSys);
+        if (uiSysDictInfo != null) {
+            for (UiSysDictInfo uiSysDictInfoZh : uiSysDictInfo) {
+                listDictUiSys.put(String.valueOf(uiSysDictInfoZh.getSysDictId()), uiSysDictInfoZh);
+            }
+        }
+        logger.info("局点表的预加载结果\t" + listDictUiSys);
+
         //业务字典表的预加载(中英俄)
         listNtcService = new HashMap<>();
-        List<NtcServiceDict> ntcServiceDict = dictService.getNtcServiceDict();
-        for (NtcServiceDict serviceDict : ntcServiceDict) {
-            listNtcService.put(String.valueOf(serviceDict.getServiceCode()), serviceDict);
+        List<NtcServiceDict> ntcServiceDict = null;
+        try {
+            ntcServiceDict = dictService.getNtcServiceDict();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("业务字典表预加载出现异常");
         }
-        logger.info("业务字典表的预加载\t" + listNtcService);
+        if (ntcServiceDict != null) {
+            for (NtcServiceDict serviceDict : ntcServiceDict) {
+                listNtcService.put(String.valueOf(serviceDict.getServiceCode()), serviceDict);
+            }
+        }
+        logger.info("业务字典表的预加载结果\t" + listNtcService);
 
+        //协议字典表的预加载
         listProtocolDict = new HashMap<>();
-        List<ProtocolDict> protocolDict = dictService.getProtocolDict();
-        for (ProtocolDict dict : protocolDict) {
-            listProtocolDict.put(String.valueOf(dict.getViewCode()), dict.getProtocolType());
+        List<ProtocolDict> protocolDict = null;
+        try {
+            protocolDict = dictService.getProtocolDict();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("协议字典表的预加载出现异常");
         }
-        logger.info("协议字典表的预加载\t" + listProtocolDict);
+        if (protocolDict != null) {
+            for (ProtocolDict dict : protocolDict) {
+                listProtocolDict.put(String.valueOf(dict.getViewCode()), dict.getProtocolType());
+            }
+        }
+        logger.info("协议字典表的预加载结果为\t" + listProtocolDict);
 
+        //标签表的预加载
         listUiTagDicInfo = new HashMap<>();
-        List<UiTagDicInfo> uiTagDicInfo = dictService.getUiTagDicInfo();
-        for (UiTagDicInfo tagDicInfo : uiTagDicInfo) {
-            listUiTagDicInfo.put(String.valueOf(tagDicInfo.getServiceDictId()), tagDicInfo);
+        List<UiTagDicInfo> uiTagDicInfo = null;
+        try {
+            uiTagDicInfo = dictService.getUiTagDicInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("标签表的预加载出现异常");
         }
-        logger.info("标签字典表的预加载\t" + listProtocolDict);
-
+        if (uiTagDicInfo != null) {
+            for (UiTagDicInfo tagDicInfo : uiTagDicInfo) {
+                listUiTagDicInfo.put(String.valueOf(tagDicInfo.getServiceDictId()), tagDicInfo);
+            }
+        }
+        logger.info("标签字典表的预加载结果为\t" + listProtocolDict);
         logger.info("初始化字典表操作执行完成");
-
     }
 }

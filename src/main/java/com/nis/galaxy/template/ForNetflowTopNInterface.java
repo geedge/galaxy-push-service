@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -16,8 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Component
-@Async
-public class ForNetflowTopNInterface {
+@Order(10)
+public class ForNetflowTopNInterface implements CommandLineRunner {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -31,21 +33,32 @@ public class ForNetflowTopNInterface {
     @Value("${SERVICE_PATH_NETFLOW}")
     private String SERVICE_PATH_NETFLOW;
 
+    @Override
+    public void run(String... args) throws Exception {
+        getIpActiveStatisticOf5m();
+    }
+
     /**
      * 5分钟内活跃IP流量TOP10
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
     public void getIpActiveStatisticOf5m() {
-        if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)){
+        if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
-        //获取并封装数据
-        List contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getIpActiveStatisticOf5m/"+start, List.class);
+        List contentValue = null;
+        try {
+            //获取并封装数据
+            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getIpActiveStatisticOf5m/" + start, List.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("5分钟内活跃IP流量TOP10\t查询异常\trestTemplate");
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.5min.ip.active.waterflow", contentValue);
         logger.info("开始推送=======>>5分钟内活跃IP流量TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
-        logger.info("5分钟内活跃IP流量TOP10\t推送返回结果"+response);
+        logger.info("5分钟内活跃IP流量TOP10\t推送返回结果" + response);
     }
 }

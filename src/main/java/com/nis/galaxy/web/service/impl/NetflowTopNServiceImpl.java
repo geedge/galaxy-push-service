@@ -7,6 +7,8 @@ import com.nis.galaxy.domain.dict.UiSysDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowTopNDao;
 import com.nis.galaxy.web.service.NetflowTopNService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import java.util.List;
 
 @Service
 public class NetflowTopNServiceImpl implements NetflowTopNService {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     NetflowTopNDao netflowTopNDao;
     @Autowired
@@ -31,10 +35,25 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         return myLoad.listDictUiSys;
     }
 
+    /**
+     * 5分钟内活跃IP流量TOP10
+     * @param start
+     * @param end
+     * @return
+     */
     @Override
     public List<IpActiveInt> getIpActiveStatisticOf5m(String start,String end) {
+        List<IpActiveInt> list = null;
+        try{
+        list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl");
+        }
+        if(list==null || list.size()==0){
+            getIpActiveStatisticOf5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
+        }
         List<IpActiveInt> result = new ArrayList<>();
-        List<IpActiveInt> list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         for (IpActiveInt ipActiveInt : list) {
             String area = ipActiveInt.getArea();
@@ -54,10 +73,6 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 }
             }
         }
-        if(result.size()==0){
-            return getIpActiveStatisticOf5m(DateUtils.getBeforeNminOfTime(start,-5),DateUtils.getBeforeNminOfTime(end,-5));
-        }
         return result;
-
      }
 }
