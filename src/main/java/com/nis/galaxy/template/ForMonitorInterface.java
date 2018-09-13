@@ -21,7 +21,6 @@ import java.util.List;
  * @data 2018/9/8 15:59
  */
 @Component
-@Order(8)
 public class ForMonitorInterface implements CommandLineRunner {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
@@ -37,10 +36,8 @@ public class ForMonitorInterface implements CommandLineRunner {
     private String scheduledMonitorEnable;
 
 
-    @Override
-    public void run(String... args) throws Exception {
-        getIpActiveInfoOf5min();
-    }
+
+
 
     /**
      * 系统监控
@@ -54,13 +51,20 @@ public class ForMonitorInterface implements CommandLineRunner {
         try {
             contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getMonitorOf1m/", List.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("系统监控\t查询异常\trestTemplate");
+            logger.info("系统监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("system_monitoring.global.gis", contentValue);
         logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
-        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity);
+        //ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity);
+        ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity, String.class);
         logger.info("系统监控\t推送返回结果" + response);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+
+        getIpActiveInfoOf5min();
+
     }
 }

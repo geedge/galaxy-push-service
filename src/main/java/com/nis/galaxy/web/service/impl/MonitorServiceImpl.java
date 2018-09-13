@@ -27,29 +27,29 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public List<NmsServerBean> getMonitorOf1m() {
+        List<NmsServerBean> result = new ArrayList<>();
         NmsServiceBeanTmp nmsServerBeanTmp = null;
-        try{
-        //查询
-        nmsServerBeanTmp = monitorDao.getMonitorOf1m01();
-        }catch (Exception e){
-           e.printStackTrace();
-           logger.info("系统监控\t查询异常\tserviceImpl");
+        try {
+            //查询
+            nmsServerBeanTmp = monitorDao.getMonitorOf1m01();
+        } catch (Exception e) {
+            logger.error("系统监控\t查询异常\tserviceImpl", e);
         }
         List<AbnormalBean> abnormalBean = null;
         if (nmsServerBeanTmp != null) {
             int id = nmsServerBeanTmp.getId();
             abnormalBean = monitorDao.getMonitorOf1m02(id);
+            //结果的封装
+            NmsServerBean nmsServerBean = new NmsServerBean();
+            nmsServerBean.setTime(nmsServerBeanTmp.getTime());
+            nmsServerBean.setArea(nmsServerBeanTmp.getArea());
+            nmsServerBean.setTotal(nmsServerBeanTmp.getTotal());
+            nmsServerBean.setNormal(nmsServerBeanTmp.getNormal());
+            nmsServerBean.setAbnormal(nmsServerBeanTmp.getNormal());
+            nmsServerBean.setAbnormalmachines(abnormalBean);
+            result.add(nmsServerBean);
+            return result;
         }
-        //结果的封装
-        NmsServerBean nmsServerBean = new NmsServerBean();
-        nmsServerBean.setTime(nmsServerBeanTmp.getTime());
-        nmsServerBean.setArea(nmsServerBeanTmp.getArea());
-        nmsServerBean.setTotal(nmsServerBeanTmp.getTotal());
-        nmsServerBean.setNormal(nmsServerBeanTmp.getNormal());
-        nmsServerBean.setAbnormal(nmsServerBeanTmp.getNormal());
-        nmsServerBean.setAbnormalmachines(abnormalBean);
-        List<NmsServerBean> list = new ArrayList<>();
-        list.add(nmsServerBean);
-        return list;
+        return result;
     }
 }

@@ -10,6 +10,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,14 @@ public class ConfigBean {
     private int MaxTotal;
     @Value("${RestTemplate.DefaultMaxPerRoute}")
     private int DefaultMaxPerRoute;
+    @Value("${RestTemplate.ConnectTimeout}")
+    private int ConnectTimeout;
+    @Value("${RestTemplate.SocketTimeout}")
+    private int SocketTimeout;
+    @Value("${RestTemplate.ConnectionRequestTimeout}")
+    private int ConnectionRequestTimeout;
+
+
 
     @Bean
     public ClientHttpRequestFactory httpRequestFactory() {
@@ -34,7 +43,8 @@ public class ConfigBean {
 
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate(httpRequestFactory());
+        RestTemplate restTemplate = new RestTemplate(httpRequestFactory());
+        return restTemplate;
     }
 
     @Bean
@@ -50,9 +60,9 @@ public class ConfigBean {
         connectionManager.setDefaultMaxPerRoute(DefaultMaxPerRoute);
 
         RequestConfig requestConfig = RequestConfig.custom()
-                .setSocketTimeout(8000)
-                .setConnectTimeout(8000)
-                .setConnectionRequestTimeout(8000)
+                .setSocketTimeout(SocketTimeout)
+                .setConnectTimeout(ConnectTimeout)
+                .setConnectionRequestTimeout(ConnectionRequestTimeout)
                 .build();
 
         return HttpClientBuilder.create()

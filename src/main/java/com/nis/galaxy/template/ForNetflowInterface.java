@@ -17,8 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Component
-@Order(9)
-public class ForNetflowInterface implements CommandLineRunner {
+public class ForNetflowInterface implements CommandLineRunner{
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -33,12 +32,8 @@ public class ForNetflowInterface implements CommandLineRunner {
     @Value("${SERVICE_PATH_NETFLOW}")
     private String SERVICE_PATH_NETFLOW;
 
-    @Override
-    public void run(String... args) throws Exception {
-        getNetflowStatistic5m();
-        getProtocolStatisticOf1h();
-        getIpActiveInfoOf5min();
-    }
+
+
 
 
     /**
@@ -56,8 +51,7 @@ public class ForNetflowInterface implements CommandLineRunner {
         contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getNetflowStatistic5m/"+start, List.class);
 
        }catch (Exception e){
-           e.printStackTrace();
-           logger.info("5分钟内网络流量统计\t查询异常\trestTemplate");
+            logger.error("5分钟内网络流量统计\t查询异常\trestTemplate",e);
        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.5min.waterflow", contentValue);
@@ -80,8 +74,7 @@ public class ForNetflowInterface implements CommandLineRunner {
                 //获取并封装数据
         contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getProtocolStatisticOf1h/"+start, List.class);
         }catch (Exception e){
-            e.printStackTrace();
-            logger.info("1小时内网络协议统计\t查询异常\trestTemplate");
+             logger.error("1小时内网络协议统计\t查询异常\trestTemplate",e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.1hour.protocol", contentValue);
@@ -105,8 +98,7 @@ public class ForNetflowInterface implements CommandLineRunner {
         contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getIpActiveInfoOf5min/"+start, List.class);
 
         }catch (Exception e){
-            e.printStackTrace();
-            logger.info("5分钟内活跃IP信息\t查询异常\trestTemplate");
+             logger.error("5分钟内活跃IP信息\t查询异常\trestTemplate",e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.1hour.protocol", contentValue);
@@ -117,4 +109,10 @@ public class ForNetflowInterface implements CommandLineRunner {
     }
 
 
+    @Override
+    public void run(String... args) throws Exception {
+        getNetflowStatistic5m();
+        getProtocolStatisticOf1h();
+        getIpActiveInfoOf5min();
+    }
 }

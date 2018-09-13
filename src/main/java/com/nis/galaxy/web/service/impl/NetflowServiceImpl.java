@@ -59,8 +59,7 @@ public class NetflowServiceImpl implements NetflowService {
         try {
             list = netflowDao.getNetflowStatistic5mOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("5分钟内网络流量统计\t查询异常\tserviceImpl");
+             logger.error("5分钟内网络流量统计\t查询异常\tserviceImpl",e);
         }
         if (list == null || list.size() == 0) {
             if (times >= max) {
@@ -100,8 +99,7 @@ public class NetflowServiceImpl implements NetflowService {
         try {
             list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("1小时内网络协议统计\t查询异常\tserviceImpl");
+             logger.error("1小时内网络协议统计\t查询异常\tserviceImpl",e);
         }
         if (list == null || list.size() == 0) {
             if(times>=max){
@@ -137,8 +135,7 @@ public class NetflowServiceImpl implements NetflowService {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("5分钟内活跃IP信息\t查询异常\tserviceImpl");
+             logger.error("5分钟内活跃IP信息\t查询异常\tserviceImpl",e);
         }
         if (list == null || list.size() == 0) {
             if(times>=max){

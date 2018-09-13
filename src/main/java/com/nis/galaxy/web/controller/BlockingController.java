@@ -26,6 +26,7 @@ public class BlockingController {
     public List<NtcTypeCount> getAllBlockInformation(@PathVariable("start") String start){
         String end = DateUtils.getAfter5min(start);
         int times = 1;
+
         return blockingService.getAllBlockInformation(start,end,times);
     }
 

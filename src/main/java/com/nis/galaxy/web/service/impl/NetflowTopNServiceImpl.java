@@ -49,8 +49,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl");
+             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl",e);
         }
         if (list == null || list.size() == 0) {
             if (times >= max) {

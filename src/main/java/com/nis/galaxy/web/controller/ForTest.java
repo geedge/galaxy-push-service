@@ -29,7 +29,7 @@ public class ForTest {
     public void net(@RequestBody Map<String,Object> map){
         System.out.println("接收数据\n"+map);
     }
-    @RequestMapping(value = "v1/system_monitoring",method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/system_monitoring",method = RequestMethod.POST)
     public void monitor(@RequestBody Map<String,Object> map){
         System.out.println("接收数据\n"+map);
     }

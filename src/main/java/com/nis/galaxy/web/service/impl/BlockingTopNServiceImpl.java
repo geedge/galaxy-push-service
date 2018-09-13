@@ -58,8 +58,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         try {
             result = blockingTopNDao.getBlockTop10URLOf1h(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("1小时内全国阻断URLTOP10\t查询异常\tserviceImpl");
+            logger.error("1小时内全国阻断URLTOP10\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个1h的数据
         if (result == null || result.size() == 0) {
@@ -84,8 +83,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         try {
             result = blockingTopNDao.getBlockTop10WebsiteOf1h(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("1小时内全国阻断网站TOP10\t查询异常\tserviceImpl");
+            logger.error("1小时内全国阻断网站TOP10\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个1h的数据
         if (result == null || result.size() == 0) {
@@ -110,8 +108,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         try {
             list = blockingTopNDao.getBlockTop10Tag24hOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("24小时内封堵标签TOP10\t查询异常\tserviceImpl");
+            logger.error("24小时内封堵标签TOP10\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个1h的数据
         if (list == null || list.size() == 0) {
@@ -153,13 +150,16 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         List<AreaBlockProtocol> list = null;
         try {
             list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hDayOnly(start, end);
-            if (list == null) {
+        } catch (Exception e) {
+            logger.error("24小时区域阻断协议TOP10日报表\t查询异常\tserviceImpl", e);
+        }
+        if (list == null || list.size() == 0) {
+            try {
                 //查分钟报
                 list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hOnly(start, end);
+            } catch (Exception e) {
+                logger.error("24小时区域阻断协议TOP10分钟报表\t查询异常\tserviceImpl", e);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("24小时区域阻断协议TOP10\t查询异常\tserviceImpl");
         }
         //查询数据为空则查询上一天数据
         if (list == null || list.size() == 0) {
@@ -219,8 +219,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             result = blockingTopNDao.getBlockTop10URLOf5m(start, end);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("5分钟内全国阻断URLTOP10\t查询异常\tserviceImpl");
+            logger.error("5分钟内全国阻断URLTOP10\t查询异常\tserviceImpl", e);
         }
         //查询不到时，继续向前一段时间
         if (result == null || result.size() == 0) {
@@ -245,8 +244,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         try {
             result = blockingTopNDao.getBlockTop10WebsiteOf5m(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("5分钟内全国阻断website\t查询异常\tserviceImpl");
+            logger.error("5分钟内全国阻断website\t查询异常\tserviceImpl", e);
         }
         //查询不到时，继续向前一段时间
         if (result == null || result.size() == 0) {
@@ -273,13 +271,12 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         try {
             list = blockingTopNDao.getBlockTop10Tag5mOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("5分钟内全国阻断标签TOP10\t查询异常\tserviceImpl");
+            logger.error("5分钟内全国阻断标签TOP10\t查询异常\tserviceImpl", e);
         }
         //查询不到继续向前一段时间
         if (list == null || list.size() == 0) {
             if (times >= max) {
-                return null;
+                return result;
             }
             return getBlockTop10Tag5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }

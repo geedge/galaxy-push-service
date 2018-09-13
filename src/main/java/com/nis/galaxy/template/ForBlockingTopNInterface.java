@@ -18,7 +18,6 @@ import java.util.*;
 
 
 @Component
-@Order(7)
 public class ForBlockingTopNInterface implements CommandLineRunner {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -34,16 +33,7 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
     @Value("${SERVICE_PATH_BLOCKING}")
     private String SERVICE_PATH_BLOCKING;
 
-    @Override
-    public void run(String... args) throws Exception {
-        getAreaBlockTop10ProtocolOf24h();
-        getBlockTop10URLOf1h();
-        getBlockTop10WebsiteOf1h();
-        getBlockTop10Tag24h();
-        getBlockTop10URLOf5m();
-        getBlockTop10WebsiteOf5m();
-        getBlockTop10Tag5m();
-    }
+
 
     /**
      * 24小时区域阻断协议TOP10
@@ -59,8 +49,7 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             //获取并封装数据
             contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAreaBlockTop10ProtocolOf24h/" + start, List.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("24小时区域阻断协议TOP10\t查询异常\trestTemplate");
+            logger.error("24小时区域阻断协议TOP10\t查询异常\trestTemplate", e);
         }
         //请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.area.protocol.block", contentValue);
@@ -84,8 +73,7 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             //获取并封装数据
             contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10URLOf1h/" + start, List.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("1小时内全国阻断URLTOP10\t查询异常\trestTemplate");
+            logger.error("1小时内全国阻断URLTOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.1hour.url.top_10", contentValue);
@@ -108,8 +96,7 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             //获取并封装推送数据
             contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10WebsiteOf1h/" + start, List.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("1小时内全国阻断网站TOP10\t查询异常\trestTemplate");
+            logger.error("1小时内全国阻断网站TOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.1hour.website.top_10", contentValue);
@@ -133,11 +120,10 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             //获取并封装数据
             contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10Tag24h/" + start, List.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("24小时内封堵标签TOP10\t查询异常\trestTemplate");
+            logger.error("24小时内封堵标签TOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.1hour.keyword.top_10", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.keyword.top_10", contentValue);
         logger.info("开始推送======>>>24小时内封堵标签TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("24小时内封堵标签TOP10\t推送返回结果" + response);
@@ -154,14 +140,13 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
-        List contentValue =null;
-        try{
-                //获取并封装数据
-        contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10URLOf5m/" + start, List.class);
+        List contentValue = null;
+        try {
+            //获取并封装数据
+            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10URLOf5m/" + start, List.class);
 
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.info("5分钟内全国阻断URLTOP10\t查询异常\trestTemplate");
+        } catch (Exception e) {
+            logger.error("5分钟内全国阻断URLTOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.5minute.url.top_10", contentValue);
@@ -181,13 +166,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
         List contentValue = null;
-        try{
-        //获取并封装数据
-        contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10WebsiteOf5m/" + start, List.class);
+        try {
+            //获取并封装数据
+            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10WebsiteOf5m/" + start, List.class);
 
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.info("5分钟内全国阻断website\t查询异常\trestTemplate");
+        } catch (Exception e) {
+            logger.error("5分钟内全国阻断website\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.5minute.website.top_10", contentValue);
@@ -207,17 +191,28 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
         List contentValue = null;
-        try{
-                //获取并封装数据
-        contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10Tag5m/" + start, List.class);
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.info("5分钟内全国阻断标签TOP10\t查询异常\trestTemplate");
+        try {
+            //获取并封装数据
+            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10Tag5m/" + start, List.class);
+        } catch (Exception e) {
+            logger.error("5分钟内全国阻断标签TOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.5min.keyword.top_10", contentValue);
         logger.info("开始推送======>>>5分钟内全国阻断标签TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("5分钟内全国阻断标签TOP10\t推送返回结果" + response);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+         getAreaBlockTop10ProtocolOf24h();
+         getBlockTop10URLOf1h();
+         getBlockTop10WebsiteOf1h();
+         getBlockTop10Tag24h();
+         getBlockTop10URLOf5m();
+         getBlockTop10WebsiteOf5m();
+         getBlockTop10Tag5m();
+
     }
 }

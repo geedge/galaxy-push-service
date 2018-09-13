@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -61,8 +62,7 @@ public class BlockingServiceImp implements BlockingService {
         try {
             list = blockingDao.getAllBlockInformation(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("整体封堵数量\t查询异常\tserviceImpl");
+            logger.error("整体封堵数量\t查询异常\tserviceImpl", e);
         }
         //若插叙信息为空则继续查前一阶段的数据
         if (list == null || list.size() == 0) {
@@ -114,8 +114,7 @@ public class BlockingServiceImp implements BlockingService {
         try {
             list = blockingDao.getDNSDeceiveInformationOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("DNS欺骗信息显示\t查询异常\tserviceImpl");
+            logger.error("DNS欺骗信息显示\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个5min的数据
         if (list == null || list.size() == 0) {
@@ -162,8 +161,7 @@ public class BlockingServiceImp implements BlockingService {
         try {
             list = blockingDao.get24hAllBlockEachProtocolOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("24小时全国范围阻断协议信息\t查询异常\tserviceImpl");
+            logger.error("24小时全国范围阻断协议信息\t查询异常\tserviceImpl", e);
         }
         //若查询结果为空，查询上时间段的数据
         if (list == null || list.size() == 0) {
@@ -219,8 +217,7 @@ public class BlockingServiceImp implements BlockingService {
             list2 = blockingDao.getDisBlockInformationOnly(start, end, c, d);
             list3 = blockingDao.getDisBlockInformationOnly(start, end, e, f);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("封堵信息分布显示\t查询异常\tserviceImpl");
+            logger.error("封堵信息分布显示\t查询异常\tserviceImpl", e);
         }
         List<NtcDisReport> list = new ArrayList<>();
         list.addAll(list1);
@@ -284,8 +281,7 @@ public class BlockingServiceImp implements BlockingService {
         try {
             list = blockingDao.getAllHotStatistisOnly(start, end);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("24小时内全国热力图");
+            logger.error("24小时内全国热力图\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个5min的数据
         if (list == null || list.size() == 0) {
@@ -342,31 +338,32 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List<PointMap> getPointMapOf10s() {
         List<PointMap> result = new ArrayList<>();
+        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         List<PointMap> list = null;
         try {
             list = blockingDao.getPointMapOf10sOnly();
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("实时打点图\t查询异常\tserviceImpl");
+            logger.error("实时打点图\t查询异常\tserviceImpl", e);
         }
-        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
-        for (PointMap pointMap : list) {
-            String type = pointMap.getType();
-            if (type != null && listNtcService != null) {
-                NtcServiceDict ntcServiceDict = listNtcService.get(type);
-                if (ntcServiceDict != null) {
-                    if (languageChose == 2) {
-                        //英文
-                        pointMap.setType(ntcServiceDict.getServiceNameEn());
-                        result.add(pointMap);
-                    } else if (languageChose == 1) {
-                        //中文
-                        pointMap.setType(ntcServiceDict.getServiceNameZh());
-                        result.add(pointMap);
-                    } else {
-                        //俄文
-                        pointMap.setType(ntcServiceDict.getServiceNameRu());
-                        result.add(pointMap);
+        if (list != null && list.size() != 0) {
+            for (PointMap pointMap : list) {
+                String type = pointMap.getType();
+                if (type != null && listNtcService != null) {
+                    NtcServiceDict ntcServiceDict = listNtcService.get(type);
+                    if (ntcServiceDict != null) {
+                        if (languageChose == 2) {
+                            //英文
+                            pointMap.setType(ntcServiceDict.getServiceNameEn());
+                            result.add(pointMap);
+                        } else if (languageChose == 1) {
+                            //中文
+                            pointMap.setType(ntcServiceDict.getServiceNameZh());
+                            result.add(pointMap);
+                        } else {
+                            //俄文
+                            pointMap.setType(ntcServiceDict.getServiceNameRu());
+                            result.add(pointMap);
+                        }
                     }
                 }
             }
@@ -392,8 +389,7 @@ public class BlockingServiceImp implements BlockingService {
             list2 = blockingDao.getDisBlockMapOnly(start, end, c, d);
             list3 = blockingDao.getDisBlockMapOnly(start, end, e, f);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("热力图接口\t查询异常\tserviceImpl");
+            logger.error("热力图接口\t查询异常\tserviceImpl", e);
         }
         List<AreaCount> list = new ArrayList<>();
         list.addAll(list1);
@@ -444,28 +440,29 @@ public class BlockingServiceImp implements BlockingService {
     public List<CfgTypeCount> getAllCfgInfo() {
         List<CfgTypeCount> result = new ArrayList<>();
         List<CfgTypeCount> list = null;
+        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         try {
             list = blockingDao.getAllCfgInfoOnly();
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("全国协议配置信息\t查询异常\tserviceImpl");
+            logger.error("全国协议配置信息\t查询异常\tserviceImpl", e);
         }
-        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
-        for (CfgTypeCount cfgTypeCount : list) {
-            NtcServiceDict ntcServiceDict = listNtcService.get(cfgTypeCount.getType());
-            if (ntcServiceDict != null) {
-                if (languageChose == 2) {
-                    //获取英文业务字段
-                    cfgTypeCount.setType(ntcServiceDict.getServiceNameEn());
-                    result.add(cfgTypeCount);
-                } else if (languageChose == 1) {
-                    //中文
-                    cfgTypeCount.setType(ntcServiceDict.getServiceNameZh());
-                    result.add(cfgTypeCount);
-                } else {
-                    //俄文
-                    cfgTypeCount.setType(ntcServiceDict.getServiceNameRu());
-                    result.add(cfgTypeCount);
+        if (list != null && list.size() != 0) {
+            for (CfgTypeCount cfgTypeCount : list) {
+                NtcServiceDict ntcServiceDict = listNtcService.get(cfgTypeCount.getType());
+                if (ntcServiceDict != null) {
+                    if (languageChose == 2) {
+                        //获取英文业务字段
+                        cfgTypeCount.setType(ntcServiceDict.getServiceNameEn());
+                        result.add(cfgTypeCount);
+                    } else if (languageChose == 1) {
+                        //中文
+                        cfgTypeCount.setType(ntcServiceDict.getServiceNameZh());
+                        result.add(cfgTypeCount);
+                    } else {
+                        //俄文
+                        cfgTypeCount.setType(ntcServiceDict.getServiceNameRu());
+                        result.add(cfgTypeCount);
+                    }
                 }
             }
         }
