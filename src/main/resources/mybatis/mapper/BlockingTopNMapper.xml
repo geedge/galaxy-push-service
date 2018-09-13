@@ -30,7 +30,7 @@
         FROM ntc_reject_url_statistic
         where stat_time between #{start} and #{end}
         group by url
-        ORDER BY sum desc
+        ORDER BY count desc
         LIMIT 10;
     </select>
     <!--5分钟内全国阻断URL TOP10  5m/条 Top10-->
@@ -38,7 +38,7 @@
         SELECT #{end} time,url type,ip_addr ip,sum count
            FROM ntc_reject_url_statistic
            where stat_time  between #{start} and #{end}
-           ORDER BY sum desc
+           ORDER BY count desc
            LIMIT 10;
     </select>
     <!--1小时内全国阻断网站TOP10 1h/条-->
@@ -47,7 +47,7 @@
         FROM ntc_reject_website_statistic
         where stat_time between #{start} and #{end}
         group by website
-        ORDER BY sum desc
+        ORDER BY count desc
         LIMIT 10;
     </select>
     <!--5min 内全国阻断网站TOP10 5min/条-->
@@ -55,7 +55,7 @@
       SELECT #{end} time,website type,ip_addr ip,sum count
           FROM ntc_reject_website_statistic
           where stat_time between #{start} and #{end}
-          ORDER BY sum desc
+          ORDER BY count desc
           LIMIT 10;
     </select>
     <!--1.24小时内封堵标签TOP10 1h/条 粒度5min 1h的汇总_____映射-->
