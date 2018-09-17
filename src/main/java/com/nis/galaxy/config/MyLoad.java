@@ -6,6 +6,7 @@ import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,9 +23,10 @@ import java.util.List;
 
 
 @Component
-@Order(5)
-public class MyLoad implements CommandLineRunner {
+@Order(1)
+public class MyLoad {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     @Autowired
     DictService dictService;
@@ -55,8 +57,8 @@ public class MyLoad implements CommandLineRunner {
     }
 
 
-    @Override
-    public void run(String... args) throws Exception {
+    @Scheduled(fixedRate = 3600000*24)
+    public void run() {
         logger.info("执行初始化加载数据：\t局点字典表\t业务字典表\t协议字典表\t标签字典表");
 
         //局点表的预加载(中英俄)

@@ -2,6 +2,7 @@ package com.nis.galaxy.template;
 
 import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.util.DateUtils;
+import com.nis.galaxy.web.service.BlockingTopNService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,17 @@ import java.util.*;
 
 
 @Component
-public class ForBlockingTopNInterface implements CommandLineRunner {
+@Async
+public class ForBlockingTopNInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     @Autowired
     RestTemplate restTemplate;
+    @Autowired
+    BlockingTopNService blockingTopNService;
+    //计数器用于第一次启动全部执行一次
+    private int a = 1;
 
     @Value("${scheduled.block.topn.enable}")
     private String scheduledBlockTopnEnable;
@@ -34,7 +41,6 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
     private String SERVICE_PATH_BLOCKING;
 
 
-
     /**
      * 24小时区域阻断协议TOP10
      */
@@ -44,10 +50,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf24h30s();
+        String end = DateUtils.getAfter24h(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAreaBlockTop10ProtocolOf24h/" + start, List.class);
+            contentValue = blockingTopNService.getAreaBlockTop10ProtocolOf24(start, end, times);
         } catch (Exception e) {
             logger.error("24小时区域阻断协议TOP10\t查询异常\trestTemplate", e);
         }
@@ -68,10 +76,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf1h30s();
+        String end = DateUtils.getAfter1h(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10URLOf1h/" + start, List.class);
+            contentValue = blockingTopNService.getBlockTop10URLOf1h(start, end, times);
         } catch (Exception e) {
             logger.error("1小时内全国阻断URLTOP10\t查询异常\trestTemplate", e);
         }
@@ -91,10 +101,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf1h30s();
+        String end = DateUtils.getAfter1h(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10WebsiteOf1h/" + start, List.class);
+            contentValue = blockingTopNService.getBlockTop10WebsiteOf1h(start, end, times);
         } catch (Exception e) {
             logger.error("1小时内全国阻断网站TOP10\t查询异常\trestTemplate", e);
         }
@@ -115,10 +127,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf1h30s();
+        String end = DateUtils.getAfter1h(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10Tag24h/" + start, List.class);
+            contentValue = blockingTopNService.getBlockTop10Tag24h(start, end, times);
         } catch (Exception e) {
             logger.error("24小时内封堵标签TOP10\t查询异常\trestTemplate", e);
         }
@@ -140,10 +154,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10URLOf5m/" + start, List.class);
+            contentValue = blockingTopNService.getBlockTop10URLOf5m(start, end, times);
 
         } catch (Exception e) {
             logger.error("5分钟内全国阻断URLTOP10\t查询异常\trestTemplate", e);
@@ -165,10 +181,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10WebsiteOf5m/" + start, List.class);
+            contentValue = blockingTopNService.getBlockTop10WebsiteOf5m(start, end, times);
 
         } catch (Exception e) {
             logger.error("5分钟内全国阻断website\t查询异常\trestTemplate", e);
@@ -190,10 +208,12 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getBlockTop10Tag5m/" + start, List.class);
+            contentValue = blockingTopNService.getBlockTop10Tag5m(start, end, times);
         } catch (Exception e) {
             logger.error("5分钟内全国阻断标签TOP10\t查询异常\trestTemplate", e);
         }
@@ -204,15 +224,17 @@ public class ForBlockingTopNInterface implements CommandLineRunner {
         logger.info("5分钟内全国阻断标签TOP10\t推送返回结果" + response);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-         getAreaBlockTop10ProtocolOf24h();
-         getBlockTop10URLOf1h();
-         getBlockTop10WebsiteOf1h();
-         getBlockTop10Tag24h();
-         getBlockTop10URLOf5m();
-         getBlockTop10WebsiteOf5m();
-         getBlockTop10Tag5m();
-
+    @Scheduled(fixedRate = 999999999)
+    public void run() {
+        if (a++ > 1) {
+            return;
+        }
+        getAreaBlockTop10ProtocolOf24h();
+        getBlockTop10URLOf1h();
+        getBlockTop10WebsiteOf1h();
+        getBlockTop10Tag24h();
+        getBlockTop10URLOf5m();
+        getBlockTop10WebsiteOf5m();
+        getBlockTop10Tag5m();
     }
 }

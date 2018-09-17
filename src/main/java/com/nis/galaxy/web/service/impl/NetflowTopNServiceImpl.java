@@ -2,7 +2,6 @@ package com.nis.galaxy.web.service.impl;
 
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.IpActiveInt;
-import com.nis.galaxy.domain.dict.AreaDict;
 import com.nis.galaxy.domain.dict.UiSysDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowTopNDao;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,9 +41,8 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
      */
     @Override
     public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end, int times) {
-        List<IpActiveInt> result = new ArrayList<>();
-        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         List<IpActiveInt> list = null;
+        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
         } catch (Exception e) {
@@ -65,19 +62,15 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                     if (dict != null && dict.getItemType() == 1) {
                         if (languageChose == 2) {
                             ipActiveInt.setArea(dict.getItemValue());
-                            result.add(ipActiveInt);
                         } else if (languageChose == 1) {
                             ipActiveInt.setArea(dict.getItemDesc());
-                            result.add(ipActiveInt);
                         } else {
                             ipActiveInt.setArea(dict.getItemDesc());
-                            result.add(ipActiveInt);
                         }
                     }
                 }
             }
-
         }
-        return result;
+        return list;
     }
 }

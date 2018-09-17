@@ -2,6 +2,7 @@ package com.nis.galaxy.template;
 
 import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.util.DateUtils;
+import com.nis.galaxy.web.service.MonitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -21,10 +23,14 @@ import java.util.List;
  * @data 2018/9/8 15:59
  */
 @Component
-public class ForMonitorInterface implements CommandLineRunner {
+@Async
+public class ForMonitorInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     RestTemplate restTemplate;
+    @Autowired
+    MonitorService monitorService;
+    private int a = 1;
     @Value("${REST_URL_PREFIX_CHECK}")
     private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
@@ -34,9 +40,6 @@ public class ForMonitorInterface implements CommandLineRunner {
 
     @Value("${scheduled.monitor.enable}")
     private String scheduledMonitorEnable;
-
-
-
 
 
     /**
@@ -49,22 +52,22 @@ public class ForMonitorInterface implements CommandLineRunner {
         }
         List contentValue = null;
         try {
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getMonitorOf1m/", List.class);
+            contentValue = monitorService.getMonitorOf1m();
         } catch (Exception e) {
             logger.info("系统监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("system_monitoring.global.gis", contentValue);
         logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
-        //ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity);
         ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity, String.class);
         logger.info("系统监控\t推送返回结果" + response);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-
+    @Scheduled(fixedRate = 999999999)
+    public void run() {
+        if (a++ > 1) {
+            return;
+        }
         getIpActiveInfoOf5min();
-
     }
 }

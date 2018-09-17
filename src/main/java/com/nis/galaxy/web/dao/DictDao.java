@@ -17,6 +17,4 @@ public interface DictDao {
     List<NtcServiceDict> getNtcServiceDict();
     List<ProtocolDict> getProtocolDict();
     List<UiTagDicInfo> getUiTagDicInfo();
-
-    List<AreaDict> getAreaDict();
 }

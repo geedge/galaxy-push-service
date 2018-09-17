@@ -2,6 +2,7 @@ package com.nis.galaxy.template;
 
 import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.util.DateUtils;
+import com.nis.galaxy.web.service.NetflowTopNService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,15 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Component
-public class ForNetflowTopNInterface implements CommandLineRunner{
+@Async
+public class ForNetflowTopNInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     RestTemplate restTemplate;
+    @Autowired
+    NetflowTopNService netflowTopNService;
+    private int a = 1;
     @Value("${scheduled.netflow.topn.enable}")
     private String scheduledNetflowTopnEnable;
     @Value("${REST_URL_PREFIX_CHECK}")
@@ -31,7 +36,6 @@ public class ForNetflowTopNInterface implements CommandLineRunner{
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_NETFLOW}")
     private String SERVICE_PATH_NETFLOW;
-
 
 
     /**
@@ -43,10 +47,12 @@ public class ForNetflowTopNInterface implements CommandLineRunner{
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getIpActiveStatisticOf5m/" + start, List.class);
+            contentValue = netflowTopNService.getIpActiveStatisticOf5m(start, end, times);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\trestTemplate", e);
         }
@@ -57,8 +63,11 @@ public class ForNetflowTopNInterface implements CommandLineRunner{
         logger.info("5分钟内活跃IP流量TOP10\t推送返回结果" + response);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+    @Scheduled(fixedRate = 999999999)
+    public void run() {
+        if (a++ > 1) {
+            return;
+        }
         getIpActiveStatisticOf5m();
     }
 }

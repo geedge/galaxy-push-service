@@ -3,9 +3,7 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.IpActiveInfo;
 import com.nis.galaxy.domain.NetflowProtocol;
-import com.nis.galaxy.domain.PointMap;
 import com.nis.galaxy.domain.TimeTypeCount;
-import com.nis.galaxy.domain.dict.AreaDict;
 import com.nis.galaxy.domain.dict.UiSysDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowDao;
@@ -15,9 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,9 +48,8 @@ public class NetflowServiceImpl implements NetflowService {
      */
     @Override
     public List<TimeTypeCount> getNetflowStatistic5m(String start, String end, int times) {
-        List<TimeTypeCount> result = new ArrayList<>();
-        HashMap<String, String> listProtocolDict = listProtocolDict();
         List<TimeTypeCount> list = null;
+        HashMap<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getNetflowStatistic5mOnly(start, end);
         } catch (Exception e) {
@@ -76,12 +70,11 @@ public class NetflowServiceImpl implements NetflowService {
                     if (s != null) {
                         //协议类型字典表
                         timeTypeCount.setType(s);
-                        result.add(timeTypeCount);
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -93,9 +86,8 @@ public class NetflowServiceImpl implements NetflowService {
      */
     @Override
     public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end,int times) {
-        List<NetflowProtocol> result = new ArrayList<>();
-        HashMap<String, String> listProtocolDict = listProtocolDict();
         List<NetflowProtocol> list = null;
+        HashMap<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
         } catch (Exception e) {
@@ -112,11 +104,10 @@ public class NetflowServiceImpl implements NetflowService {
                 if (type != null && listProtocolDict != null) {
                     //与协议类型的字典对应
                     netflowProtocol.setType(listProtocolDict.get(type));
-                    result.add(netflowProtocol);
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -128,9 +119,8 @@ public class NetflowServiceImpl implements NetflowService {
      */
     @Override
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end,int times) {
-        List<IpActiveInfo> result = new ArrayList<>();
-        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         List<IpActiveInfo> list = null;
+         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         try {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
 
@@ -153,18 +143,15 @@ public class NetflowServiceImpl implements NetflowService {
                         if (languageChose == 2) {
                             //英文
                             ipActiveInfo.setArea(dict.getItemValue());
-                            result.add(ipActiveInfo);
                         } else if (languageChose == 1) {
                             ipActiveInfo.setArea(dict.getItemDesc());
-                            result.add(ipActiveInfo);
                         } else {
                             ipActiveInfo.setArea(dict.getItemValue());
-                            result.add(ipActiveInfo);
                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 }

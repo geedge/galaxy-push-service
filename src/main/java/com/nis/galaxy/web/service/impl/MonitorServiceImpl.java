@@ -27,7 +27,7 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Override
     public List<NmsServerBean> getMonitorOf1m() {
-        List<NmsServerBean> result = new ArrayList<>();
+        List<NmsServerBean> list = new ArrayList<>();
         NmsServiceBeanTmp nmsServerBeanTmp = null;
         try {
             //查询
@@ -47,9 +47,9 @@ public class MonitorServiceImpl implements MonitorService {
             nmsServerBean.setNormal(nmsServerBeanTmp.getNormal());
             nmsServerBean.setAbnormal(nmsServerBeanTmp.getNormal());
             nmsServerBean.setAbnormalmachines(abnormalBean);
-            result.add(nmsServerBean);
-            return result;
+            list.add(nmsServerBean);
+            return list;
         }
-        return result;
+        return list;
     }
 }

@@ -6,7 +6,8 @@
     <select id="getIpActiveStatisticOf5mOnly" resultType="com.nis.galaxy.domain.IpActiveInt" parameterType="String">
        SELECT  #{start} time,area_id area,ip_addr IP,SUM(c2s_byte_len)+SUM(s2c_byte_len) COUNT
        FROM traffic_ip_active_statistic
-       WHERE stat_time between #{start} AND #{end}
+       WHERE stat_time >= #{start}
+              AND stat_time &lt; #{end}
        GROUP BY ip_addr ,area_id
        ORDER BY COUNT desc
        LIMIT 10;

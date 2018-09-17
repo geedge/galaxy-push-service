@@ -7,9 +7,10 @@
 
     <!--1.24小时区域阻断协议TOP10 24h/条 粒度5min 5min的汇总 分钟报___映射-->
     <select id="getAreaBlockTop10ProtocolOf24hOnly" resultType="com.nis.galaxy.domain.AreaBlockProtocol">
-       SELECT #{end} time,entrance_id area,service type,sum(sum) count
+       SELECT #{start} time,entrance_id area,service type,sum(sum) count
         FROM ntc_entrance_report
-       WHERE report_time between  #{start} AND #{end}
+       WHERE report_time >= #{start}
+          AND report_time &lt; #{end}
 		GROUP BY service , entrance_id
 		ORDER BY count desc
 		LIMIT 10;
@@ -17,52 +18,60 @@
 
     <!--2.24小时区域阻断协议TOP10 24h/条 天报______映射-->
     <select id="getAreaBlockTop10ProtocolOf24hDayOnly" resultType="com.nis.galaxy.domain.AreaBlockProtocol">
-      SELECT  #{end} time,entrance_id area,service type,sum(sum) count
+      SELECT  #{start} time,entrance_id area,service type,sum(sum) count
           FROM ntc_entrance_stat_daily
-      WHERE report_time between  #{start} AND #{end}
+      WHERE report_time >= #{start}
+          AND report_time &lt; #{end}
 	  GROUP BY service ,entrance_id
 	  ORDER BY count desc
 	  LIMIT 10;
     </select>
     <!--1小时内全国阻断URLTOP10 1h/条 小时报-->
     <select id="getBlockTop10URLOf1h" resultType="com.nis.galaxy.domain.NtcRejectUrlStatistic">
-        SELECT #{end} time,url type,SUM(sum) count
+        SELECT #{start} time,url type,SUM(sum) count
         FROM ntc_reject_url_statistic
-        where stat_time between #{start} and #{end}
-        group by url
+        WHERE stat_time >= #{start}
+          AND stat_time &lt; #{end}
+        GROUP BY url
         ORDER BY count desc
         LIMIT 10;
     </select>
     <!--5分钟内全国阻断URL TOP10  5m/条 Top10-->
     <select id="getBlockTop10URLOf5m" resultType="com.nis.galaxy.domain.NtcUrlIpCount">
-        SELECT #{end} time,url type,ip_addr ip,sum count
+        SELECT #{start} time,url type,ip_addr ip,SUM(sum) count
            FROM ntc_reject_url_statistic
-           where stat_time  between #{start} and #{end}
+           WHERE stat_time >= #{start}
+              AND stat_time &lt; #{end}
+           GROUP BY url,ip_addr
            ORDER BY count desc
            LIMIT 10;
     </select>
     <!--1小时内全国阻断网站TOP10 1h/条-->
     <select id="getBlockTop10WebsiteOf1h" resultType="com.nis.galaxy.domain.NtcRejectWebsiteStatistic">
-        SELECT #{end} time ,website type ,sum(sum) count
+        SELECT #{start} time ,website type ,sum(sum) count
         FROM ntc_reject_website_statistic
-        where stat_time between #{start} and #{end}
+        WHERE stat_time >= #{start}
+            AND stat_time &lt; #{end}
         group by website
         ORDER BY count desc
         LIMIT 10;
     </select>
     <!--5min 内全国阻断网站TOP10 5min/条-->
     <select id="getBlockTop10WebsiteOf5m" resultType="com.nis.galaxy.domain.NtcWebIpCount">
-      SELECT #{end} time,website type,ip_addr ip,sum count
+      SELECT #{start} time,website type,ip_addr ip,sum count
           FROM ntc_reject_website_statistic
-          where stat_time between #{start} and #{end}
+          WHERE stat_time >= #{start}
+              AND stat_time &lt; #{end}
+          GROUP BY website ,ip_addr
           ORDER BY count desc
           LIMIT 10;
     </select>
     <!--1.24小时内封堵标签TOP10 1h/条 粒度5min 1h的汇总_____映射-->
     <select id="getBlockTop10Tag24hOnly" resultType="com.nis.galaxy.domain.NtcTagReport">
-        SELECT #{end} time,tag type ,SUM(sum) count
+        SELECT #{start} time,tag type ,SUM(sum) count
         FROM ntc_tag_report
-		  WHERE report_time between #{start} AND #{end}
+		  WHERE report_time >= #{start}
+              AND report_time &lt; #{end}
 		  GROUP BY tag
 		  ORDER BY count desc
 		  LIMIT 10;
@@ -70,9 +79,10 @@
 
     <!--5分钟内全国阻断标签TOP10_____映射-->
     <select id="getBlockTop10Tag5mOnly" resultType="com.nis.galaxy.domain.NtcTagReport">
-        SELECT  #{end} time,tag type ,SUM(sum) count
+        SELECT  #{start} time,tag type ,SUM(sum) count
         FROM ntc_tag_report
-			WHERE report_time between #{start} AND #{end}
+			WHERE report_time >= #{start}
+              AND report_time &lt; #{end}
 			GROUP BY tag
 			order by count desc
           LIMIT 10;

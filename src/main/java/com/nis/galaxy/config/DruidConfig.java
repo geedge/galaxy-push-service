@@ -35,7 +35,7 @@ public class DruidConfig {
         ServletRegistrationBean bean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
         Map<String,String> map = new HashMap<>();
         map.put("loginUsername","root");
-        map.put("loginPassword","1234");
+        map.put("loginPassword","12340");
         map.put("allow","");
         bean.setInitParameters(map);
         return bean;

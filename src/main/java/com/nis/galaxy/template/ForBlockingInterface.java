@@ -2,28 +2,32 @@ package com.nis.galaxy.template;
 
 import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.util.DateUtils;
+import com.nis.galaxy.web.service.BlockingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 
 @Component
-public class ForBlockingInterface  implements CommandLineRunner{
+@Async
+public class ForBlockingInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     RestTemplate restTemplate;
+    @Autowired
+    BlockingService blockingService;
+    //计数器用于第一次启动全部执行一次
+    private int a =1;
 
 
     @Value("${scheduled.block.enable}")
@@ -36,9 +40,6 @@ public class ForBlockingInterface  implements CommandLineRunner{
     private String SERVICE_PATH_BLOCKING;
 
 
-
-
-
     /**
      * 封堵信息整体显示 5min/次
      */
@@ -48,10 +49,11 @@ public class ForBlockingInterface  implements CommandLineRunner{
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
-            //数据获取封装
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAllBlockInformation/" + start, List.class);
+            contentValue = blockingService.getAllBlockInformation(start, end, times);
         } catch (Exception e) {
             logger.error("封堵信息整体显示\t查询异常\trestTemplate", e);
         }
@@ -67,14 +69,15 @@ public class ForBlockingInterface  implements CommandLineRunner{
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
     public void getDisBlockInformation() {
-
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getDisBlockInformation/" + start, List.class);
+            contentValue = blockingService.getDisBlockInformation(start, end, times);
         } catch (Exception e) {
             logger.error("封堵信息分布显示\t查询异常\trestTemplate", e);
         }
@@ -83,7 +86,6 @@ public class ForBlockingInterface  implements CommandLineRunner{
         logger.info("开始推送======>>>封堵信息分布显示\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("封堵信息分布显示\t推送返回结果" + response);
-
     }
 
     /**
@@ -95,11 +97,12 @@ public class ForBlockingInterface  implements CommandLineRunner{
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获得封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getDNSDeceiveInformation/" + start, List.class);
-
+            contentValue = blockingService.getDNSDeceiveInformation(start, end, times);
         } catch (Exception e) {
             logger.error("DNS欺骗信息显示\t查询异常\trestTemplate", e);
         }
@@ -108,7 +111,6 @@ public class ForBlockingInterface  implements CommandLineRunner{
         logger.info("开始推送======>>>DNS欺骗信息显示\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("DNS欺骗信息显示\t推送返回结果" + response);
-
     }
 
     /**
@@ -120,11 +122,12 @@ public class ForBlockingInterface  implements CommandLineRunner{
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/get24hAllBlockEachProtocol/" + start, List.class);
-
+            contentValue = blockingService.get24hAllBlockEachProtocol(start, end, times);
         } catch (Exception e) {
             logger.error("24小时全国范围阻断协议信息\t查询异常\trestTemplate", e);
 
@@ -134,7 +137,6 @@ public class ForBlockingInterface  implements CommandLineRunner{
         logger.info("开始推送======>>>24小时全国范围阻断协议信息\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("24小时全国范围阻断协议信息\t推送返回结果" + response);
-
     }
 
     /**
@@ -145,11 +147,13 @@ public class ForBlockingInterface  implements CommandLineRunner{
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
         //获取并封装数据
         List contentValue = null;
         try {
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAllHotStatistis/" + start, List.class);
+            String start = DateUtils.getBeforeTimeOf5min30s();
+            String end = DateUtils.getAfter5min(start);
+            int times = 1;
+            contentValue = blockingService.getAllHotStatistis(start, end, times);
         } catch (Exception e) {
             logger.error("24小时内全国热力图\t查询异常\trestTemplate", e);
         }
@@ -172,7 +176,7 @@ public class ForBlockingInterface  implements CommandLineRunner{
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getPointMapOf10s", List.class);
+            contentValue = blockingService.getPointMapOf10s();
         } catch (Exception e) {
             logger.error("实时打点图\t查询异常\trestTemplate", e);
 
@@ -180,7 +184,6 @@ public class ForBlockingInterface  implements CommandLineRunner{
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.realtime.point", contentValue);
         logger.info("开始推送======>>>实时打点图\t请求头和请求体：" + httpEntity);
-        //ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity, String.class);
         logger.info("实时打点图\t推送返回结果" + response);
 
@@ -195,10 +198,12 @@ public class ForBlockingInterface  implements CommandLineRunner{
             return;
         }
         String start = DateUtils.getBeforeTimeOf5min30s();
+        String end = DateUtils.getAfter5min(start);
+        int times = 1;
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getDisBlockMap/" + start, List.class);
+            contentValue = blockingService.getDisBlockMap(start, end, times);
         } catch (Exception e) {
             logger.error("热力图接口\t查询异常\trestTemplate", e);
         }
@@ -220,7 +225,7 @@ public class ForBlockingInterface  implements CommandLineRunner{
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = restTemplate.getForObject(REST_URL_PREFIX_CHECK + "/getAllCfgInfo", List.class);
+            contentValue = blockingService.getAllCfgInfo();
         } catch (Exception e) {
             logger.error("全国协议配置信息\t查询异常\trestTemplate", e);
 
@@ -231,10 +236,11 @@ public class ForBlockingInterface  implements CommandLineRunner{
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("全国协议配置信息\t推送返回结果" + response);
     }
-
-
-    @Override
-    public void run(String... args) throws Exception {
+    @Scheduled(fixedRate = 999999999)
+    public void run() {
+        if(a++>1){
+            return;
+        }
         getAllBlockInformation();
         getDisBlockInformation();
         getDNSDeceiveInformation();

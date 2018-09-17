@@ -14,6 +14,4 @@ public interface DictService {
     List<UiSysDictInfo> getUiSysDictInfo();
     List<NtcServiceDict> getNtcServiceDict();
     List<UiTagDicInfo> getUiTagDicInfo();
-
-    List<AreaDict> getAreaDict();
 }

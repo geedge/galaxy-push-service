@@ -11,10 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -108,7 +106,6 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<NtcEntranceReport> getDNSDeceiveInformation(String start, String end, int times) {
-        List<NtcEntranceReport> result = new ArrayList<>();
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         List<NtcEntranceReport> list = null;
         try {
@@ -131,20 +128,17 @@ public class BlockingServiceImp implements BlockingService {
                     if (languageChose == 2) {
                         //获取英文字段
                         ntcEntranceReport.setType(uiSysDictInfo.getItemValue());
-                        result.add(ntcEntranceReport);
                     } else if (languageChose == 1) {
                         //中文
                         ntcEntranceReport.setType(uiSysDictInfo.getItemDesc());
-                        result.add(ntcEntranceReport);
                     } else {
                         //俄文
                         ntcEntranceReport.setType(uiSysDictInfo.getItemValue());
-                        result.add(ntcEntranceReport);
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -156,7 +150,6 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<TimeTypeCount> get24hAllBlockEachProtocol(String start, String end, int times) {
-        ArrayList<TimeTypeCount> result = new ArrayList<>();
         List<TimeTypeCount> list = null;
         try {
             list = blockingDao.get24hAllBlockEachProtocolOnly(start, end);
@@ -182,21 +175,18 @@ public class BlockingServiceImp implements BlockingService {
                         if (languageChose == 2) {
                             //获取英文字段
                             timeTypeCount.setType(ntcServiceDict.getServiceNameEn());
-                            result.add(timeTypeCount);
                         } else if (languageChose == 1) {
                             //中文
                             timeTypeCount.setType(ntcServiceDict.getServiceNameZh());
-                            result.add(timeTypeCount);
                         } else {
                             //俄文
                             timeTypeCount.setType(ntcServiceDict.getServiceNameRu());
-                            result.add(timeTypeCount);
                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -208,7 +198,7 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<NtcDisReport> getDisBlockInformation(String start, String end, int times) {
-        List<NtcDisReport> result = new ArrayList<>();
+        List<NtcDisReport> list = new ArrayList<>();
         List<NtcDisReport> list1 = null;
         List<NtcDisReport> list2 = null;
         List<NtcDisReport> list3 = null;
@@ -219,7 +209,6 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("封堵信息分布显示\t查询异常\tserviceImpl", e);
         }
-        List<NtcDisReport> list = new ArrayList<>();
         list.addAll(list1);
         list.addAll(list2);
         list.addAll(list3);
@@ -249,24 +238,21 @@ public class BlockingServiceImp implements BlockingService {
                                 //设置type和area为英文名称字段
                                 ntcDisReport.setArea(uiSysDictInfo.getItemValue());
                                 ntcDisReport.setType(ntcServiceDict.getServiceNameEn());
-                                result.add(ntcDisReport);
                             } else if (languageChose == 1) {
                                 //中文
                                 ntcDisReport.setArea(uiSysDictInfo.getItemDesc());
                                 ntcDisReport.setType(ntcServiceDict.getServiceNameZh());
-                                result.add(ntcDisReport);
                             } else {
                                 //俄文
                                 ntcDisReport.setArea(uiSysDictInfo.getItemValue());
                                 ntcDisReport.setType(ntcServiceDict.getServiceNameRu());
-                                result.add(ntcDisReport);
                             }
                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -276,7 +262,6 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<HotStatistic> getAllHotStatistis(String start, String end, int times) {
-        ArrayList<HotStatistic> result = new ArrayList<>();
         List<HotStatistic> list = null;
         try {
             list = blockingDao.getAllHotStatistisOnly(start, end);
@@ -309,25 +294,21 @@ public class BlockingServiceImp implements BlockingService {
                                 //英文
                                 hotStatistic.setArea(uiSysDictInfo.getItemValue());
                                 hotStatistic.setType(ntcServiceDict.getServiceNameEn());
-                                result.add(hotStatistic);
-
                             } else if (languageChose == 1) {
                                 //中文
                                 hotStatistic.setArea(uiSysDictInfo.getItemDesc());
                                 hotStatistic.setType(ntcServiceDict.getServiceNameZh());
-                                result.add(hotStatistic);
                             } else {
                                 //俄文
                                 hotStatistic.setArea(uiSysDictInfo.getItemValue());
                                 hotStatistic.setType(ntcServiceDict.getServiceNameRu());
-                                result.add(hotStatistic);
                             }
                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -337,7 +318,6 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<PointMap> getPointMapOf10s() {
-        List<PointMap> result = new ArrayList<>();
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         List<PointMap> list = null;
         try {
@@ -354,21 +334,18 @@ public class BlockingServiceImp implements BlockingService {
                         if (languageChose == 2) {
                             //英文
                             pointMap.setType(ntcServiceDict.getServiceNameEn());
-                            result.add(pointMap);
                         } else if (languageChose == 1) {
                             //中文
                             pointMap.setType(ntcServiceDict.getServiceNameZh());
-                            result.add(pointMap);
                         } else {
                             //俄文
                             pointMap.setType(ntcServiceDict.getServiceNameRu());
-                            result.add(pointMap);
                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -380,7 +357,7 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<AreaCount> getDisBlockMap(String start, String end, int times) {
-        List<AreaCount> result = new ArrayList<>();
+        List<AreaCount> list = new ArrayList<>();
         List<AreaCount> list1 = null;
         List<AreaCount> list2 = null;
         List<AreaCount> list3 = null;
@@ -391,7 +368,6 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("热力图接口\t查询异常\tserviceImpl", e);
         }
-        List<AreaCount> list = new ArrayList<>();
         list.addAll(list1);
         list.addAll(list2);
         list.addAll(list3);
@@ -415,11 +391,9 @@ public class BlockingServiceImp implements BlockingService {
                         if (languageChose == 2) {
                             //英文
                             areaCount.setArea(uiSysDictInfo.getItemValue());
-                            result.add(areaCount);
                         } else if (languageChose == 1) {
                             //中文
                             areaCount.setArea(uiSysDictInfo.getItemDesc());
-                            result.add(areaCount);
                         } else {
                             //俄文
                             areaCount.setArea(uiSysDictInfo.getItemValue());
@@ -428,7 +402,7 @@ public class BlockingServiceImp implements BlockingService {
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -438,7 +412,6 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<CfgTypeCount> getAllCfgInfo() {
-        List<CfgTypeCount> result = new ArrayList<>();
         List<CfgTypeCount> list = null;
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         try {
@@ -453,19 +426,16 @@ public class BlockingServiceImp implements BlockingService {
                     if (languageChose == 2) {
                         //获取英文业务字段
                         cfgTypeCount.setType(ntcServiceDict.getServiceNameEn());
-                        result.add(cfgTypeCount);
                     } else if (languageChose == 1) {
                         //中文
                         cfgTypeCount.setType(ntcServiceDict.getServiceNameZh());
-                        result.add(cfgTypeCount);
                     } else {
                         //俄文
                         cfgTypeCount.setType(ntcServiceDict.getServiceNameRu());
-                        result.add(cfgTypeCount);
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 }

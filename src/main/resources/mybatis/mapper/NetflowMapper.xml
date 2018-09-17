@@ -4,24 +4,27 @@
 <mapper namespace="com.nis.galaxy.web.dao.NetflowDao">
     <!--5分钟内网络流量统计 5min_____映射-->
     <select id="getNetflowStatistic5mOnly" resultType="com.nis.galaxy.domain.TimeTypeCount">
-        SELECT #{end} time,proto_type type,SUM(c2s_byte_len)+SUM(s2c_byte_len) count
+        SELECT #{start} time,proto_type type,SUM(c2s_byte_len)+SUM(s2c_byte_len) count
         FROM traffic_protocol_statistic
-           WHERE stat_time between #{start} AND #{end}
+           WHERE stat_time >= #{start}
+              AND stat_time &lt; #{end}
         GROUP BY proto_type;
         </select>
     <!--1小时内网络协议统计_-->
     <select id="getProtocolStatisticOf1hOnly" resultType="com.nis.galaxy.domain.NetflowProtocol">
-      select #{end} time,proto_type type,max(link_num) linknum ,sum(c2s_pkt_num)+sum(s2c_pkt_num) pakeagenum,
+      select #{start} time,proto_type type,max(link_num) linknum ,sum(c2s_pkt_num)+sum(s2c_pkt_num) pakeagenum,
       sum(c2s_byte_len)+sum(s2c_byte_len) bytes
       FROM traffic_protocol_statistic
-      where stat_time between #{start} AND #{end}
+        WHERE stat_time >= #{start}
+        AND stat_time &lt; #{end}
       GROUP BY proto_type
   </select>
     <!--5分钟内活跃IP信息 5min __映射-->
     <select id="getIpActiveInfoOf5minOnly" resultType="com.nis.galaxy.domain.IpActiveInfo">
-       SELECT #{end} time ,ip_addr ip,area_id area,link_num links,c2s_pkt_num+s2c_pkt_num packets,
+       SELECT stat_time time ,ip_addr ip,area_id area,link_num links,c2s_pkt_num+s2c_pkt_num packets,
         c2s_byte_len+s2c_byte_len bytes
         FROM traffic_ip_active_statistic
-        where stat_time between #{start} and #{end};
+        WHERE stat_time >= #{start}
+              AND stat_time &lt; #{end}
     </select>
 </mapper>

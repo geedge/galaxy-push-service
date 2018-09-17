@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -54,20 +55,20 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcRejectUrlStatistic> getBlockTop10URLOf1h(String start, String end, int times) {
-        List<NtcRejectUrlStatistic> result = null;
+        List<NtcRejectUrlStatistic> list = null;
         try {
-            result = blockingTopNDao.getBlockTop10URLOf1h(start, end);
+            list = blockingTopNDao.getBlockTop10URLOf1h(start, end);
         } catch (Exception e) {
             logger.error("1小时内全国阻断URLTOP10\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个1h的数据
-        if (result == null || result.size() == 0) {
+        if (list == null || list.size() == 0) {
             if (times >= max) {
                 return null;
             }
             return getBlockTop10URLOf1h(DateUtils.getBeforeNminOfTime(start, -60), DateUtils.getBeforeNminOfTime(end, -60), ++times);
         }
-        return result;
+        return list;
     }
 
     /**
@@ -79,20 +80,20 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcRejectWebsiteStatistic> getBlockTop10WebsiteOf1h(String start, String end, int times) {
-        List<NtcRejectWebsiteStatistic> result = null;
+        List<NtcRejectWebsiteStatistic> list = null;
         try {
-            result = blockingTopNDao.getBlockTop10WebsiteOf1h(start, end);
+            list = blockingTopNDao.getBlockTop10WebsiteOf1h(start, end);
         } catch (Exception e) {
             logger.error("1小时内全国阻断网站TOP10\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个1h的数据
-        if (result == null || result.size() == 0) {
+        if (list == null || list.size() == 0) {
             if (times >= max) {
                 return null;
             }
             return getBlockTop10WebsiteOf1h(DateUtils.getBeforeNminOfTime(start, -60), DateUtils.getBeforeNminOfTime(end, -60), ++times);
         }
-        return result;
+        return list;
     }
 
     /**
@@ -102,9 +103,8 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcTagReport> getBlockTop10Tag24h(String start, String end, int times) {
-        List<NtcTagReport> result = new ArrayList<>();
-        HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         List<NtcTagReport> list = null;
+        HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
             list = blockingTopNDao.getBlockTop10Tag24hOnly(start, end);
         } catch (Exception e) {
@@ -126,12 +126,11 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                     if (itemType == 3) {
                         //取字典表中的字段值
                         ntcTagReport.setType(uiTagDicInfo.getItemValue());
-                        result.add(ntcTagReport);
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 
     /**
@@ -143,12 +142,11 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24(String start, String end, int times) {
+        List<AreaBlockProtocol> list = null;
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
-        ArrayList<AreaBlockProtocol> result = new ArrayList<>();
-        //查询日报表
-        List<AreaBlockProtocol> list = null;
         try {
+        //查询日报表
             list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hDayOnly(start, end);
         } catch (Exception e) {
             logger.error("24小时区域阻断协议TOP10日报表\t查询异常\tserviceImpl", e);
@@ -184,24 +182,21 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                                 //设置英文字段
                                 areaBlockProtocol.setType(ntcServiceDict.getServiceNameEn());
                                 areaBlockProtocol.setArea(uiSysDictInfo.getItemValue());
-                                result.add(areaBlockProtocol);
                             } else if (languageChose == 1) {
                                 //中文
                                 areaBlockProtocol.setType(ntcServiceDict.getServiceNameZh());
                                 areaBlockProtocol.setArea(uiSysDictInfo.getItemDesc());
-                                result.add(areaBlockProtocol);
                             } else {
                                 //俄文
                                 areaBlockProtocol.setType(ntcServiceDict.getServiceNameRu());
                                 areaBlockProtocol.setArea(uiSysDictInfo.getItemValue());
-                                result.add(areaBlockProtocol);
                             }
                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
 
     }
 
@@ -214,21 +209,21 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcUrlIpCount> getBlockTop10URLOf5m(String start, String end, int times) {
-        List<NtcUrlIpCount> result = null;
+        List<NtcUrlIpCount> list = null;
         try {
-            result = blockingTopNDao.getBlockTop10URLOf5m(start, end);
+            list = blockingTopNDao.getBlockTop10URLOf5m(start, end);
 
         } catch (Exception e) {
             logger.error("5分钟内全国阻断URLTOP10\t查询异常\tserviceImpl", e);
         }
         //查询不到时，继续向前一段时间
-        if (result == null || result.size() == 0) {
+        if (list == null || list.size() == 0) {
             if (times >= max) {
                 return null;
             }
             return getBlockTop10URLOf5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
-        return result;
+        return list;
     }
 
     /**
@@ -240,20 +235,20 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(String start, String end, int times) {
-        List<NtcUrlIpCount> result = null;
+        List<NtcUrlIpCount> list = null;
         try {
-            result = blockingTopNDao.getBlockTop10WebsiteOf5m(start, end);
+            list = blockingTopNDao.getBlockTop10WebsiteOf5m(start, end);
         } catch (Exception e) {
             logger.error("5分钟内全国阻断website\t查询异常\tserviceImpl", e);
         }
         //查询不到时，继续向前一段时间
-        if (result == null || result.size() == 0) {
+        if (list == null || list.size() == 0) {
             if (times >= max) {
                 return null;
             }
             return getBlockTop10WebsiteOf5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
-        return result;
+        return list;
     }
 
     /**
@@ -265,9 +260,8 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcTagReport> getBlockTop10Tag5m(String start, String end, int times) {
-        List<NtcTagReport> result = new ArrayList<>();
-        HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         List<NtcTagReport> list = null;
+        HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
             list = blockingTopNDao.getBlockTop10Tag5mOnly(start, end);
         } catch (Exception e) {
@@ -276,7 +270,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         //查询不到继续向前一段时间
         if (list == null || list.size() == 0) {
             if (times >= max) {
-                return result;
+                return list;
             }
             return getBlockTop10Tag5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
@@ -290,12 +284,11 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                         //条件是属性item=3的
                         if (itemType == 3) {
                             ntcTagReport.setType(uiTagDicInfo.getItemValue());
-                            result.add(ntcTagReport);
-                        }
+                         }
                     }
                 }
             }
         }
-        return result;
+        return list;
     }
 }

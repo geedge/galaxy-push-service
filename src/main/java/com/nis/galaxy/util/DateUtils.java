@@ -25,17 +25,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
     /**
-     * 获取距当前5分钟之前的时间
-     *
-     * @return
-     */
-    public static String getBeforeTimeOf5min() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.MINUTE, -5);
-        return DateUtils.formatDateTime(gc.getTime());
-    }
-
-    /**
      * 获取距当前5分30s前的时间
      *
      * @return
@@ -45,8 +34,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         gc.add(Calendar.MINUTE, -5);
         gc.add(Calendar.SECOND, -30);
         return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-01-01 00:00:00";
-
+        //return "2018-07-01 00:00:00";
     }
 
     /**
@@ -55,11 +43,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeTimeOf1h30s() {
-       GregorianCalendar gc = new GregorianCalendar();
-       gc.add(Calendar.HOUR, -1);
-       gc.add(Calendar.SECOND, -30);
-       return DateUtils.formatDateTime(gc.getTime());
-       //return "2018-01-01 00:00:00";
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.add(Calendar.HOUR, -1);
+        gc.add(Calendar.SECOND, -30);
+        return DateUtils.formatDateTime(gc.getTime());
+        //return "2018-07-01 00:00:00";
     }
 
     /**
@@ -68,11 +56,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeTimeOf24h30s() {
-       GregorianCalendar gc = new GregorianCalendar();
-       gc.add(Calendar.DATE, -1);
-       gc.add(Calendar.SECOND, -30);
-       return DateUtils.formatDateTime(gc.getTime());
-       // return "2018-01-01 00:00:00";
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.add(Calendar.DATE, -1);
+        gc.add(Calendar.SECOND, -30);
+        return DateUtils.formatDateTime(gc.getTime());
+        //return "2018-07-01 00:00:00";
     }
 
     /**
@@ -89,18 +77,20 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
     }
+
     /**
      * 获取距离time时间minute分钟的时间,之前需加符号-、之后为正+
+     *
      * @param time
      * @param minute
      * @return
      */
-    public static String getBeforeNminOfTime(String time,int minute) {
-         Date date = DateUtils.parseDate(time);
-         GregorianCalendar gc = new GregorianCalendar();
-         gc.setTime(date);
-         gc.add(Calendar.MINUTE, minute);
-         return DateUtils.formatDateTime(gc.getTime());
+    public static String getBeforeNminOfTime(String time, int minute) {
+        Date date = DateUtils.parseDate(time);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(Calendar.MINUTE, minute);
+        return DateUtils.formatDateTime(gc.getTime());
     }
 
     /**
@@ -110,11 +100,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter24h(String time) {
-       Date date = DateUtils.parseDate(time);
-       GregorianCalendar gc = new GregorianCalendar();
-       gc.setTime(date);
-       gc.add(Calendar.DATE, 1);
-       return DateUtils.formatDateTime(gc.getTime());
+        Date date = DateUtils.parseDate(time);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(Calendar.DATE, 1);
+        return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
     }
 
@@ -125,50 +115,21 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter1h(String time) {
-      Date date = DateUtils.parseDate(time);
-      GregorianCalendar gc = new GregorianCalendar();
-      gc.setTime(date);
-      gc.add(Calendar.HOUR, 1);
-      return DateUtils.formatDateTime(gc.getTime());
-       // return "2018-12-01 00:00:00";
-    }
-
-
-    /**
-     * 获取距当前时间n分钟的时间，之前的话加-号
-     *
-     * @return
-     */
-    public static String getBeforeTimeOfNmin(int minute) {
+        Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.MINUTE, minute);
+        gc.setTime(date);
+        gc.add(Calendar.HOUR, 1);
         return DateUtils.formatDateTime(gc.getTime());
+        //return "2018-12-01 00:00:00";
     }
 
+ //   //当前时间的上一个5min的整时间
+ //   public static String getTimePointNmin(String time){
+ //       getTime()
+//
+ //       return null;
+ //   }
 
-    /**
-     * 获取距当前时间1小时的时间
-     *
-     * @return
-     */
-    public static String getBeforeTimeOf1h() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.HOUR, -1);
-        //gc.add(Calendar.MONTH, -2);
-        return DateUtils.formatDateTime(gc.getTime());
-    }
-
-    /**
-     * 获取距当前时间24小时的时间
-     *
-     * @return
-     */
-    public static String getBeforeTimeOf24h() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.HOUR, -24);
-        //gc.add(Calendar.MONTH, -2);
-        return DateUtils.formatDateTime(gc.getTime());
-    }
 
 
     /**
