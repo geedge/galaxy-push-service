@@ -11,7 +11,10 @@ import java.util.List;
  */
 public interface DictService {
     List<ProtocolDict> getProtocolDict();
+
     List<UiSysDictInfo> getUiSysDictInfo();
+
     List<NtcServiceDict> getNtcServiceDict();
+
     List<UiTagDicInfo> getUiTagDicInfo();
 }

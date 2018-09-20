@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,8 +27,6 @@ public class NetflowServiceImpl implements NetflowService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
-
-    private int max = 3;
 
     //协议表
     public HashMap<String, String> listProtocolDict() {
@@ -47,19 +46,23 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<TimeTypeCount> getNetflowStatistic5m(String start, String end, int times) {
+    public List<TimeTypeCount> getNetflowStatistic5m(String start, String end) {
         List<TimeTypeCount> list = null;
         HashMap<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getNetflowStatistic5mOnly(start, end);
         } catch (Exception e) {
-             logger.error("5分钟内网络流量统计\t查询异常\tserviceImpl",e);
+            logger.error("5分钟内网络流量统计\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = netflowDao.getNetflowStatistic5mLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = netflowDao.getNetflowStatistic5mOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("5分钟内网络流量统计\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getNetflowStatistic5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
 
@@ -85,20 +88,25 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end,int times) {
+    public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end) {
         List<NetflowProtocol> list = null;
         HashMap<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
         } catch (Exception e) {
-             logger.error("1小时内网络协议统计\t查询异常\tserviceImpl",e);
+            logger.error("1小时内网络协议统计\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
-            if(times>=max){
-            return getProtocolStatisticOf1h(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5),++times);
+            try {
+                String lastTime = netflowDao.getProtocolStatisticOf1hLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = netflowDao.getProtocolStatisticOf1hOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("1小时内网络协议统计\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if(list!=null && list.size()!=0){
+        if (list != null && list.size() != 0) {
             for (NetflowProtocol netflowProtocol : list) {
                 String type = netflowProtocol.getType();
                 if (type != null && listProtocolDict != null) {
@@ -118,22 +126,25 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end,int times) {
+    public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
         List<IpActiveInfo> list = null;
-         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
+        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         try {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
-
         } catch (Exception e) {
-             logger.error("5分钟内活跃IP信息\t查询异常\tserviceImpl",e);
+            logger.error("5分钟内活跃IP信息\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
-            if(times>=max){
-                return null;
+            try {
+                String lastTime = netflowDao.getIpActiveInfoOf5minLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = netflowDao.getIpActiveInfoOf5minOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("5分钟内活跃IP信息\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getIpActiveInfoOf5min(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5),++times);
         }
-        if(list !=null && list.size()!=0){
+        if (list != null && list.size() != 0) {
             for (IpActiveInfo ipActiveInfo : list) {
                 String area = ipActiveInfo.getArea();
                 if (area != null && listDictUiSys != null) {

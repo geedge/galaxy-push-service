@@ -43,13 +43,16 @@ public class MonitorServiceImpl implements MonitorService {
             NmsServerBean nmsServerBean = new NmsServerBean();
             nmsServerBean.setTime(nmsServerBeanTmp.getTime());
             nmsServerBean.setArea(nmsServerBeanTmp.getArea());
-            nmsServerBean.setTotal(nmsServerBeanTmp.getTotal());
-            nmsServerBean.setNormal(nmsServerBeanTmp.getNormal());
-            nmsServerBean.setAbnormal(nmsServerBeanTmp.getNormal());
+            nmsServerBean.setTotal(Integer.parseInt(nmsServerBeanTmp.getTotal()));
+            nmsServerBean.setNormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
+            nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
             nmsServerBean.setAbnormalmachines(abnormalBean);
             list.add(nmsServerBean);
             return list;
         }
         return list;
     }
+
+
+
 }

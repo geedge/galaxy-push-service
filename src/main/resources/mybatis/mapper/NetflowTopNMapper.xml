@@ -6,10 +6,24 @@
     <select id="getIpActiveStatisticOf5mOnly" resultType="com.nis.galaxy.domain.IpActiveInt" parameterType="String">
        SELECT  #{start} time,area_id area,ip_addr IP,SUM(c2s_byte_len)+SUM(s2c_byte_len) COUNT
        FROM traffic_ip_active_statistic
-       WHERE stat_time >= #{start}
-              AND stat_time &lt; #{end}
+       <![CDATA[
+          WHERE stat_time >= #{start}
+          AND stat_time < #{end}
+        ]]>
        GROUP BY ip_addr ,area_id
        ORDER BY COUNT desc
        LIMIT 10;
+    </select>
+
+    <!--最近数据时间的获取 and 小于参数end-->
+    <!--时间：5分钟内活跃IP流量TOP10-->
+    <select id="getIpActiveStatisticOf5mLastTime" resultType="String">
+        select stat_time
+          FROM traffic_ip_active_statistic
+        <![CDATA[
+          WHERE stat_time < #{end}
+        ]]>
+          ORDER BY stat_time desc
+          LIMIT 1;
     </select>
 </mapper>

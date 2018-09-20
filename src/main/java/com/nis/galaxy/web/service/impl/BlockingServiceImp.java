@@ -54,7 +54,7 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List getAllBlockInformation(String start, String end, int times) {
+    public List getAllBlockInformation(String start, String end) {
         List<NtcTypeCount> result = new CopyOnWriteArrayList<>();
         List<NtcTotalReport> list = null;
         try {
@@ -64,11 +64,14 @@ public class BlockingServiceImp implements BlockingService {
         }
         //若插叙信息为空则继续查前一阶段的数据
         if (list == null || list.size() == 0) {
-            //连续查询次数不大于max
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingDao.getAllBlockInformationLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingDao.getAllBlockInformation(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("整体封堵数量\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getAllBlockInformation(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             NtcTotalReport listParams = list.get(0);
@@ -105,7 +108,7 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List<NtcEntranceReport> getDNSDeceiveInformation(String start, String end, int times) {
+    public List<NtcEntranceReport> getDNSDeceiveInformation(String start, String end) {
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         List<NtcEntranceReport> list = null;
         try {
@@ -113,13 +116,15 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("DNS欺骗信息显示\t查询异常\tserviceImpl", e);
         }
-        //如果此次没有查询到数据查上一个5min的数据
         if (list == null || list.size() == 0) {
-            //连续查询次数不大于max
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingDao.getDNSDeceiveInformationLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingDao.getDNSDeceiveInformationOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("DNS欺骗信息显示\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getDNSDeceiveInformation(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             for (NtcEntranceReport ntcEntranceReport : list) {
@@ -149,7 +154,7 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List<TimeTypeCount> get24hAllBlockEachProtocol(String start, String end, int times) {
+    public List<TimeTypeCount> get24hAllBlockEachProtocol(String start, String end) {
         List<TimeTypeCount> list = null;
         try {
             list = blockingDao.get24hAllBlockEachProtocolOnly(start, end);
@@ -158,11 +163,14 @@ public class BlockingServiceImp implements BlockingService {
         }
         //若查询结果为空，查询上时间段的数据
         if (list == null || list.size() == 0) {
-            //连续查询次数不大于max
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingDao.get24hAllBlockEachProtocolOLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingDao.get24hAllBlockEachProtocolOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("24小时全国范围阻断协议信息\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return get24hAllBlockEachProtocol(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             HashMap<String, NtcServiceDict> listNtcService = listNtcService();
@@ -197,7 +205,7 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List<NtcDisReport> getDisBlockInformation(String start, String end, int times) {
+    public List<NtcDisReport> getDisBlockInformation(String start, String end) {
         List<NtcDisReport> list = new ArrayList<>();
         List<NtcDisReport> list1 = null;
         List<NtcDisReport> list2 = null;
@@ -214,11 +222,19 @@ public class BlockingServiceImp implements BlockingService {
         list.addAll(list3);
         //若查询结果为空，查询上时间段的数据
         if (list == null || list.size() == 0) {
-            //连续查询次数不大于max
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingDao.getDisBlockInformationLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list1 = blockingDao.getDisBlockInformationOnly(time, DateUtils.getAfter5min(time), a, b);
+                list2 = blockingDao.getDisBlockInformationOnly(time, DateUtils.getAfter5min(time), c, d);
+                list3 = blockingDao.getDisBlockInformationOnly(time, DateUtils.getAfter5min(time), e, f);
+                list.addAll(list1);
+                list.addAll(list2);
+                list.addAll(list3);
+            } catch (Exception e) {
+                logger.error("整体封堵数量\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getDisBlockInformation(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             //业务表
@@ -261,20 +277,22 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List<HotStatistic> getAllHotStatistis(String start, String end, int times) {
+    public List<HotStatistic> getAllHotStatistis(String start, String end) {
         List<HotStatistic> list = null;
         try {
             list = blockingDao.getAllHotStatistisOnly(start, end);
         } catch (Exception e) {
             logger.error("24小时内全国热力图\t查询异常\tserviceImpl", e);
         }
-        //如果此次没有查询到数据查上一个5min的数据
         if (list == null || list.size() == 0) {
-            //连续查询次数不大于max
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingDao.getAllHotStatistisLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingDao.getAllHotStatistisOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("24小时内全国热力图\t最近数据\t查询异常\tserviceImpl", e);
             }
-            getAllHotStatistis(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             HashMap<String, NtcServiceDict> listNtcService = listNtcService();
@@ -356,7 +374,7 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List<AreaCount> getDisBlockMap(String start, String end, int times) {
+    public List<AreaCount> getDisBlockMap(String start, String end) {
         List<AreaCount> list = new ArrayList<>();
         List<AreaCount> list1 = null;
         List<AreaCount> list2 = null;
@@ -373,11 +391,19 @@ public class BlockingServiceImp implements BlockingService {
         list.addAll(list3);
         //如果此次没有查询到数据查上一个5min的数据
         if (list == null || list.size() == 0) {
-            //连续查询次数不大于max
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingDao.getDisBlockMapLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list1 = blockingDao.getDisBlockMapOnly(time, DateUtils.getAfter5min(time), a, b);
+                list2 = blockingDao.getDisBlockMapOnly(time, DateUtils.getAfter5min(time), c, d);
+                list3 = blockingDao.getDisBlockMapOnly(time, DateUtils.getAfter5min(time), e, f);
+                list.addAll(list1);
+                list.addAll(list2);
+                list.addAll(list3);
+            } catch (Exception e) {
+                logger.error("热力图接口\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getDisBlockMap(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             //局点表

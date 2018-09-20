@@ -26,4 +26,18 @@ public interface BlockingTopNDao {
     List<NtcTagReport> getBlockTop10Tag24hOnly(@Param("start") String start, @Param("end") String end);
 
     List<NtcTagReport> getBlockTop10Tag5mOnly(@Param("start") String start, @Param("end") String end);
+
+    String getAreaBlockTop10ProtocolOf24hLastTime(@Param("end") String end);
+
+    String getBlockTop10URLOf1hLastTime(@Param("end") String end);
+
+    String getBlockTop10WebsiteOf1hLastTime(@Param("end") String end);
+
+    String getBlockTop10Tag24hLastTime(@Param("end") String end);
+
+    String getBlockTop10URLOf5mLastTime(@Param("end") String end);
+
+    String getBlockTop10WebsiteOf5mLastTime(@Param("end") String end);
+
+    String getBlockTop10Tag5mOnlyLastTime(@Param("end") String end);
 }

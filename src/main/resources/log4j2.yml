@@ -10,7 +10,7 @@ Configuration:
     - name: log.level.galaxy
       value: debug
     - name: log.path
-      value: /home/mesasoft/galaxyPush/logs
+      value: /home/ceiec/galaxyPush/logs
     - name: project.name
       value: galaxy-push-service
   Appenders:

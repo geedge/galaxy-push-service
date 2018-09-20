@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import sun.reflect.annotation.ExceptionProxy;
@@ -27,6 +28,8 @@ import java.util.List;
 public class MyLoad {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
+    private int a =1;
 
     @Autowired
     DictService dictService;
@@ -56,9 +59,8 @@ public class MyLoad {
         return listNtcService;
     }
 
-
-    @Scheduled(fixedRate = 3600000*24)
-    public void run() {
+    @Scheduled(cron = "${dict.scheduled.cron.plan}")
+    public void runMyLoad() {
         logger.info("执行初始化加载数据：\t局点字典表\t业务字典表\t协议字典表\t标签字典表");
 
         //局点表的预加载(中英俄)
@@ -70,7 +72,7 @@ public class MyLoad {
             e.printStackTrace();
             logger.info("局点表预加载出现异常");
         }
-        if (uiSysDictInfo != null) {
+        if (uiSysDictInfo != null && uiSysDictInfo.size()>0) {
             for (UiSysDictInfo uiSysDictInfoZh : uiSysDictInfo) {
                 listDictUiSys.put(String.valueOf(uiSysDictInfoZh.getSysDictId()), uiSysDictInfoZh);
             }
@@ -86,7 +88,7 @@ public class MyLoad {
             e.printStackTrace();
             logger.info("业务字典表预加载出现异常");
         }
-        if (ntcServiceDict != null) {
+        if (ntcServiceDict != null && ntcServiceDict.size()>0) {
             for (NtcServiceDict serviceDict : ntcServiceDict) {
                 listNtcService.put(String.valueOf(serviceDict.getServiceCode()), serviceDict);
             }
@@ -102,7 +104,7 @@ public class MyLoad {
             e.printStackTrace();
             logger.info("协议字典表的预加载出现异常");
         }
-        if (protocolDict != null) {
+        if (protocolDict != null && protocolDict.size()>0) {
             for (ProtocolDict dict : protocolDict) {
                 listProtocolDict.put(String.valueOf(dict.getViewCode()), dict.getProtocolType());
             }
@@ -118,12 +120,19 @@ public class MyLoad {
             e.printStackTrace();
             logger.info("标签表的预加载出现异常");
         }
-        if (uiTagDicInfo != null) {
+        if (uiTagDicInfo != null && uiTagDicInfo.size()>0) {
             for (UiTagDicInfo tagDicInfo : uiTagDicInfo) {
                 listUiTagDicInfo.put(String.valueOf(tagDicInfo.getServiceDictId()), tagDicInfo);
             }
         }
-        logger.info("标签字典表的预加载结果为\t" + listProtocolDict);
+        logger.info("标签字典表的预加载结果为\t" + uiTagDicInfo);
         logger.info("初始化字典表操作执行完成");
+    }
+    @Scheduled(fixedRate = 999999999)
+    public void run() {
+        if (a++ > 1) {
+            return;
+        }
+        runMyLoad();
     }
 }

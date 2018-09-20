@@ -25,7 +25,6 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
-    private int max = 3;
 
     //局点表
     public HashMap<String, UiSysDictInfo> listDictUiSys() {
@@ -40,19 +39,23 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
      * @return
      */
     @Override
-    public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end, int times) {
+    public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end) {
         List<IpActiveInt> list = null;
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
         } catch (Exception e) {
-             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl",e);
+            logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = netflowTopNDao.getIpActiveStatisticOf5mOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("5分钟内活跃IP流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
-            getIpActiveStatisticOf5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             for (IpActiveInt ipActiveInt : list) {

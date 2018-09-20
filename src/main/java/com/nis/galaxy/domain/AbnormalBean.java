@@ -15,7 +15,6 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class AbnormalBean {
-
     private String name;
     private String ip;
 }

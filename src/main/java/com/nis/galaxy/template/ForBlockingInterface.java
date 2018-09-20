@@ -26,9 +26,8 @@ public class ForBlockingInterface {
     RestTemplate restTemplate;
     @Autowired
     BlockingService blockingService;
-    //计数器用于第一次启动全部执行一次
-    private int a =1;
-
+    private int a = 1;
+    private int before5m = -5;
 
     @Value("${scheduled.block.enable}")
     private String scheduledBlockEnable;
@@ -48,12 +47,12 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            contentValue = blockingService.getAllBlockInformation(start, end, times);
+            contentValue = blockingService.getAllBlockInformation(start, end);
         } catch (Exception e) {
             logger.error("封堵信息整体显示\t查询异常\trestTemplate", e);
         }
@@ -72,12 +71,12 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            contentValue = blockingService.getDisBlockInformation(start, end, times);
+            contentValue = blockingService.getDisBlockInformation(start, end);
         } catch (Exception e) {
             logger.error("封堵信息分布显示\t查询异常\trestTemplate", e);
         }
@@ -96,13 +95,13 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获得封装数据
-            contentValue = blockingService.getDNSDeceiveInformation(start, end, times);
+            contentValue = blockingService.getDNSDeceiveInformation(start, end);
         } catch (Exception e) {
             logger.error("DNS欺骗信息显示\t查询异常\trestTemplate", e);
         }
@@ -121,13 +120,13 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = blockingService.get24hAllBlockEachProtocol(start, end, times);
+            contentValue = blockingService.get24hAllBlockEachProtocol(start, end);
         } catch (Exception e) {
             logger.error("24小时全国范围阻断协议信息\t查询异常\trestTemplate", e);
 
@@ -147,13 +146,13 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         //获取并封装数据
         List contentValue = null;
         try {
-            String start = DateUtils.getBeforeTimeOf5min30s();
-            String end = DateUtils.getAfter5min(start);
-            int times = 1;
-            contentValue = blockingService.getAllHotStatistis(start, end, times);
+            contentValue = blockingService.getAllHotStatistis(start, end);
         } catch (Exception e) {
             logger.error("24小时内全国热力图\t查询异常\trestTemplate", e);
         }
@@ -197,13 +196,13 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingService.getDisBlockMap(start, end, times);
+            contentValue = blockingService.getDisBlockMap(start, end);
         } catch (Exception e) {
             logger.error("热力图接口\t查询异常\trestTemplate", e);
         }
@@ -236,9 +235,10 @@ public class ForBlockingInterface {
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("全国协议配置信息\t推送返回结果" + response);
     }
+
     @Scheduled(fixedRate = 999999999)
     public void run() {
-        if(a++>1){
+        if (a++ > 1) {
             return;
         }
         getAllBlockInformation();

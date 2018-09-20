@@ -29,6 +29,8 @@ public class ForNetflowInterface {
     @Autowired
     NetflowService netflowService;
     private int a = 1;
+    private int before5m = -5;
+
     @Value("${scheduled.netflow.enable}")
     private String scheduledNetflowEnable;
     @Value("${REST_URL_PREFIX_CHECK}")
@@ -47,13 +49,13 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = netflowService.getNetflowStatistic5m(start, end, times);
+            contentValue = netflowService.getNetflowStatistic5m(start, end);
 
         } catch (Exception e) {
             logger.error("5分钟内网络流量统计\t查询异常\trestTemplate", e);
@@ -63,7 +65,6 @@ public class ForNetflowInterface {
         logger.info("开始推送========>>>5分钟内网络流量统计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("5分钟内网络流量统计\t推送返回结果" + response);
-
     }
 
     /**
@@ -74,13 +75,13 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = netflowService.getProtocolStatisticOf1h(start, end, times);
+            contentValue = netflowService.getProtocolStatisticOf1h(start, end);
         } catch (Exception e) {
             logger.error("1小时内网络协议统计\t查询异常\trestTemplate", e);
         }
@@ -99,19 +100,19 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = netflowService.getIpActiveInfoOf5min(start, end, times);
+            contentValue = netflowService.getIpActiveInfoOf5min(start, end);
 
         } catch (Exception e) {
             logger.error("5分钟内活跃IP信息\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.1hour.protocol", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.5min.ip.active", contentValue);
         logger.info("开始推送======>>>5分钟内活跃IP信息 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("5分钟内活跃IP信息\t推送返回结果" + response);
@@ -120,7 +121,7 @@ public class ForNetflowInterface {
 
 
     @Scheduled(fixedRate = 999999999)
-    public void run(){
+    public void run() {
         if (a++ > 1) {
             return;
         }

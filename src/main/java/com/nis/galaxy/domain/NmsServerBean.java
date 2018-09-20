@@ -20,9 +20,9 @@ public class NmsServerBean {
     private String time;
     private String system;
     private String area;
-    private String total;
-    private String normal;
-    private String abnormal;
+    private int total;
+    private int normal;
+    private int abnormal;
     private List<AbnormalBean> abnormalmachines;
     public void setTime(String time) {
         this.time = time.substring(0,time.length()-2);

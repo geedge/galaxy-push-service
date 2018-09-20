@@ -24,6 +24,9 @@ public class AsyncConfig {
     private int maxPoolSize;
     @Value("${Asyn.queueCapacity}")
     private int queueCapacity;
+    @Value("${Asyn.keepAliveSeconds}")
+    private int keepAliveSeconds;
+
 
     @Bean
     public Executor taskExecutor() {
@@ -31,6 +34,7 @@ public class AsyncConfig {
         executor.setCorePoolSize(corePoolSize);
         executor.setMaxPoolSize(maxPoolSize);
         executor.setQueueCapacity(queueCapacity);
+        executor.setKeepAliveSeconds(keepAliveSeconds);
         executor.initialize();
         // 设置默认线程名称
         executor.setThreadNamePrefix("My-Thread-");

@@ -28,8 +28,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
-    //最大查询次数
-    private int max = 3;
+
 
     //局点表
     public HashMap<String, UiSysDictInfo> listDictUiSys() {
@@ -54,7 +53,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      * @return
      */
     @Override
-    public List<NtcRejectUrlStatistic> getBlockTop10URLOf1h(String start, String end, int times) {
+    public List<NtcRejectUrlStatistic> getBlockTop10URLOf1h(String start, String end) {
         List<NtcRejectUrlStatistic> list = null;
         try {
             list = blockingTopNDao.getBlockTop10URLOf1h(start, end);
@@ -63,10 +62,14 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //如果此次没有查询到数据查上一个1h的数据
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingTopNDao.getBlockTop10URLOf1hLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOfhour(time);
+                list = blockingTopNDao.getBlockTop10URLOf1h(time, DateUtils.getAfter1h(time));
+            } catch (Exception e) {
+                logger.error("1小时内全国阻断URLTOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getBlockTop10URLOf1h(DateUtils.getBeforeNminOfTime(start, -60), DateUtils.getBeforeNminOfTime(end, -60), ++times);
         }
         return list;
     }
@@ -79,7 +82,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      * @return
      */
     @Override
-    public List<NtcRejectWebsiteStatistic> getBlockTop10WebsiteOf1h(String start, String end, int times) {
+    public List<NtcRejectWebsiteStatistic> getBlockTop10WebsiteOf1h(String start, String end) {
         List<NtcRejectWebsiteStatistic> list = null;
         try {
             list = blockingTopNDao.getBlockTop10WebsiteOf1h(start, end);
@@ -88,10 +91,14 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //如果此次没有查询到数据查上一个1h的数据
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingTopNDao.getBlockTop10WebsiteOf1hLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOfhour(time);
+                list = blockingTopNDao.getBlockTop10WebsiteOf1h(time, DateUtils.getAfter1h(time));
+            } catch (Exception e) {
+                logger.error("1小时内全国阻断网站TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getBlockTop10WebsiteOf1h(DateUtils.getBeforeNminOfTime(start, -60), DateUtils.getBeforeNminOfTime(end, -60), ++times);
         }
         return list;
     }
@@ -102,7 +109,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      * @return
      */
     @Override
-    public List<NtcTagReport> getBlockTop10Tag24h(String start, String end, int times) {
+    public List<NtcTagReport> getBlockTop10Tag24h(String start, String end) {
         List<NtcTagReport> list = null;
         HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
@@ -112,10 +119,14 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //如果此次没有查询到数据查上一个1h的数据
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingTopNDao.getBlockTop10Tag24hLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOfhour(time);
+                list = blockingTopNDao.getBlockTop10Tag24hOnly(time, DateUtils.getAfter1h(time));
+            } catch (Exception e) {
+                logger.error("1小时内全国阻断网站TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getBlockTop10Tag24h(DateUtils.getBeforeNminOfTime(start, -60), DateUtils.getBeforeNminOfTime(end, -60), ++times);
         }
         if (list != null && list.size() != 0) {
             for (NtcTagReport ntcTagReport : list) {
@@ -141,12 +152,12 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      * @return
      */
     @Override
-    public List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24(String start, String end, int times) {
+    public List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24(String start, String end) {
         List<AreaBlockProtocol> list = null;
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         try {
-        //查询日报表
+            //查询日报表
             list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hDayOnly(start, end);
         } catch (Exception e) {
             logger.error("24小时区域阻断协议TOP10日报表\t查询异常\tserviceImpl", e);
@@ -161,10 +172,14 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //查询数据为空则查询上一天数据
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingTopNDao.getAreaBlockTop10ProtocolOf24hLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOfday(time);
+                list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hOnly(time, DateUtils.getAfter24h(time));
+            } catch (Exception e) {
+                logger.error("24小时区域阻断协议TOP10分钟报表\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getAreaBlockTop10ProtocolOf24(DateUtils.getBeforeNminOfTime(start, -60 * 24), DateUtils.getBeforeNminOfTime(end, -60 * 24), ++times);
         }
         if (list != null && list.size() != 0) {
             //映射
@@ -208,7 +223,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      * @return
      */
     @Override
-    public List<NtcUrlIpCount> getBlockTop10URLOf5m(String start, String end, int times) {
+    public List<NtcUrlIpCount> getBlockTop10URLOf5m(String start, String end) {
         List<NtcUrlIpCount> list = null;
         try {
             list = blockingTopNDao.getBlockTop10URLOf5m(start, end);
@@ -218,23 +233,27 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //查询不到时，继续向前一段时间
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingTopNDao.getBlockTop10URLOf5mLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingTopNDao.getBlockTop10URLOf5m(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("5分钟内全国阻断URLTOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getBlockTop10URLOf5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         return list;
     }
 
     /**
-     * 5分钟内全国阻断website
+     * 5分钟内全国阻断websiteTOP10
      *
      * @param start
      * @param end
      * @return
      */
     @Override
-    public List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(String start, String end, int times) {
+    public List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(String start, String end) {
         List<NtcUrlIpCount> list = null;
         try {
             list = blockingTopNDao.getBlockTop10WebsiteOf5m(start, end);
@@ -243,10 +262,14 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //查询不到时，继续向前一段时间
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return null;
+            try {
+                String lastTime = blockingTopNDao.getBlockTop10WebsiteOf5mLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingTopNDao.getBlockTop10WebsiteOf5m(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("5分钟内全国阻断website\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getBlockTop10WebsiteOf5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         return list;
     }
@@ -259,7 +282,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      * @return
      */
     @Override
-    public List<NtcTagReport> getBlockTop10Tag5m(String start, String end, int times) {
+    public List<NtcTagReport> getBlockTop10Tag5m(String start, String end) {
         List<NtcTagReport> list = null;
         HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
@@ -269,10 +292,14 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         }
         //查询不到继续向前一段时间
         if (list == null || list.size() == 0) {
-            if (times >= max) {
-                return list;
+            try {
+                String lastTime = blockingTopNDao.getBlockTop10Tag5mOnlyLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOf5min(time);
+                list = blockingTopNDao.getBlockTop10Tag5mOnly(time, DateUtils.getAfter5min(time));
+            } catch (Exception e) {
+                logger.error("5分钟内全国阻断标签TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
-            return getBlockTop10Tag5m(DateUtils.getBeforeNminOfTime(start, -5), DateUtils.getBeforeNminOfTime(end, -5), ++times);
         }
         if (list != null && list.size() != 0) {
             for (NtcTagReport ntcTagReport : list) {
@@ -284,7 +311,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                         //条件是属性item=3的
                         if (itemType == 3) {
                             ntcTagReport.setType(uiTagDicInfo.getItemValue());
-                         }
+                        }
                     }
                 }
             }

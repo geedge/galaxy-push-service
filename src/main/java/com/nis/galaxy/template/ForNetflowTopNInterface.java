@@ -28,6 +28,7 @@ public class ForNetflowTopNInterface {
     @Autowired
     NetflowTopNService netflowTopNService;
     private int a = 1;
+    private int before5m = -5;
     @Value("${scheduled.netflow.topn.enable}")
     private String scheduledNetflowTopnEnable;
     @Value("${REST_URL_PREFIX_CHECK}")
@@ -46,13 +47,13 @@ public class ForNetflowTopNInterface {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = netflowTopNService.getIpActiveStatisticOf5m(start, end, times);
+            contentValue = netflowTopNService.getIpActiveStatisticOf5m(start, end);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\trestTemplate", e);
         }

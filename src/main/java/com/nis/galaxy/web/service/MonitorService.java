@@ -11,4 +11,5 @@ import java.util.List;
 public interface MonitorService {
 
     List<NmsServerBean> getMonitorOf1m();
+
 }

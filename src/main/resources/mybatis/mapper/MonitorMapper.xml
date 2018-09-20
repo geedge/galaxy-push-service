@@ -13,5 +13,4 @@
       FROM traffic_abnormal_machine
       WHERE nmsServer_Id = #{nmsServiceId};
     </select>
-
 </mapper>

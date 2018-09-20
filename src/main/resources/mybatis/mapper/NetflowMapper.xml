@@ -6,8 +6,10 @@
     <select id="getNetflowStatistic5mOnly" resultType="com.nis.galaxy.domain.TimeTypeCount">
         SELECT #{start} time,proto_type type,SUM(c2s_byte_len)+SUM(s2c_byte_len) count
         FROM traffic_protocol_statistic
-           WHERE stat_time >= #{start}
-              AND stat_time &lt; #{end}
+        <![CDATA[
+          WHERE stat_time >= #{start}
+          AND stat_time < #{end}
+        ]]>
         GROUP BY proto_type;
         </select>
     <!--1小时内网络协议统计_-->
@@ -15,8 +17,10 @@
       select #{start} time,proto_type type,max(link_num) linknum ,sum(c2s_pkt_num)+sum(s2c_pkt_num) pakeagenum,
       sum(c2s_byte_len)+sum(s2c_byte_len) bytes
       FROM traffic_protocol_statistic
-        WHERE stat_time >= #{start}
-        AND stat_time &lt; #{end}
+        <![CDATA[
+          WHERE stat_time >= #{start}
+          AND stat_time < #{end}
+        ]]>
       GROUP BY proto_type
   </select>
     <!--5分钟内活跃IP信息 5min __映射-->
@@ -24,7 +28,42 @@
        SELECT stat_time time ,ip_addr ip,area_id area,link_num links,c2s_pkt_num+s2c_pkt_num packets,
         c2s_byte_len+s2c_byte_len bytes
         FROM traffic_ip_active_statistic
-        WHERE stat_time >= #{start}
-              AND stat_time &lt; #{end}
+        <![CDATA[
+          WHERE stat_time >= #{start}
+          AND stat_time < #{end}
+
+        ]]>
+    </select>
+
+    <!--最近数据时间的获取 and 小于参数end-->
+    <!--时间：5分钟内网络流量统计-->
+    <select id="getNetflowStatistic5mLastTime" resultType="String">
+        SELECT stat_time
+        FROM traffic_protocol_statistic
+        <![CDATA[
+        where stat_time < #{end}
+         ]]>
+        ORDER BY stat_time desc
+        LIMIT 1;
+    </select>
+    <!--时间：1小时内网络协议统计-->
+    <select id="getProtocolStatisticOf1hLastTime" resultType="String">
+        SELECT stat_time
+        FROM traffic_protocol_statistic
+        <![CDATA[
+        where stat_time < #{end}
+         ]]>
+        ORDER BY stat_time desc
+        LIMIT 1;
+    </select>
+    <!--时间：5分钟内活跃IP信息-->
+    <select id="getIpActiveInfoOf5minLastTime" resultType="String">
+       SELECT stat_time
+        FROM traffic_ip_active_statistic
+        <![CDATA[
+        where stat_time < #{end}
+         ]]>
+        ORDER BY stat_time desc
+        LIMIT 1;
     </select>
 </mapper>

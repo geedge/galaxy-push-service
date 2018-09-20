@@ -28,8 +28,9 @@ public class ForBlockingTopNInterface {
     RestTemplate restTemplate;
     @Autowired
     BlockingTopNService blockingTopNService;
-    //计数器用于第一次启动全部执行一次
     private int a = 1;
+    private int before5m = -5;
+    private int before60m = -60;
 
     @Value("${scheduled.block.topn.enable}")
     private String scheduledBlockTopnEnable;
@@ -49,13 +50,13 @@ public class ForBlockingTopNInterface {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf24h30s();
-        String end = DateUtils.getAfter24h(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOfday(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m * 24);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingTopNService.getAreaBlockTop10ProtocolOf24(start, end, times);
+            contentValue = blockingTopNService.getAreaBlockTop10ProtocolOf24(start, end);
         } catch (Exception e) {
             logger.error("24小时区域阻断协议TOP10\t查询异常\trestTemplate", e);
         }
@@ -75,13 +76,13 @@ public class ForBlockingTopNInterface {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf1h30s();
-        String end = DateUtils.getAfter1h(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOfhour(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingTopNService.getBlockTop10URLOf1h(start, end, times);
+            contentValue = blockingTopNService.getBlockTop10URLOf1h(start, end);
         } catch (Exception e) {
             logger.error("1小时内全国阻断URLTOP10\t查询异常\trestTemplate", e);
         }
@@ -100,13 +101,13 @@ public class ForBlockingTopNInterface {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf1h30s();
-        String end = DateUtils.getAfter1h(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOfhour(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = blockingTopNService.getBlockTop10WebsiteOf1h(start, end, times);
+            contentValue = blockingTopNService.getBlockTop10WebsiteOf1h(start, end);
         } catch (Exception e) {
             logger.error("1小时内全国阻断网站TOP10\t查询异常\trestTemplate", e);
         }
@@ -126,13 +127,13 @@ public class ForBlockingTopNInterface {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf1h30s();
-        String end = DateUtils.getAfter1h(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOfhour(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingTopNService.getBlockTop10Tag24h(start, end, times);
+            contentValue = blockingTopNService.getBlockTop10Tag24h(start, end);
         } catch (Exception e) {
             logger.error("24小时内封堵标签TOP10\t查询异常\trestTemplate", e);
         }
@@ -153,13 +154,13 @@ public class ForBlockingTopNInterface {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingTopNService.getBlockTop10URLOf5m(start, end, times);
+            contentValue = blockingTopNService.getBlockTop10URLOf5m(start, end);
 
         } catch (Exception e) {
             logger.error("5分钟内全国阻断URLTOP10\t查询异常\trestTemplate", e);
@@ -173,20 +174,20 @@ public class ForBlockingTopNInterface {
     }
 
     /**
-     * 5分钟内全国阻断website TOP10 5/min
+     * 5分钟内全国阻断websiteTOP10 5/min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
     public void getBlockTop10WebsiteOf5m() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingTopNService.getBlockTop10WebsiteOf5m(start, end, times);
+            contentValue = blockingTopNService.getBlockTop10WebsiteOf5m(start, end);
 
         } catch (Exception e) {
             logger.error("5分钟内全国阻断website\t查询异常\trestTemplate", e);
@@ -207,13 +208,13 @@ public class ForBlockingTopNInterface {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
         }
-        String start = DateUtils.getBeforeTimeOf5min30s();
-        String end = DateUtils.getAfter5min(start);
-        int times = 1;
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
             //获取并封装数据
-            contentValue = blockingTopNService.getBlockTop10Tag5m(start, end, times);
+            contentValue = blockingTopNService.getBlockTop10Tag5m(start, end);
         } catch (Exception e) {
             logger.error("5分钟内全国阻断标签TOP10\t查询异常\trestTemplate", e);
         }

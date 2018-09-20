@@ -17,4 +17,10 @@ public interface NetflowDao {
     List<NetflowProtocol> getProtocolStatisticOf1hOnly(@Param("start") String start, @Param("end") String end);
 
     List<TimeTypeCount> getNetflowStatistic5mOnly(@Param("start") String start, @Param("end") String end);
+
+    String getNetflowStatistic5mLastTime(@Param("end") String end);
+
+    String getProtocolStatisticOf1hLastTime(@Param("end") String end);
+
+    String getIpActiveInfoOf5minLastTime(@Param("end") String end);
 }

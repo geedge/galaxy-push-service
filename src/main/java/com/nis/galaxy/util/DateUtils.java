@@ -64,7 +64,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * 距time 5min之后
+     * 距参数time 5min之后的时间点
      *
      * @param time
      * @return
@@ -76,21 +76,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         gc.add(Calendar.MINUTE, 5);
         return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
-    }
-
-    /**
-     * 获取距离time时间minute分钟的时间,之前需加符号-、之后为正+
-     *
-     * @param time
-     * @param minute
-     * @return
-     */
-    public static String getBeforeNminOfTime(String time, int minute) {
-        Date date = DateUtils.parseDate(time);
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(date);
-        gc.add(Calendar.MINUTE, minute);
-        return DateUtils.formatDateTime(gc.getTime());
     }
 
     /**
@@ -122,15 +107,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
     }
-
- //   //当前时间的上一个5min的整时间
- //   public static String getTimePointNmin(String time){
- //       getTime()
-//
- //       return null;
- //   }
-
-
 
     /**
      * 得到当前日期字符串 格式（yyyy-MM-dd）
@@ -298,4 +274,152 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 //		long time = new Date().getTime()-parseDate("2012-11-19").getTime();
 //		System.out.println(time/(24*60*60*1000));
     }
+
+
+    /**
+     * 获取time时间的前整点时间点
+     * eg:2018-12-12 12:06:36 结果为：2018-12-12 00:00:00
+     * 2018-12-12 00:59:36 结果为：2018-12-12 00:00:00
+     *
+     * @param time
+     * @return 取前一个整天的时间, 如果返回为null检查输入的String类型时间格式
+     */
+    public static String getRangeOfday(String time) {
+        if (time == null || time == "") {
+            return null;
+        }
+        int length = time.length();
+        int cut = 8;
+        if (length <= cut) {
+            return null;
+        }
+        try {
+            time = time.substring(0, length - cut);
+            time = time.concat("00:00:00");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return time;
+    }
+
+
+    /**
+     * 获取time时间的前整点时间点
+     * eg:2018-12-12 12:06:36 结果为：2018-12-12 12:00:00
+     * 2018-12-12 00:59:36 结果为：2018-12-12 00:00:00
+     *
+     * @param time
+     * @return 取前一个整点的时间, 如果返回为null检查输入的String类型时间格式
+     */
+    public static String getRangeOfhour(String time) {
+        if (time == null || time == "") {
+            return null;
+        }
+        int length = time.length();
+        int cut = 8;
+        if (length <= cut) {
+            return null;
+        }
+        try {
+            time = time.substring(0, length - 5);
+            time = time.concat("00:00");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return time;
+    }
+
+    /**
+     * 获取time时间的前整5分钟的时间点
+     * eg:  2018-12-12 12:06:36 结果为：2018-12-12 12:05:00
+     * 2018-12-12 12:04:36 结果为：2018-12-12 12:00:00
+     *
+     * @param time
+     * @return 取前一个5分钟的时间，若返回为null则检查传入的string类型时间格式
+     */
+    public static String getRangeOf5min(String time) {
+        if (time == null || time == "") {
+            return null;
+        }
+        int length = time.length();
+        int cut = 4;
+        if (length <= cut) {
+            return null;
+        }
+        int max = 5;
+        //获取分钟数的个位
+        int compare;
+        try {
+            compare = Integer.parseInt(time.substring(length - cut, length - cut + 1));
+            time = time.substring(0, length - cut);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (compare >= 0 && compare < max) {
+            time = time.concat("0:00");
+        } else if (compare >= max) {
+            time = time.concat("5:00");
+        }
+        return time;
+    }
+
+    /**
+     * 获取距离time时间minute分钟的时间,之前需加符号-、之后为正+
+     *
+     * @param time
+     * @param minute
+     * @return
+     */
+    public static String getBeforeNminOfTime(String time, int minute) {
+        Date date = DateUtils.parseDate(time);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(Calendar.MINUTE, minute);
+        return DateUtils.formatDateTime(gc.getTime());
+    }
+
+    /**
+     * 获取距离time时间hour小时的时间,之前需加符号-、之后为正+
+     *
+     * @param time
+     * @param hour
+     * @return
+     */
+    public static String getRangeNhourOfTime(String time, int hour) {
+        Date date = DateUtils.parseDate(time);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(Calendar.HOUR, hour);
+        return DateUtils.formatDateTime(gc.getTime());
+    }
+
+    /**
+     * 获取距离time时间day天的时间,之前需加符号-、之后为正+
+     *
+     * @param time
+     * @param day
+     * @return
+     */
+    public static String getRangeNdayOfTime(String time, int day) {
+        Date date = DateUtils.parseDate(time);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(date);
+        gc.add(Calendar.DATE, day);
+        return DateUtils.formatDateTime(gc.getTime());
+    }
+
+    /**
+     * 截取时间 eg：截取时间参数：2018-09-18 14:30:00.0 结果为：2018-09-18 14:30:00
+     *
+     * @param time
+     * @return
+     */
+    public static String getSubstringTime(String time) {
+        time = time.substring(0, time.length() - 2);
+        return time;
+    }
+
 }
