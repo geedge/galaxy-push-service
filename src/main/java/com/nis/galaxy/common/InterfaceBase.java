@@ -8,9 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +19,17 @@ import java.util.Map;
  * @data 2018/8/27 11:51
  */
 public class InterfaceBase {
+    protected final static Logger logger = LoggerFactory.getLogger(InterfaceBase.class);
 
-    //响应成功状态码
+    /**
+     * 响应成功状态码
+     */
     private static int success = 200;
-    //设置传送失败后120s后再次推送数据
-    private static int t_loop=120*1000;
+    /**
+     * 传送失败后t_loop后再次推送
+     */
+    private static int t_loop = 120 * 1000;
+
     /**
      * 开始推送定时任务
      *
@@ -39,40 +43,30 @@ public class InterfaceBase {
             if (response.getStatusCodeValue() != success) {
                 throw new RuntimeException();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("第1次推送失败" + DateUtils.getDateTime());
+        } catch (Exception e1) {
+            logger.error("第一次推送失败",e1);
             try {
-                //需要间隔120s推送最多3次
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            //等待120s
-                            Thread.sleep(t_loop);
-                            restTemplate.postForEntity(url, httpEntity, String.class);
-                            System.out.println("第2次推送成功" + DateUtils.getDateTime());
-                            return;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.out.println("第2次推送失败" + DateUtils.getDateTime());
-                            try {
-                                //等待120s
-                                Thread.sleep(t_loop);
-                                restTemplate.postForEntity(url, httpEntity, String.class);
-                                System.out.println("第2次推送成功" + DateUtils.getDateTime());
-                            } catch (Exception e1) {
-                                System.out.println("第3次推送失败" + DateUtils.getDateTime());
-                            }
-                        }
+                //等待第二次推送
+                Thread.sleep(t_loop);
+                response = restTemplate.postForEntity(url, httpEntity, String.class);
+                if (response.getStatusCodeValue() != success) {
+                    throw new RuntimeException();
+                }
+            } catch (Exception e2) {
+                logger.error("第二次推送失败",e2);
+                try {
+                    //等待第三次推送
+                    Thread.sleep(t_loop);
+                    response = restTemplate.postForEntity(url, httpEntity, String.class);
+                    if (response.getStatusCodeValue() != success) {
+                        throw new RuntimeException();
                     }
-                }).start();
-            } catch (Exception e1) {
-                e1.printStackTrace();
+                } catch (Exception e3) {
+                    logger.error("第三次推送失败",e3);
+                }
             }
-        } finally {
-            return response;
         }
+        return response;
     }
 
     /**
@@ -90,6 +84,7 @@ public class InterfaceBase {
         map.put("tag", tagValue);
         map.put("content", contentValue);
         String params = JsonMapper.toJsonString(map);
-        return new HttpEntity<String>(params, headers);
+        HttpEntity<String> httpEntity = new HttpEntity<>(params, headers);
+        return httpEntity;
     }
 }
