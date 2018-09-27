@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nis.galaxy.web.dao.BlockingDao">
+    <!-- 封堵信息总体显示 5min/条、粒度5min-->
+    <select id="getAllBlockInformation" resultType="com.nis.galaxy.domain.NtcTotalReport">
+        SELECT reject_num rejectNum ,monitor_num monitorNum,c2s_byte_len c2sByteLen,s2c_byte_len s2cByteLen,
+        new_uni_conn_num newUniConnNum,live_conn_num liveConnNum,drop_conn_num dropConnNum,loop_conn_num loopConnNum
+        FROM ntc_total_report
+        <![CDATA[
+          WHERE report_time >= #{start}
+          AND report_time < #{end}
+
+
+        ]]>
+    </select>
+
+    <!--封堵信息分布显示_____映射-->
+    <select id="getDisBlockInformationOnly" resultType="com.nis.galaxy.domain.NtcDisReport">
+      	SELECT #{start} time,entrance_id area,service type,SUM(sum) count
+      	FROM ntc_entrance_report
+      	<![CDATA[
+          WHERE report_time >= #{start}
+          AND report_time < #{end}
+        ]]>
+	      AND  service BETWEEN #{a} AND #{b}
+	    GROUP BY entrance_id,service;
+    </select>
+    <!--DNS欺骗信息显示 5min/条、粒度5min______映射局点表-->
+    <select id="getDNSDeceiveInformationOnly" resultType="com.nis.galaxy.domain.NtcEntranceReport">
+        SELECT entrance_id type,sum(sum) count
+        FROM ntc_entrance_report
+		<![CDATA[
+          WHERE report_time >= #{start}
+          AND report_time < #{end}
+        ]]>
+          AND service = 18
+        group by entrance_id;
+    </select>
+
+    <!--24小时全国范围阻断协议信息 5min/条、粒度5min_______映射业务表-->
+    <select id="get24hAllBlockEachProtocolOnly" resultType="com.nis.galaxy.domain.TimeTypeCount">
+        SELECT  #{start} time ,service type,SUM(sum)  count
+        FROM ntc_service_report
+        <![CDATA[
+          WHERE report_time >= #{start}
+          AND report_time < #{end}
+        ]]>
+        GROUP BY service;
+    </select>
+    <!--24小时内全国热力图 5min/条、粒度1min_____映射-->
+    <select id="getAllHotStatistisOnly" resultType="com.nis.galaxy.domain.HotStatistic">
+      SELECT #{start} time,entrance_id area, s_ip src_ip, d_ip dst_ip,service type,SUM(sum) count
+	    FROM ntc_service_behav_statistic
+	   <![CDATA[
+          WHERE report_time >= #{start}
+          AND report_time < #{end}
+        ]]>
+	    GROUP BY s_ip,d_ip,service,entrance_id
+    </select>
+
+    <!--实时打点图10s/次___映射-->
+    <select id="getPointMapOf10sOnly" resultType="com.nis.galaxy.domain.PointMap">
+      SELECT  report_time time,s_ip src_ip,d_ip dst_ip,service type
+        FROM ntc_service_behav_statistic
+        ORDER BY stat_id desc
+        LIMIT 100;
+    </select>
+
+    <!--热力图接口 5min/次 粒度5min_____映射 -->
+    <select id="getDisBlockMapOnly" resultType="com.nis.galaxy.domain.AreaCount">
+       SELECT #{start} time, entrance_id area,sum(sum) count
+       FROM ntc_entrance_report
+        <![CDATA[
+          WHERE report_time >= #{start}
+          AND report_time < #{end}
+        ]]>
+          AND service between #{a} and #{b}
+        GROUP BY entrance_id;
+    </select>
+
+    <!--全国协议配置信息_________做映射用-->
+    <select id="getAllCfgInfoOnly" resultType="com.nis.galaxy.domain.CfgTypeCount">
+      SELECT service_id type, count(cfg_type) count
+        FROM ui_cfg_num_statistics
+        WHERE cfg_state = 1
+      GROUP BY service_id
+      ORDER BY count desc;
+    </select>
+
+
+    <!--最近数据时间的获取 and 小于参数end-->
+    <!--时间：封堵信息整体显示-->
+    <select id="getAllBlockInformationLastTime" resultType="String">
+        select report_time
+          FROM ntc_total_report
+        <![CDATA[
+          WHERE report_time < #{end}
+        ]]>
+          ORDER BY report_time desc
+          LIMIT 1;
+    </select>
+    <!--封堵信息分布显示-->
+    <select id="getDisBlockInformationLastTime" resultType="String">
+        select report_time
+          FROM ntc_entrance_report
+        <![CDATA[
+          WHERE report_time < #{end}
+        ]]>
+          ORDER BY report_time desc
+          LIMIT 1;
+    </select>
+    <!--DNS欺骗信息显示-->
+    <select id="getDNSDeceiveInformationLastTime" resultType="String">
+        select report_time
+          FROM ntc_entrance_report
+        <![CDATA[
+          WHERE report_time < #{end}
+          AND service = 18
+        ]]>
+          ORDER BY report_time desc
+          LIMIT 1;
+    </select>
+    <!--24小时全国范围阻断协议信息-->
+    <select id="get24hAllBlockEachProtocolOLastTime" resultType="String">
+        select report_time
+          FROM ntc_service_report
+        <![CDATA[
+          WHERE report_time < #{end}
+        ]]>
+          ORDER BY report_time desc
+          LIMIT 1;
+    </select>
+    <!--24小时内全国热力图-->
+    <select id="getAllHotStatistisLastTime" resultType="String">
+        select report_time
+          FROM ntc_service_behav_statistic
+        <![CDATA[
+          WHERE report_time < #{end}
+        ]]>
+          ORDER BY report_time desc
+          LIMIT 1;
+    </select>
+    <!--热力图接口-->
+    <select id="getDisBlockMapLastTime" resultType="String">
+        select report_time
+          FROM ntc_entrance_report
+        <![CDATA[
+          WHERE report_time < #{end}
+        ]]>
+          ORDER BY report_time desc
+          LIMIT 1;
+    </select>
+
+
+</mapper>
