@@ -70,6 +70,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter5min(String time) {
+        if(time ==null || time.isEmpty()){
+            return "";
+        }
         Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
@@ -77,7 +80,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
     }
-
     /**
      * 距time 24h之后
      *
@@ -85,6 +87,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter24h(String time) {
+        if(time ==null || time.isEmpty()){
+            return "";
+        }
         Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
@@ -100,6 +105,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter1h(String time) {
+        if(time ==null || time.isEmpty()){
+            return "";
+        }
         Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
@@ -285,8 +293,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return 取前一个整天的时间, 如果返回为null检查输入的String类型时间格式
      */
     public static String getRangeOfday(String time) {
-        if (time == null || time == "") {
-            return null;
+        if (time == null || time.isEmpty()) {
+            return "";
         }
         int length = time.length();
         int cut = 8;
@@ -313,13 +321,13 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return 取前一个整点的时间, 如果返回为null检查输入的String类型时间格式
      */
     public static String getRangeOfhour(String time) {
-        if (time == null || time == "") {
-            return null;
+        if (time == null || time.isEmpty()) {
+            return "";
         }
         int length = time.length();
         int cut = 8;
         if (length <= cut) {
-            return null;
+            return "";
         }
         try {
             time = time.substring(0, length - 5);
@@ -340,8 +348,8 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return 取前一个5分钟的时间，若返回为null则检查传入的string类型时间格式
      */
     public static String getRangeOf5min(String time) {
-        if (time == null || time == "") {
-            return null;
+        if (time == null || time.isEmpty()) {
+            return "";
         }
         int length = time.length();
         int cut = 4;
@@ -374,6 +382,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeNminOfTime(String time, int minute) {
+        if(time ==null || time.isEmpty()){
+            return "";
+        }
         Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
@@ -389,6 +400,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getRangeNhourOfTime(String time, int hour) {
+        if(time==null){
+            return "";
+        }
         Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
@@ -404,6 +418,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getRangeNdayOfTime(String time, int day) {
+        if(time ==null || time.isEmpty()){
+            return "";
+        }
         Date date = DateUtils.parseDate(time);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(date);
@@ -418,8 +435,12 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getSubstringTime(String time) {
+        if (time == null || time.length() != 21 || time.isEmpty()) {
+            return "";
+        }
         time = time.substring(0, time.length() - 2);
         return time;
     }
+
 
 }

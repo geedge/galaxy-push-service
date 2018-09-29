@@ -10,7 +10,7 @@ Configuration:
     - name: log.level.galaxy
       value: debug
     - name: log.path
-      value: /home/ceiec/galaxyPush/logs
+      value: D:/log/idea
     - name: project.name
       value: galaxy-push-service
   Appenders:
@@ -22,19 +22,20 @@ Configuration:
         onMatch: ACCEPT
         onMismatch: DENY
       PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) %m%n------->>"
+        pattern: "%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%l %x) - %m%n------->>"
     RollingFile: # 输出到文件，超过128MB归档
     - name: ROLLING_FILE
       ignoreExceptions: false
       fileName: ${log.path}/${project.name}.log
       filePattern: "${log.path}/$${date:yyyy-MM}/${project.name}-%d{yyyy-MM-dd}-%i.log.gz"
       PatternLayout:
-        pattern: "%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%F:%L) - %m%n"
+        pattern: "%d{yyyy-MM-dd HH:mm:ss,SSS}:%4p %t (%l %x) - %m%n"
       Policies:
-        SizeBasedTriggeringPolicy:
-          size: "128 MB"
-      DefaultRolloverStrategy:
-        max: 1000
+        TimeBasedTriggeringPolicy:
+          modulate: true
+          interval: 1
+        DefaultRolloverStrategy:     # 文件最多200个
+          max: 200
   Loggers:
     Root:
       level: info

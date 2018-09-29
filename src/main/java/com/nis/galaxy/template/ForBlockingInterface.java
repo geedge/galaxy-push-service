@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +17,6 @@ import java.util.List;
 
 
 @Component
-@Async
 public class ForBlockingInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -31,6 +29,8 @@ public class ForBlockingInterface {
 
     @Value("${scheduled.block.enable}")
     private String scheduledBlockEnable;
+    @Value("${DICT.WAIT}")
+    private int DICTWAIT;
     @Value("${REST_URL_PREFIX_CHECK}")
     private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
@@ -54,7 +54,10 @@ public class ForBlockingInterface {
         try {
             contentValue = blockingService.getAllBlockInformation(start, end);
         } catch (Exception e) {
-            logger.error("封堵信息整体显示\t查询异常\trestTemplate", e);
+            logger.error("封堵信息整体显示\t查询异常\trestTemplate",e);
+        }
+        if(contentValue==null){
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.global", contentValue);
@@ -80,6 +83,9 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("封堵信息分布显示\t查询异常\trestTemplate", e);
         }
+        if(contentValue==null){
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.area", contentValue);
         logger.info("开始推送======>>>封堵信息分布显示\t请求头和请求体：" + httpEntity);
@@ -104,6 +110,9 @@ public class ForBlockingInterface {
             contentValue = blockingService.getDNSDeceiveInformation(start, end);
         } catch (Exception e) {
             logger.error("DNS欺骗信息显示\t查询异常\trestTemplate", e);
+        }
+        if(contentValue==null){
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.dns.deceive", contentValue);
@@ -131,6 +140,9 @@ public class ForBlockingInterface {
             logger.error("24小时全国范围阻断协议信息\t查询异常\trestTemplate", e);
 
         }
+        if(contentValue==null){
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.global.protocol.block", contentValue);
         logger.info("开始推送======>>>24小时全国范围阻断协议信息\t请求头和请求体：" + httpEntity);
@@ -156,6 +168,9 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("24小时内全国热力图\t查询异常\trestTemplate", e);
         }
+        if(contentValue==null){
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.24hour.thermodynamic", contentValue);
         logger.info("开始推送======>>>24h全国热力图\t请求头和请求体：" + httpEntity);
@@ -179,6 +194,9 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("实时打点图\t查询异常\trestTemplate", e);
 
+        }
+        if(contentValue==null){
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.realtime.point", contentValue);
@@ -206,6 +224,9 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("热力图接口\t查询异常\trestTemplate", e);
         }
+        if(contentValue==null){
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.thermodynamic", contentValue);
         logger.info("开始推送======>>>热力图\t请求头和请求体：" + httpEntity);
@@ -229,6 +250,9 @@ public class ForBlockingInterface {
             logger.error("全国协议配置信息\t查询异常\trestTemplate", e);
 
         }
+        if(contentValue==null){
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("blocking.global.protocol.config", contentValue);
         logger.info("开始推送======>>>全国协议配置信息 请求头和请求体：" + httpEntity);
@@ -237,10 +261,11 @@ public class ForBlockingInterface {
     }
 
     @Scheduled(fixedRate = 999999999)
-    public void run() {
+    public void run()  throws InterruptedException{
         if (a++ > 1) {
             return;
         }
+        Thread.sleep(DICTWAIT);
         getAllBlockInformation();
         getDisBlockInformation();
         getDNSDeceiveInformation();

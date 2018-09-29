@@ -17,19 +17,6 @@
 		ORDER BY count desc
 		LIMIT 10;
      </select>
-
-    <!--2.24小时区域阻断协议TOP10 24h/条 天报-->
-    <select id="getAreaBlockTop10ProtocolOf24hDayOnly" resultType="com.nis.galaxy.domain.AreaBlockProtocol">
-      SELECT  #{start} time,entrance_id area,service type,sum(sum) count
-          FROM ntc_entrance_stat_daily
-        <![CDATA[
-          WHERE report_time >= #{start}
-          AND report_time < #{end}
-        ]]>
-	  GROUP BY service ,entrance_id
-	  ORDER BY count desc
-	  LIMIT 10;
-    </select>
     <!--1小时内全国阻断URLTOP10 1h/条 小时报-->
     <select id="getBlockTop10URLOf1h" resultType="com.nis.galaxy.domain.NtcRejectUrlStatistic">
         SELECT #{start} time,url type,SUM(sum) count

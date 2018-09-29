@@ -6,16 +6,7 @@ mybatis:
 
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
     driver-class-name: org.mariadb.jdbc.Driver              # mariadb驱动包
-    url: jdbc:mariadb://10.0.6.249:3306/galaxy   # 数据库名称
+    url: jdbc:mariadb://10.0.6.249:3306/galaxy        # 数据库名称
     username: ENC(L0d9FkUJX6BIaxPyy57bqQ==)
     password: ENC(0WPm6y8me4cavVjpk2BuBQ==)
-    initialSize: 8
-    minIdle: 5
-    maxIdle: 20
-    maxActive: 8
-    maxWait: 20000
-    timeBetweenEvictionRunsMillis: 60000  #Destroy线程会检测连接的间隔时间、testWhileIdle的判断依据，详细看testWhileIdle属性的说明
-    testOnBorrow: true      #申请连接时执行validationQuery检测连接是否有效
-    testOnReturn: false     #归还连接时执行validationQuery检测连接是否有效

@@ -32,6 +32,32 @@
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
 
+
+
+
+
+        ]]>
+    </select>
+    <!--地域流量-->
+    <select id="getAreaNetflowOf5min" resultType="com.nis.galaxy.domain.AreaBPSTime">
+        <![CDATA[
+        	SELECT #{start} time,sum(t.speed)
+        	from ( SELECT RECV_TIME,NODE_IP,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
+        	       FROM traffic_netflow_port_info
+            where RECV_TIME >= #{start} and RECV_TIME < #{end} ) t   ;
+        ]]>
+    </select>
+    <!--端口流量-->
+    <select id="getPortNetflowOf5min" resultType="com.nis.galaxy.domain.PortBPSTime">
+        <![CDATA[
+
+
+        SELECT t.RECV_TIME time,t.port port,avg(t.speed) bps
+        from ( SELECT RECV_TIME,PORT,INOCTETS_SPEED+OUTOCTETS_SPEED as speed FROM traffic_netflow_port_info
+        where RECV_TIME >= #{start} and RECV_TIME < #{end} ) t
+        GROUP BY t.port,RECV_TIME;
+
+
         ]]>
     </select>
 
@@ -64,6 +90,26 @@
         where stat_time < #{end}
          ]]>
         ORDER BY stat_time desc
+        LIMIT 1;
+    </select>
+    <!--时间：地域流量-->
+    <select id="getAreaNetflowOf5minLastTime" resultType="String">
+       SELECT RECV_TIME
+        FROM traffic_netflow_port_info
+        <![CDATA[
+        where RECV_TIME < #{end}
+         ]]>
+        ORDER BY RECV_TIME desc
+        LIMIT 1;
+    </select>
+    <!--时间：端口流量-->
+    <select id="getPortNetflowOf5minLastTime" resultType="String">
+       SELECT RECV_TIME
+        FROM traffic_netflow_port_info
+        <![CDATA[
+        where RECV_TIME < #{end}
+         ]]>
+        ORDER BY RECV_TIME desc
         LIMIT 1;
     </select>
 </mapper>

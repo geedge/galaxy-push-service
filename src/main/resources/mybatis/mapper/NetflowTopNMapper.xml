@@ -14,6 +14,21 @@
        ORDER BY COUNT desc
        LIMIT 10;
     </select>
+    <!--互联网流量TOP10-->
+    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
+        <![CDATA[
+        SELECT #{start} as time,(sum(a.INOCTETS)+sum(a.OUTOCTETS)-b.count)/#{average} as count
+        FROM traffic_netflow_port_info a,(SELECT sum(INOCTETS)+sum(OUTOCTETS) as count
+                FROM traffic_netflow_port_info
+                WHERE RECV_TIME >= #{startB}
+                AND RECV_TIME < #{endB}) b
+        WHERE RECV_TIME >= #{start}
+        AND RECV_TIME < #{end}
+        order by count desc;
+        ]]>
+
+    </select>
+
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：5分钟内活跃IP流量TOP10-->
@@ -25,5 +40,15 @@
         ]]>
           ORDER BY stat_time desc
           LIMIT 1;
+    </select>
+    <!--时间：1小时内互联网流量TOP10-->
+    <select id="getNetFlowWaterTop10LastTime" resultType="String">
+        select RECV_TIME
+        FROM traffic_netflow_port_info
+        <![CDATA[
+          WHERE RECV_TIME < #{end}
+          ORDER BY RECV_TIME desc
+          LIMIT 1;
+        ]]>
     </select>
 </mapper>
