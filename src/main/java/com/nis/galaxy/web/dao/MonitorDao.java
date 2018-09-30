@@ -19,9 +19,6 @@ public interface MonitorDao {
 
     List<AbnormalBean> getMonitorOf1m02(int id);
 
-    List<CountryMonitorProxy> getCountryMonitor(@Param("start") String start, @Param("end") String end);
-
-    String getCountryMonitorLastTime(@Param("end")String end);
 
     List<NetWaterMonitor> getNetWaterMonitor(@Param("start") String start, @Param("end") String end);
 

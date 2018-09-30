@@ -23,15 +23,7 @@
         ]]>
     </select>
 
-    <!--国家代理监控_小时-->
-    <select id="getCountryMonitor" resultType="com.nis.galaxy.domain.CountryMonitorProxy">
-        SELECT sum(MONITOR_NUM) as monitorNum,sum(REJECT_NUM)  as rejectNum,sum(REPLACE_NUM) as replaceNum
-        FROM pxy_total_report
-        <![CDATA[
-           WHERE REPORT_TIME >= #{start}
-          AND REPORT_TIME < #{end};
-        ]]>
-    </select>
+
     <!--网络流量监控_5min-->
     <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
         SELECT #{start} time,(sum(INOCTETS)+sum(OUTOCTETS))/300  count
@@ -42,18 +34,6 @@
         ]]>
     </select>
 
-
-
-    <!--时间：国家代理监控_小时-->
-    <select id="getCountryMonitorLastTime" resultType="String">
-        SELECT report_time
-        FROM pxy_total_report
-        <![CDATA[
-          WHERE report_time < #{end}
-        ]]>
-        ORDER BY report_time desc
-        LIMIT 1;
-    </select>
     <!--时间:网络流量监控_5min-->
     <select id="getNetWaterMonitorLastTime" resultType="String">
         SELECT RECV_TIME

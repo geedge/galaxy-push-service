@@ -6,41 +6,17 @@
     <!--系统总计 /天-->
     <select id="getSystemTotalOf1Day" resultType="com.nis.galaxy.domain.SystemTotal">
     <![CDATA[
-
-
-
-
-
-
-
-
         SELECT p.pz_num totalNum,t.byte_sum configNum,t.reject_sum blockNum,t.monitor_sum monitorNum,t.drop_conn_sum discardedNum,t.loop_conn_sum refluxNum
         FROM
           ( SELECT count(0) pz_num FROM ui_cfg_num_statistics WHERE cfg_state = 1 ) p,
           ( SELECT sum(c2s_byte_len + s2c_byte_len) byte_sum, sum(reject_num) reject_sum,sum(monitor_num) monitor_sum, sum(drop_conn_num) drop_conn_sum, sum(loop_conn_num) loop_conn_sum
               FROM NTC_TOTAL_REPORT
-               WHERE report_time >= #{start} AND report_time < #{end} ) t
-
-
-
-
-
-
-
-
+            WHERE report_time >= #{start} AND report_time < #{end} ) t
         ]]>
     </select>
     <!--特定APP访问监控 /小时-->
     <select id="getSpecifiedAPPMonitor" resultType="com.nis.galaxy.domain.EventsAppMonitor">
     <![CDATA[
-
-
-
-
-
-
-
-
        select #{start} time,a.app_name name,t.link_sum num
        from (select app_type,sum(link_num) link_sum
               from TRAFFIC_APP_STATISTIC
@@ -48,16 +24,15 @@
                  and stat_time<#{end}
                  group by app_type) t , ui_code_app_dic a
         where t.app_type=a.view_code;
-
         ]]>
     </select>
     <!--来函统计报表-->
     <select id="getLetterCount" resultType="com.nis.galaxy.domain.EventsLetterCount">
       select r.create_time time,r.request_title letter,count(s.compile_id) num
       from ui_request_info r left join
-                     (SELECT t.request_id,t.service_id,t.compile_id
-                       FROM ui_request_num_statistics t
-                        GROUP BY t.request_id, t.service_id, t.compile_id) s
+              (SELECT t.request_id,t.service_id,t.compile_id
+                FROM ui_request_num_statistics t
+                 GROUP BY t.request_id, t.service_id, t.compile_id) s
       on r.id = s.request_id
       group by r.id,r.create_time,r.request_title
     </select>
@@ -75,7 +50,7 @@
     <select id="getKeyPointSafaguardThing" resultType="com.nis.galaxy.domain.EventsKeyPointSafaguardThing">
         <![CDATA[
        SELECT  #{end} time,task.task_name teskName, count(lwhh.id) letterNum,COALESCE(sum(num.cfg_num),0) configNum,COALESCE( sum(num.reject_sum),0) monitorNum,COALESCE( sum(num.monit_sum),0) controlNum
-          FROM (select * from ui_task_info where is_valid=1) task left join (select * from ui_request_info  where is_valid=1) lwhh on task.id = lwhh.task_id left join  ( SELECT req.request_id, count(req.compile_id) cfg_num, sum(pz.reject_sum) reject_sum, sum(pz.monit_sum) monit_sum FROM (
+        FROM (select * from ui_task_info where is_valid=1) task left join (select * from ui_request_info  where is_valid=1) lwhh on task.id = lwhh.task_id left join  ( SELECT req.request_id, count(req.compile_id) cfg_num, sum(pz.reject_sum) reject_sum, sum(pz.monit_sum) monit_sum FROM (
           SELECT  t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) req
           LEFT JOIN ( SELECT s.cfg_id, SUM(s.reject_sum) reject_sum, SUM(s.monit_sum) monit_sum FROM (
           SELECT p.cfg_id,( CASE WHEN (p.service BETWEEN 16 AND 65) OR (p.service BETWEEN 256 AND 272) OR (p.service BETWEEN 512 AND 576) THEN  p.sum ELSE  0 END ) reject_sum,
@@ -139,7 +114,15 @@
             limit 10
         ]]>
     </select>
-
+    <!--运行状态-->
+    <select id="getRunningState" resultType="com.nis.galaxy.domain.EventsRunningState">
+    <![CDATA[
+	SELECT sum(MONITOR_NUM) as visitsNum,sum(REJECT_NUM)  as controlNum,sum(REPLACE_NUM) as replaceNum
+        FROM pxy_total_report
+        WHERE REPORT_TIME >= #{start}
+       AND REPORT_TIME < #{end}
+     ]]>
+    </select>
 
     <!--时间：系统总计 -->
     <select id="getSystemTotalOf1DayLastTime" resultType="String">
@@ -209,6 +192,16 @@
         where report_time < #{end}
          ]]>
         ORDER BY report_time desc
+        LIMIT 1;
+    </select>
+ <!--时间：运行状态-->
+    <select id="getRunningStateLastTime" resultType="String">
+        SELECT REPORT_TIME
+        FROM  pxy_total_report
+        <![CDATA[
+        where REPORT_TIME < #{end}
+         ]]>
+        ORDER BY REPORT_TIME desc
         LIMIT 1;
     </select>
 

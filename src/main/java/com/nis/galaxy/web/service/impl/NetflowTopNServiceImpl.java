@@ -102,8 +102,8 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         }
         try {
             list = netflowTopNDao.getNetFlowWaterTop10(start, end, startB, endB, average);
-            if(list ==null || list.get(0).getCount()==0){
-                list=new ArrayList<>();
+            if (list == null || list.get(0).getCount() == 0) {
+                list = new ArrayList<>();
             }
         } catch (Exception e) {
             logger.error("互联网流量TOP10\t查询异常\tserviceImpl", e);
@@ -125,8 +125,8 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                     endB = DateUtils.getAfter5min(startB);
                 }
                 list = netflowTopNDao.getNetFlowWaterTop10(start, end, startB, endB, average);
-                if(list ==null || list.get(0).getCount()==0){
-                    list=new ArrayList<>();
+                if (list == null || list.get(0).getCount() == 0) {
+                    list = new ArrayList<>();
                 }
             } catch (Exception e) {
                 logger.error("互联网流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
@@ -135,7 +135,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         //假数据
         if (list == null || list.isEmpty() || list.size() < 10) {
             list = new ArrayList<>();
-            list.add( new NetFlowWater(start, "astana" , (int) (Math.random() * 1000)));
+            list.add(new NetFlowWater(start, "astana", (int) (Math.random() * 1000)));
         }
         return list;
     }

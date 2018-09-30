@@ -72,59 +72,6 @@ public class MonitorServiceImpl implements MonitorService {
     }
 
     /**
-     * 国家代理监控_小时
-     *
-     * @param start
-     * @param end
-     * @return
-     */
-    @Override
-    public List getCountryMonitor(String start, String end) {
-        List<StringCount> result = new ArrayList<>();
-        List<CountryMonitorProxy> list = new ArrayList<>();
-        try {
-            list = monitorDao.getCountryMonitor(start, end);
-            list.remove(null);
-        } catch (Exception e) {
-            logger.error("国家代理监控\t查询异常\tserviceImpl", e);
-        }
-        if (list == null || list.isEmpty()) {
-            try {
-                String lastTime = monitorDao.getCountryMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = monitorDao.getCountryMonitor(time, DateUtils.getAfter1h(time));
-            } catch (Exception e) {
-                logger.error("国家代理监控\t最近数据\t查询异常\tserviceImpl", e);
-            }
-        }
-        if (list != null && list.size() > 0) {
-            CountryMonitorProxy countryMonitorProxy = list.get(0);
-            if (countryMonitorProxy != null) {
-                if (languageChose == 2) {
-                    result.add(new StringCount("MonitorNum", countryMonitorProxy.getMonitorNum()));
-                    result.add(new StringCount("RejectNum", countryMonitorProxy.getRejectNum()));
-                    result.add(new StringCount("ReplaceNum", countryMonitorProxy.getReplaceNum()));
-                } else if (languageChose == 1) {
-                    result.add(new StringCount("访问次数", countryMonitorProxy.getMonitorNum()));
-                    result.add(new StringCount("管控次数", countryMonitorProxy.getRejectNum()));
-                    result.add(new StringCount("替换次数", countryMonitorProxy.getReplaceNum()));
-                } else if (languageChose == 3) {
-                    result.add(new StringCount("MonitorNum", countryMonitorProxy.getMonitorNum()));
-                    result.add(new StringCount("RejectNum", countryMonitorProxy.getRejectNum()));
-                    result.add(new StringCount("ReplaceNum", countryMonitorProxy.getReplaceNum()));
-                }
-            }
-        }
-        //假数据
-        if (result == null || result.isEmpty()) {
-            result.add(new StringCount("MonitorNum", BigInteger.valueOf(2565663)));
-            result.add(new StringCount("RejectNum", BigInteger.valueOf(682123)));
-            result.add(new StringCount("ReplaceNum", BigInteger.valueOf(2580000)));
-        }
-        return result;
-    }
-    /**
      * 网络流量监控_5min
      *
      * @param start
@@ -160,7 +107,7 @@ public class MonitorServiceImpl implements MonitorService {
         //假数据
         if (list == null || list.isEmpty()) {
             list =new ArrayList<>();
-            list.add(new NetWaterMonitor(start, "astana", "OCTETS", (int) (Math.random() * 1000)));
+            list.add(new NetWaterMonitor(start, "astana", "OCTETS", (int) (Math.random() * 150)));
         }
         return list;
     }

@@ -76,15 +76,16 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         //假数据
-        if(list==null || list.isEmpty()){
-            list.add(new TimeTypeCount(start,"HTTP",3600));
-            list.add(new TimeTypeCount(start,"IPSE",38621));
-            list.add(new TimeTypeCount(start,"PPTP",36487));
-            list.add(new TimeTypeCount(start,"Quic",7898));
-            list.add(new TimeTypeCount(start,"SPDY",2875));
-            list.add(new TimeTypeCount(start,"SSL",38792));
-            list.add(new TimeTypeCount(start,"SSH",21822));
-            list.add(new TimeTypeCount(start,"HTTPS",25862));
+        if (list == null || list.isEmpty()) {
+            int i = (int) (Math.random() * 1000);
+            list.add(new TimeTypeCount(start, "HTTP", 3600 + i));
+            list.add(new TimeTypeCount(start, "IPSE", 38621 + i));
+            list.add(new TimeTypeCount(start, "PPTP", 36487 + i));
+            list.add(new TimeTypeCount(start, "Quic", 7898 + i));
+            list.add(new TimeTypeCount(start, "SPDY", 2875 + i));
+            list.add(new TimeTypeCount(start, "SSL", 38792 + i));
+            list.add(new TimeTypeCount(start, "SSH", 21822 + i));
+            list.add(new TimeTypeCount(start, "HTTPS", 25862 + i));
         }
         return list;
     }
@@ -129,19 +130,21 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         //假数据
-        if(list==null || list.isEmpty()){
-            list.add(new NetflowProtocol(start,"GRE",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"HTTP",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"HTTPS",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"IPSEC",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"PPTP",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"Quic",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"SMP",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"SPDY",21000,25000,4000));
-            list.add(new NetflowProtocol(start,"SSL",21000,25000,4000));
+        if (list == null || list.isEmpty()) {
+            int i = (int) (Math.random() * 5000);
+            list.add(new NetflowProtocol(start, "GRE", 2100 + i, 25000 + i, 4000 + i));
+            list.add(new NetflowProtocol(start, "HTTP", 300 + i, 2520 + i, 78 + i));
+            list.add(new NetflowProtocol(start, "HTTPS", 2000 + i, 7823 + i, 546 + i));
+            list.add(new NetflowProtocol(start, "IPSEC", 500 + i, 4623 + i, 456 + i));
+            list.add(new NetflowProtocol(start, "PPTP", 6300 + i, 6420 + i, 311 + i));
+            list.add(new NetflowProtocol(start, "Quic", 2000 + i, 3128 + i, 132 + i));
+            list.add(new NetflowProtocol(start, "SMP", 1000 + i, 463 + i, 13 + i));
+            list.add(new NetflowProtocol(start, "SPDY", 2000 + i, 23 + i, 111 + i));
+            list.add(new NetflowProtocol(start, "SSL", 2000 + i, 7456 + i, 400 + i));
         }
         return list;
     }
+
     /**
      * 5分钟内活跃IP信息
      *
@@ -192,6 +195,7 @@ public class NetflowServiceImpl implements NetflowService {
 
     /**
      * 地域流量
+     *
      * @param start
      * @param end
      * @return
@@ -201,34 +205,36 @@ public class NetflowServiceImpl implements NetflowService {
         List<AreaBPSTime> list = new ArrayList<>();
         try {
             list = netflowDao.getAreaNetflowOf5min(start, end);
-            if(list ==null || list.get(0).getBps()==0){
-                list=new ArrayList<>();
-            }
         } catch (Exception e) {
             logger.error("地域流量\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = netflowDao.getAreaNetflowOf5minLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
                 list = netflowDao.getAreaNetflowOf5min(time, DateUtils.getAfter5min(time));
-                if(list ==null || list.get(0).getBps()==0){
-                    list=new ArrayList<>();
-                }
             } catch (Exception e) {
                 logger.error("地域流量\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if(list == null || list.isEmpty()){
+        if (!list.isEmpty()) {
+            int bps = 0;
+            for (AreaBPSTime areaBPSTime : list) {
+                bps = areaBPSTime.getBps() + bps;
+            }
             list = new ArrayList<>();
-            list.add(new AreaBPSTime("astana",(int) (Math.random() * 10000),DateUtils.getDateTime()));
+            list.add(new AreaBPSTime("astana", bps, start));
+        } else {
+            //假数据
+            list.add(new AreaBPSTime("astana", (int) (Math.random() * 10000), DateUtils.getDateTime()));
         }
         return list;
     }
 
     /**
      * 端口流量
+     *
      * @param start
      * @param end
      * @return
@@ -241,7 +247,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("端口流量\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = netflowDao.getPortNetflowOf5minLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -251,17 +257,19 @@ public class NetflowServiceImpl implements NetflowService {
                 logger.error("端口流量\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if(list == null || list.isEmpty()){
+        //假数据
+        if (list.isEmpty()) {
             list = new ArrayList<>();
-            list.add(new PortBPSTime(84,153,DateUtils.getDateTime()+".0"));
-            list.add(new PortBPSTime(86,152,DateUtils.getDateTime()+".0"));
-            list.add(new PortBPSTime(83,158,DateUtils.getDateTime()+".0"));
+            list.add(new PortBPSTime((int) (Math.random() * 100), (int) (Math.random() * 150), start));
+            list.add(new PortBPSTime((int) (Math.random() * 100), (int) (Math.random() * 200), start));
+            list.add(new PortBPSTime((int) (Math.random() * 100), (int) (Math.random() * 200), start));
         }
         return list;
     }
 
     /**
      * 文本
+     *
      * @param start
      * @param end
      * @return
@@ -269,15 +277,16 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<NetflowMonitor> getNetflowMonitorTxt(String start, String end) {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("HTTP","http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0965.jpg",start));
-        list.add(new NetflowMonitor("HTTPS","http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0966.jpg",start));
-        list.add(new NetflowMonitor("XMPP","http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0967.jpg",start));
-        list.add(new NetflowMonitor("NTP","http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0968.jpg",start));
+        list.add(new NetflowMonitor("HTTP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0965.jpg", start));
+        list.add(new NetflowMonitor("HTTPS", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0966.jpg", start));
+        list.add(new NetflowMonitor("XMPP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0967.jpg", start));
+        list.add(new NetflowMonitor("NTP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0968.jpg", start));
         return list;
     }
 
     /**
      * 音视频
+     *
      * @param start
      * @param end
      * @return
@@ -285,15 +294,16 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<NetflowMonitor> getNetflowMonitorVideo(String start, String end) {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("MP4","http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MP4.jpg",start));
-        list.add(new NetflowMonitor("AVI","http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-AVI.jpg",start));
-        list.add(new NetflowMonitor("MOV","http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MOV.jpg",start));
-        list.add(new NetflowMonitor("RM","http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-RM.jpg",start));
+        list.add(new NetflowMonitor("MP4", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MP4.jpg", start));
+        list.add(new NetflowMonitor("AVI", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-AVI.jpg", start));
+        list.add(new NetflowMonitor("MOV", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MOV.jpg", start));
+        list.add(new NetflowMonitor("RM", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-RM.jpg", start));
         return list;
     }
 
     /**
      * APP
+     *
      * @param start
      * @param end
      * @return
@@ -301,17 +311,18 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<NetflowMonitor> getNetflowMonitorApp(String start, String end) {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("Telegram","http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Telegram.jpg",start));
-        list.add(new NetflowMonitor("Odnoklassniki","http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Odnoklassniki.jpg",start));
-        list.add(new NetflowMonitor("PlayMarket","http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-PlayMarket.jpg",start));
-        list.add(new NetflowMonitor("WeChat","http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-WeChat.jpg",start));
-        list.add(new NetflowMonitor("Twitter","http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Twitter.jpg",start));
-        list.add(new NetflowMonitor("Viber","http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Viber.jpg",start));
+        list.add(new NetflowMonitor("Telegram", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Telegram.jpg", start));
+        list.add(new NetflowMonitor("Odnoklassniki", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Odnoklassniki.jpg", start));
+        list.add(new NetflowMonitor("PlayMarket", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-PlayMarket.jpg", start));
+        list.add(new NetflowMonitor("WeChat", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-WeChat.jpg", start));
+        list.add(new NetflowMonitor("Twitter", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Twitter.jpg", start));
+        list.add(new NetflowMonitor("Viber", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Viber.jpg", start));
         return list;
     }
 
     /**
-     * 加密管控
+     * 加密类型
+     *
      * @param start
      * @param end
      * @return
@@ -319,11 +330,11 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<NetflowMonitor> getNetflowMonitorEncrypt(String start, String end) {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("MMPE","http://192.168.10.2/group4/M00/00/06/PASS-YIHK-MMPE.jpg",start));
-        list.add(new NetflowMonitor("IPSEC","http://192.168.10.2/group4/M00/00/06/PASS-YIHK-IPSEC.jpg",start));
-        list.add(new NetflowMonitor("PAP","http://192.168.10.2/group4/M00/00/06/PASS-YIHK-PAP.jpg",start));
-        list.add(new NetflowMonitor("CHAP","http://192.168.10.2/group4/M00/00/06/PASS-YIHK-CHAP.jpg",start));
-        list.add(new NetflowMonitor("EAP-TLS","http://192.168.10.2/group4/M00/00/06/PASS-YIHK-EAP-TLS.jpg",start));
+        list.add(new NetflowMonitor("MMPE", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-MMPE.jpg", start));
+        list.add(new NetflowMonitor("IPSEC", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-IPSEC.jpg", start));
+        list.add(new NetflowMonitor("PAP", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-PAP.jpg", start));
+        list.add(new NetflowMonitor("CHAP", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-CHAP.jpg", start));
+        list.add(new NetflowMonitor("EAP-TLS", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-EAP-TLS.jpg", start));
         return list;
     }
 }

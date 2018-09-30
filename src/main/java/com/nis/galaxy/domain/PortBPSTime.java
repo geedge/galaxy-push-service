@@ -16,8 +16,4 @@ public class PortBPSTime {
     private int port;
     private int bps;
     private String time;
-
-    public String getTime() {
-        return time= time.substring(0, time.length() - 2);
-    }
 }

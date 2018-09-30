@@ -35,10 +35,10 @@ public interface EventsService {
 
     /**
      * 重点保障事件总览
-     * @param start
+     * @param end
      * @return
      */
-    List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String start);
+    List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String end);
 
     /**
      * 特定网站监控
@@ -114,4 +114,14 @@ public interface EventsService {
      * @return
      */
     List<EventsDeviceNum> getDeviceNum(String end);
+
+    /**
+     * 运行状态
+     * @param start
+     * @param end
+     * @return
+     */
+    List<EventsRunningState> getRunningState(String start,String end);
+
+
 }

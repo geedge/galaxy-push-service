@@ -45,7 +45,7 @@ public class ForEventsInterface {
     /**
      * 系统总计 1天/条
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @Scheduled(cron = "${24h.scheduled.cron.plan}")
     public void getSystemTotalOf1Day() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -59,9 +59,6 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\trestTemplate", e);
         }
-        if (contentValue == null) {
-            return;
-        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("system.total", contentValue);
         logger.info("开始推送=======>>系统总计 请求头和请求体：" + httpEntity);
@@ -72,7 +69,7 @@ public class ForEventsInterface {
     /**
      * 特定APP访问监控 1小时条
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
     public void getSpecifiedAPPMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -152,7 +149,6 @@ public class ForEventsInterface {
         }
         String now = DateUtils.getDateTime();
         String end = DateUtils.getRangeOfday(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
             contentValue = systemService.getKeyPointSafaguardThing(end);
@@ -395,6 +391,32 @@ public class ForEventsInterface {
         logger.info("部署设备数量\t推送返回结果" + response);
     }
 
+    /**
+     * 运行状态 1小时送一次数据
+     */
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    public void getRunningState() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOfhour(now);
+        String start = DateUtils.getBeforeNminOfTime(end,before60m);
+        List contentValue = null;
+        try {
+            contentValue = systemService.getRunningState(start,end);
+        } catch (Exception e) {
+            logger.error("运行状态\t查询异常\trestTemplate", e);
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("running.state", contentValue);
+        logger.info("开始推送=======>>运行状态 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("运行状态\t推送返回结果" + response);
+    }
+
+
+
     @Scheduled(fixedRate = 999999999)
     public void run() throws InterruptedException {
         if (a++ > 1) {
@@ -414,5 +436,9 @@ public class ForEventsInterface {
         getImageMonitor();
         getVoipMonitor();
         getDdosAlarm();
+        getDeviceNum();
+        getRunningState();
+        getTargetNetwork();
+
     }
 }

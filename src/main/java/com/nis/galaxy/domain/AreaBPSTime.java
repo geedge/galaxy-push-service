@@ -15,9 +15,4 @@ public class AreaBPSTime {
     private String area;
     private int bps;
     private String time;
-
-    public String getArea() {
-        return "astana";
-    }
-
 }

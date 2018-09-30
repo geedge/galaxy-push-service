@@ -141,12 +141,8 @@ public class ForNetflowInterface {
         try {
             //获取并封装推送数据
             contentValue = netflowService.getAreaNetflowOf5min(start, end);
-
         } catch (Exception e) {
             logger.error("地域流量\t查询异常\trestTemplate", e);
-        }
-        if(contentValue==null){
-            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.area.netflow", contentValue);
@@ -168,9 +164,7 @@ public class ForNetflowInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            //获取并封装推送数据
             contentValue = netflowService.getPortNetflowOf5min(start, end);
-
         } catch (Exception e) {
             logger.error("端口流量\t查询异常\trestTemplate", e);
         }
@@ -273,7 +267,7 @@ public class ForNetflowInterface {
 
     }
     /**
-     * 加密管控 天/次
+     * 加密类型 天/次
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
     public void getNetflowMonitorEncrypt() {
@@ -289,16 +283,16 @@ public class ForNetflowInterface {
             contentValue = netflowService.getNetflowMonitorEncrypt(start, end);
 
         } catch (Exception e) {
-            logger.error("加密管控\t查询异常\trestTemplate", e);
+            logger.error("加密类型\t查询异常\trestTemplate", e);
         }
         if (contentValue == null) {
             return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("netflow.monitor.encrypt", contentValue);
-        logger.info("开始推送======>>>加密管控 请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>加密类型 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
-        logger.info("加密管控\t推送返回结果" + response);
+        logger.info("加密类型\t推送返回结果" + response);
 
     }
 
@@ -317,5 +311,6 @@ public class ForNetflowInterface {
         getNetflowMonitorTxt();
         getNetflowMonitorVideo();
         getNetflowMonitorApp();
+        getNetflowMonitorEncrypt();
     }
 }

@@ -1,15 +1,20 @@
 package com.nis.galaxy.web.service.impl;
 
+import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
+import com.nis.galaxy.domain.dict.NtcServiceDict;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.EventsDao;
 import com.nis.galaxy.web.service.EventsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -18,6 +23,15 @@ public class EventsServiceImpl implements EventsService {
 
     @Autowired
     EventsDao eventsDao;
+    @Autowired
+    MyLoad myLoad;
+    @Value("${Language.Chose}")
+    private int languageChose;
+
+    //业务表
+    public HashMap<String, NtcServiceDict> listNtcService() {
+        return myLoad.listNtcService;
+    }
 
     /**
      * 系统总计
@@ -34,7 +48,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -44,10 +58,10 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("系统总计\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list == null || list.isEmpty()) {
-            list = new ArrayList<>();
+        //假数据
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 20);
-            list.add(new SystemTotal(i+182,i+ 2836,i+ 3026,i+ 442688,i+ 4565,i+ 463));
+            list.add(new SystemTotal(i + 182, i + 2836, i + 3026, i + 442688, i + 4565, i + 463));
         }
         return list;
     }
@@ -67,7 +81,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -78,9 +92,8 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         //假数据
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
             list.add(new EventsAppMonitor(start, "Youtube", i + 66));
             list.add(new EventsAppMonitor(start, "Periscope", i + 45));
             list.add(new EventsAppMonitor(start, "Viber", i + 41));
@@ -102,19 +115,19 @@ public class EventsServiceImpl implements EventsService {
         try {
             list = eventsDao.getLetterCount();
         } catch (Exception e) {
-            logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
+            logger.error("来函统计报表\t查询异常\tserviceImpl", e);
         }
         //假数据
-        if (list == null || list.isEmpty()) {
+        list = new ArrayList<>();
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "Request Title", 12 + i));
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "test letter num", 19 + i));
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "Request_10002", 16 + i));
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "reqeest_02111", 0 + i));
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "letter number statistic", 7 + i));
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "20180321_001", 2 + i));
-            list.add(new EventsLetterCount(DateUtils.getDateTime(), "reqeest_02111", 32 + i));
+            list.add(new EventsLetterCount("2018-04-05", "Request Title", 12 + i));
+            list.add(new EventsLetterCount("2018-07-19", "test letter num", 19 + i));
+            list.add(new EventsLetterCount("2018-02-19", "Request_10002", 16 + i));
+            list.add(new EventsLetterCount("2018-09-19", "reqeest_02111", 0 + i));
+            list.add(new EventsLetterCount("2018-06-20", "letter number statistic", 7 + i));
+            list.add(new EventsLetterCount("2018-07-05", "20180321_001", 2 + i));
+            list.add(new EventsLetterCount("2018-04-19", "reqeest_02111", 32 + i));
         }
         return list;
     }
@@ -126,13 +139,14 @@ public class EventsServiceImpl implements EventsService {
      */
     @Override
     public List<EventsServiceCount> getServiceCount(String start, String end) {
+        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         List<EventsServiceCount> list = new ArrayList<>();
         try {
             list = eventsDao.getServiceCount(start, end);
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getServiceCountLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -142,9 +156,23 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("业务类型统计报表\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        if (!list.isEmpty()) {
+            for (EventsServiceCount eventsServiceCount : list) {
+                String type = eventsServiceCount.getType();
+                NtcServiceDict ntcServiceDict = listNtcService.get(type);
+                if (ntcServiceDict != null) {
+                    if (languageChose == 2) {
+                        eventsServiceCount.setType(ntcServiceDict.getServiceNameEn());
+                    } else if (languageChose == 1) {
+                        eventsServiceCount.setType(ntcServiceDict.getServiceNameZh());
+                    } else if (languageChose == 3) {
+                        eventsServiceCount.setType(ntcServiceDict.getServiceNameRu());
+                    }
+                }
+            }
+        }
         //假数据
-        if (list == null || list.isEmpty()) {
-            list = new ArrayList<>();
+        if (list.isEmpty()) {
             list.add(new EventsServiceCount(start, "ip_monit", (int) (Math.random() * 100)));
             list.add(new EventsServiceCount(start, "file_transfer_digest_reject", (int) (Math.random() * 100)));
             list.add(new EventsServiceCount(start, "pptp_monit", (int) (Math.random() * 100)));
@@ -156,24 +184,22 @@ public class EventsServiceImpl implements EventsService {
     /**
      * 重点保障事件总览
      *
-     * @param start
+     * @param end
      * @return
      */
     @Override
-    public List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String start) {
+    public List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String end) {
         List<EventsKeyPointSafaguardThing> list = new ArrayList<>();
         try {
-            list = eventsDao.getKeyPointSafaguardThing(start);
+            list = eventsDao.getKeyPointSafaguardThing(end);
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\tserviceImpl", e);
         }
         //假数据
-        if (list == null || list.isEmpty()) {
-            list = new ArrayList<>();
-            list.add(new EventsKeyPointSafaguardThing(start, "双面间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-            list.add(new EventsKeyPointSafaguardThing(start, "第二个任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-            list.add(new EventsKeyPointSafaguardThing(start, "测试专项", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-
+        if (list.isEmpty()) {
+            list.add(new EventsKeyPointSafaguardThing(end, "双面间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(end, "第二个任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(end, "测试专项", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -192,9 +218,8 @@ public class EventsServiceImpl implements EventsService {
             logger.error("特定网站监控\t查询异常\tserviceImpl", e);
         }
         //假数据
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
             list.add(new EventsSpecificWebsites(end, "Facebook", i + 100));
             list.add(new EventsSpecificWebsites(end, "Wikipedia", i + 90));
             list.add(new EventsSpecificWebsites(end, "Reddit", i + 80));
@@ -263,7 +288,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("音频监控\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -273,9 +298,8 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("音频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
             list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 160, "http://baidu/video/er/h66"));
             list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 152, "http://360/video/eefrev/fj=4"));
             list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 125, "http://sougou/video/gh/8"));
@@ -305,7 +329,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("视频监控\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getVedioMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -315,9 +339,8 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("视频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
             list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 320, "http://baidu/video/eefv/h66"));
             list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 311, "http://sougou/dig/86/ty"));
             list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 258, "http://hashie/y/eeefv/5"));
@@ -347,7 +370,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("图片监控\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getImageMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -357,9 +380,8 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("图片监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
             list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 320, "http://baidu/dfedf/h66"));
             list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 310, "http://souhu/users/sign_in"));
             list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 300, "http://ttt/users/iamgcom"));
@@ -389,7 +411,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("VOIP监控\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = eventsDao.getVoipMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -399,9 +421,8 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("VOIP监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
-            list = new ArrayList<>();
             list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1982345254, i + 560, "http://baidu/iphi/picture/grennd/efd=3"));
             list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1760145025, i + 230, "http://sougoole/news/vedio/id=3"));
             list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1655693574, i + 200, "http://firfox/videi/secondes/efd?"));
@@ -442,10 +463,10 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EvevtsTargetNetwork> getTargetNetwork(String start, String end) {
         List<EvevtsTargetNetwork> list = new ArrayList<>();
-        list.add(new EvevtsTargetNetwork("admin", "DNS", "10.25.6.4", "10.25.6.85", start));
-        list.add(new EvevtsTargetNetwork("root", "FTPS", "192.78.7.2", "192.78.7.6", start));
-        list.add(new EvevtsTargetNetwork("guest", "IMAP", "10.74.64.4", "10.74.64.9", start));
-        list.add(new EvevtsTargetNetwork("passerby", "SIP", "192.168.6.4", "192.168.6.36", start));
+        list.add(new EvevtsTargetNetwork("admin", "DNS", "10.25.6." + (int) (Math.random() * 50), "10.25.6." + (int) (Math.random() * 100), start));
+        list.add(new EvevtsTargetNetwork("root", "FTPS", "192.78.7." + (int) (Math.random() * 50), "192.78.7." + (int) (Math.random() * 100), start));
+        list.add(new EvevtsTargetNetwork("guest", "IMAP", "10.74.64." + (int) (Math.random() * 50), "10.74.64." + (int) (Math.random() * 100), start));
+        list.add(new EvevtsTargetNetwork("passerby", "SIP", "192.168.6." + (int) (Math.random() * 50), "192.168.6." + (int) (Math.random() * 100), start));
         return list;
     }
 
@@ -459,10 +480,43 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsDeviceNum> getDeviceNum(String end) {
         List<EventsDeviceNum> list = new ArrayList<>();
         int i = (int) (Math.random() * 20);
-        list.add(new EventsDeviceNum(end, "server",i+2 ));
-        list.add(new EventsDeviceNum(end, "switch",i+15 ));
-        list.add(new EventsDeviceNum(end, "asem",i+6 ));
-        list.add(new EventsDeviceNum(end, "adc",i+4 ));
+        list.add(new EventsDeviceNum(end, "server", i + 2));
+        list.add(new EventsDeviceNum(end, "switch", i + 15));
+        list.add(new EventsDeviceNum(end, "asem", i + 6));
+        list.add(new EventsDeviceNum(end, "adc", i + 4));
+        return list;
+    }
+
+    /**
+     * 运行状态
+     *
+     * @param end
+     * @return
+     */
+    @Override
+    public List<EventsRunningState> getRunningState(String start, String end) {
+        List<EventsRunningState> list = new ArrayList<>();
+        try {
+            list = eventsDao.getRunningState(start, end);
+            list.removeAll(Collections.singleton(null));
+        } catch (Exception e) {
+            logger.error("运行状态\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            try {
+                String lastTime = eventsDao.getRunningStateLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOfhour(time);
+                list = eventsDao.getRunningState(time, DateUtils.getAfter1h(time));
+                list.removeAll(Collections.singleton(null));
+            } catch (Exception e) {
+                logger.error("运行状态\t最近数据\t查询异常\tserviceImpl", e);
+            }
+        }
+        //假数据
+        if (list.isEmpty()) {
+            list.add(new EventsRunningState((int) (Math.random() * 300), (int) (Math.random() * 200), (int) (Math.random() * 300)));
+        }
         return list;
     }
 }

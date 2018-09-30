@@ -28,7 +28,6 @@ public class ForMonitorInterface {
     @Autowired
     MonitorService monitorService;
     private int a = 1;
-    private int before60m = -60;
     @Value("${REST_URL_PREFIX_CHECK}")
     private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
@@ -53,7 +52,6 @@ public class ForMonitorInterface {
         }
         Thread.sleep(DICTWAIT);
         getIpActiveInfoOf5min();
-        getCountryMonitor();
         getNetWaterMonitor();
     }
     /**
@@ -67,7 +65,6 @@ public class ForMonitorInterface {
         List contentValue = null;
         try {
             contentValue = monitorService.getMonitorOf1m();
-            System.out.println("444\t"+contentValue);
         } catch (Exception e) {
             logger.info("系统监控\t查询异常\trestTemplate", e);
         }
@@ -79,33 +76,6 @@ public class ForMonitorInterface {
         logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity, String.class);
         logger.info("系统监控\t推送返回结果" + response);
-    }
-
-    /**
-     * 国家代理监控_小时
-     */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    public void getCountryMonitor() {
-        if (!Boolean.parseBoolean(scheduledMonitorEnable)) {
-            return;
-        }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfhour(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before60m);
-        List contentValue = null;
-        try {
-            contentValue = monitorService.getCountryMonitor(start,end);
-        } catch (Exception e) {
-            logger.info("国家代理监控\t查询异常\trestTemplate", e);
-        }
-        if (contentValue == null) {
-            return;
-        }
-        // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("v1/country_monitoring", contentValue);
-        logger.info("开始推送======>>>国家代理监控\t请求头和请求体：" + httpEntity);
-        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity);
-        logger.info("国家代理监控\t推送返回结果" + response);
     }
 
     /**

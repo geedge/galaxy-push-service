@@ -76,7 +76,7 @@ public class ForNetflowTopNInterface {
         }
         String now = DateUtils.getDateTime();
         String end = DateUtils.getRangeOf5min(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before5m);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         int average = 2048 * 300;
         try {

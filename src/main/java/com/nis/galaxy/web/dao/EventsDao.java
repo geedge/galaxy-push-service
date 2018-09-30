@@ -41,4 +41,8 @@ public interface EventsDao {
     String getVoipMonitorLastTime(@Param("end") String end);
 
     List<EventsVoipMonitor> getVoipMonitor(@Param("start") String start, @Param("end") String end);
+
+    List<EventsRunningState> getRunningState(@Param("start") String start, @Param("end") String end);
+
+    String getRunningStateLastTime(@Param("end") String end);
 }

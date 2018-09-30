@@ -55,7 +55,7 @@ public interface NetflowService {
     List<NetflowMonitor> getNetflowMonitorApp(String start, String end);
 
     /**
-     * 加密管控
+     * 加密类型
      * @param start
      * @param end
      * @return

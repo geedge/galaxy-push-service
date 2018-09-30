@@ -31,33 +31,27 @@
         <![CDATA[
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-
-
-
-
-
         ]]>
     </select>
     <!--地域流量-->
     <select id="getAreaNetflowOf5min" resultType="com.nis.galaxy.domain.AreaBPSTime">
         <![CDATA[
-        	SELECT #{start} time,sum(t.speed)
-        	from ( SELECT RECV_TIME,NODE_IP,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
-        	       FROM traffic_netflow_port_info
-            where RECV_TIME >= #{start} and RECV_TIME < #{end} ) t   ;
+        	SELECT #{start} time,t.node_ip area,sum(t.speed) bps
+        	        from ( SELECT RECV_TIME,NODE_IP,INOCTETS_SPEED+OUTOCTETS_SPEED as speed FROM traffic_netflow_port_info
+                   where RECV_TIME >= #{start}
+                   and RECV_TIME < #{end} ) t
+            GROUP BY area;
         ]]>
     </select>
     <!--端口流量-->
     <select id="getPortNetflowOf5min" resultType="com.nis.galaxy.domain.PortBPSTime">
         <![CDATA[
-
-
-        SELECT t.RECV_TIME time,t.port port,avg(t.speed) bps
-        from ( SELECT RECV_TIME,PORT,INOCTETS_SPEED+OUTOCTETS_SPEED as speed FROM traffic_netflow_port_info
-        where RECV_TIME >= #{start} and RECV_TIME < #{end} ) t
-        GROUP BY t.port,RECV_TIME;
-
-
+        SELECT #{start} time,t.port port ,avg(t.speed)  bps
+        from ( SELECT RECV_TIME,PORT,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
+               FROM traffic_netflow_port_info
+              where RECV_TIME >= #{start}
+			  and RECV_TIME < #{end} ) t
+         GROUP BY port;
         ]]>
     </select>
 

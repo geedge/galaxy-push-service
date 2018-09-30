@@ -12,7 +12,6 @@ import java.util.List;
 public interface MonitorService {
 
     List<NmsServerBean> getMonitorOf1m();
-    List getCountryMonitor(String start, String end);
     List<NetWaterMonitor> getNetWaterMonitor(String start, String end);
 
 }
