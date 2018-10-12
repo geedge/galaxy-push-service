@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Insert title here</title>
+</head>
+<body>
+<form action="/upImageData" enctype="multipart/form-data" method="POST">
+    <h3>
+        模块名称
+        <select name="module" style="align-content: center">
+            <option value="text">文本</option>
+            <option value="audioVideo">音视频</option>
+            <option value="app">APP</option>
+            <option value="encryptionControl">加密管控</option>
+        </select><br>
+        类型
+        <input type="text" name="type"><br>
+        请选择上传的图片:
+        <input type="file" name="myfile"/><br>
+        <input type="submit" value="上传" style="width: 50px;height: 25px"/>
+    </h3><br>
+</form>
+<form action="/allImageData" method="get">
+    <input type="submit" value="查询所有" style="width: 100px;height: 25px">
+</form>
+</body>
+</html>

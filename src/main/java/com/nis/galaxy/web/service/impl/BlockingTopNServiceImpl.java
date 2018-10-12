@@ -12,11 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class BlockingTopNServiceImpl implements BlockingTopNService {
@@ -110,6 +108,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
      */
     @Override
     public List<NtcTagReport> getBlockTop10Tag24h(String start, String end) {
+        List<NtcTagReport> result = new ArrayList<>();
         List<NtcTagReport> list = new ArrayList<>();
         HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
@@ -137,9 +136,19 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                     if (itemType == 3) {
                         //取字典表中的字段值
                         ntcTagReport.setType(uiTagDicInfo.getItemValue());
+                        result.add(ntcTagReport);
                     }
                 }
+                if (result.size() >= 10) {
+                    return result;
+                }
             }
+            if (!result.isEmpty()) {
+                return result;
+            }
+        }
+        if (list.size() >= 10) {
+            return list.subList(0, 10);
         }
         return list;
     }
@@ -154,6 +163,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     @Override
     public List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24(String start, String end) {
         List<AreaBlockProtocol> list = new ArrayList<>();
+        List<AreaBlockProtocol> result = new ArrayList<>();
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         try {
@@ -198,27 +208,21 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                                 areaBlockProtocol.setType(ntcServiceDict.getServiceNameRu());
                                 areaBlockProtocol.setArea(uiSysDictInfo.getItemValue());
                             }
+                            result.add(areaBlockProtocol);
+                            if (result.size() >= 10) {
+                                return result;
+                            }
                         }
                     }
                 }
             }
+            if (!result.isEmpty()) {
+                return result;
+            }
         }
-        //假数据
-        //int i = 1;
-        //for (AreaBlockProtocol areaBlockProtocol : list) {
-        //    try {
-        //        Integer.parseInt(areaBlockProtocol.getArea());
-        //        areaBlockProtocol.setArea("Astana" + i++);
-        //    } catch (Exception e) {
-        //        logger.info("找到对应字典表", e);
-        //    }
-        //    try {
-        //        Integer.parseInt(areaBlockProtocol.getType());
-        //        areaBlockProtocol.setType("ftp_monit" + i);
-        //    } catch (Exception e) {
-        //        logger.info("找到对应字典表", e);
-        //    }
-        //}
+        if (list.size() >= 10) {
+            return list.subList(0, 10);
+        }
         return list;
     }
 
@@ -291,6 +295,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     @Override
     public List<NtcTagReport> getBlockTop10Tag5m(String start, String end) {
         List<NtcTagReport> list = new ArrayList<>();
+        List<NtcTagReport> result = new ArrayList<>();
         HashMap<String, UiTagDicInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
             list = blockingTopNDao.getBlockTop10Tag5mOnly(start, end);
@@ -318,10 +323,20 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                         //条件是属性item=3的
                         if (itemType == 3) {
                             ntcTagReport.setType(uiTagDicInfo.getItemValue());
+                            result.add(ntcTagReport);
+                            if (result.size() >= 10) {
+                                return result;
+                            }
                         }
                     }
                 }
             }
+        }
+        if (!result.isEmpty()) {
+            return result;
+        }
+        if (list.size() >= 10) {
+            return list.subList(0, 10);
         }
         return list;
     }

@@ -45,4 +45,8 @@ public interface EventsDao {
     List<EventsRunningState> getRunningState(@Param("start") String start, @Param("end") String end);
 
     String getRunningStateLastTime(@Param("end") String end);
+
+    List<EventsMonitor> getEventsMonitor();
+
+    List<EventsBlock> getEventsBlock();
 }

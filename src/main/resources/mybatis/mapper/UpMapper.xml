@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nis.galaxy.web.dao.UpDao">
+    <insert id="upImage" parameterType="Map">
+        INSERT INTO image_url (module,type,url,datetime)
+        VALUES(#{module},#{type},#{url},#{datetime});
+    </insert>
+</mapper>

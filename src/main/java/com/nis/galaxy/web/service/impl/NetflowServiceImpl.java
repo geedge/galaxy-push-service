@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,9 @@ public class NetflowServiceImpl implements NetflowService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
+    @Value("${server.port}")
+    private int serverPort;
+
 
     //协议表
     public HashMap<String, String> listProtocolDict() {
@@ -47,6 +52,7 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<TimeTypeCount> getNetflowStatistic5m(String start, String end) {
         List<TimeTypeCount> list = new ArrayList<>();
+        List<TimeTypeCount> result = new ArrayList<>();
         HashMap<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getNetflowStatistic5mOnly(start, end);
@@ -71,8 +77,12 @@ public class NetflowServiceImpl implements NetflowService {
                     if (s != null) {
                         //协议类型字典表
                         timeTypeCount.setType(s);
+                        result.add(timeTypeCount);
                     }
                 }
+            }
+            if (!result.isEmpty()) {
+                return result;
             }
         }
         //假数据
@@ -100,6 +110,7 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end) {
         List<NetflowProtocol> list = new ArrayList<>();
+        List<NetflowProtocol> result = new ArrayList<>();
         HashMap<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
@@ -125,8 +136,12 @@ public class NetflowServiceImpl implements NetflowService {
                     String s = listProtocolDict.get(type);
                     if (s != null) {
                         netflowProtocol.setType(s);
+                        result.add(netflowProtocol);
                     }
                 }
+            }
+            if (!result.isEmpty()) {
+                return result;
             }
         }
         //假数据
@@ -155,6 +170,7 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
         List<IpActiveInfo> list = new ArrayList<>();
+        List<IpActiveInfo> result = new ArrayList<>();
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
         try {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
@@ -186,8 +202,12 @@ public class NetflowServiceImpl implements NetflowService {
                         } else {
                             ipActiveInfo.setArea(dict.getItemValue());
                         }
+                        result.add(ipActiveInfo);
                     }
                 }
+            }
+            if (!result.isEmpty()) {
+                return result;
             }
         }
         return list;
@@ -267,74 +287,113 @@ public class NetflowServiceImpl implements NetflowService {
         return list;
     }
 
+
     /**
      * 文本
      *
-     * @param start
-     * @param end
      * @return
      */
     @Override
-    public List<NetflowMonitor> getNetflowMonitorTxt(String start, String end) {
+    public List<NetflowMonitor> getNetflowMonitorTxt() {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("HTTP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0965.jpg", start));
-        list.add(new NetflowMonitor("HTTPS", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0966.jpg", start));
-        list.add(new NetflowMonitor("XMPP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0967.jpg", start));
-        list.add(new NetflowMonitor("NTP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0968.jpg", start));
+        String type = "text";
+        String ip = null;
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        String ipPort = ip + ":" + serverPort;
+        try {
+            list = netflowDao.getNetflowMonitor(type);
+        } catch (Exception e) {
+            logger.error("文本\t查询异常\tserviceImpl", e);
+        }
+        if (!list.isEmpty()) {
+            for (NetflowMonitor netflowMonitor : list) {
+                String url = netflowMonitor.getUrl();
+                netflowMonitor.setUrl(ipPort + url);
+            }
+
+        }
+        if (list.isEmpty()) {
+            list.add(new NetflowMonitor("HTTP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0965.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("HTTPS", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0966.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("XMPP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0967.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("NTP", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0968.jpg", DateUtils.getDateTime()));
+        }
         return list;
     }
 
     /**
      * 音视频
      *
-     * @param start
-     * @param end
      * @return
      */
     @Override
-    public List<NetflowMonitor> getNetflowMonitorVideo(String start, String end) {
+    public List<NetflowMonitor> getNetflowMonitorVideo() {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("MP4", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MP4.jpg", start));
-        list.add(new NetflowMonitor("AVI", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-AVI.jpg", start));
-        list.add(new NetflowMonitor("MOV", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MOV.jpg", start));
-        list.add(new NetflowMonitor("RM", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-RM.jpg", start));
+        String type = "audioVideo";
+        try {
+            list = netflowDao.getNetflowMonitor(type);
+        } catch (Exception e) {
+            logger.error("音视频\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            list.add(new NetflowMonitor("MP4", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MP4.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("AVI", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-AVI.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("MOV", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MOV.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("RM", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-RM.jpg", DateUtils.getDateTime()));
+        }
         return list;
     }
 
     /**
      * APP
      *
-     * @param start
-     * @param end
      * @return
      */
     @Override
-    public List<NetflowMonitor> getNetflowMonitorApp(String start, String end) {
+    public List<NetflowMonitor> getNetflowMonitorApp() {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("Telegram", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Telegram.jpg", start));
-        list.add(new NetflowMonitor("Odnoklassniki", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Odnoklassniki.jpg", start));
-        list.add(new NetflowMonitor("PlayMarket", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-PlayMarket.jpg", start));
-        list.add(new NetflowMonitor("WeChat", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-WeChat.jpg", start));
-        list.add(new NetflowMonitor("Twitter", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Twitter.jpg", start));
-        list.add(new NetflowMonitor("Viber", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Viber.jpg", start));
+        String type = "app";
+        try {
+            list = netflowDao.getNetflowMonitor(type);
+        } catch (Exception e) {
+            logger.error("APP\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            list.add(new NetflowMonitor("Telegram", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Telegram.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("Odnoklassniki", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Odnoklassniki.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("PlayMarket", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-PlayMarket.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("WeChat", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-WeChat.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("Twitter", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Twitter.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("Viber", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Viber.jpg", DateUtils.getDateTime()));
+        }
         return list;
     }
 
     /**
      * 加密类型
      *
-     * @param start
-     * @param end
      * @return
      */
     @Override
-    public List<NetflowMonitor> getNetflowMonitorEncrypt(String start, String end) {
+    public List<NetflowMonitor> getNetflowMonitorEncrypt() {
         List<NetflowMonitor> list = new ArrayList<>();
-        list.add(new NetflowMonitor("MMPE", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-MMPE.jpg", start));
-        list.add(new NetflowMonitor("IPSEC", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-IPSEC.jpg", start));
-        list.add(new NetflowMonitor("PAP", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-PAP.jpg", start));
-        list.add(new NetflowMonitor("CHAP", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-CHAP.jpg", start));
-        list.add(new NetflowMonitor("EAP-TLS", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-EAP-TLS.jpg", start));
+        String type = "encryptionControl";
+        try {
+            list = netflowDao.getNetflowMonitor(type);
+        } catch (Exception e) {
+            logger.error("加密类型\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            list.add(new NetflowMonitor("MMPE", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-MMPE.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("IPSEC", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-IPSEC.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("PAP", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-PAP.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("CHAP", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-CHAP.jpg", DateUtils.getDateTime()));
+            list.add(new NetflowMonitor("EAP-TLS", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-EAP-TLS.jpg", DateUtils.getDateTime()));
+        }
         return list;
     }
 }

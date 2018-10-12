@@ -31,34 +31,25 @@ public interface NetflowService {
 
     /**
      * 文本
-     *
-     * @param start
-     * @param end
      * @return
      */
-    List<NetflowMonitor> getNetflowMonitorTxt(String start, String end);
+    List<NetflowMonitor> getNetflowMonitorTxt();
 
     /**
      * 音视频
-     * @param start
-     * @param end
      * @return
      */
-    List<NetflowMonitor> getNetflowMonitorVideo(String start, String end);
+    List<NetflowMonitor> getNetflowMonitorVideo();
 
     /**
      * APP
-     * @param start
-     * @param end
      * @return
      */
-    List<NetflowMonitor> getNetflowMonitorApp(String start, String end);
+    List<NetflowMonitor> getNetflowMonitorApp();
 
     /**
      * 加密类型
-     * @param start
-     * @param end
      * @return
      */
-    List<NetflowMonitor> getNetflowMonitorEncrypt(String start, String end);
+    List<NetflowMonitor> getNetflowMonitorEncrypt();
 }

@@ -15,4 +15,8 @@ public class NetflowMonitor {
     private String type;
     private String url;    // 图片url
     private String time;    // 时间
+
+    public void setTime(String time) {
+        this.time = time.substring(0, time.length() - 2);
+    }
 }

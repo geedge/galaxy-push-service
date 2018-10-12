@@ -15,7 +15,7 @@ public interface NetflowTopNDao {
 
     String getIpActiveStatisticOf5mLastTime(@Param("end") String end);
 
-    List<NetFlowWater> getNetFlowWaterTop10(@Param("start")String start, @Param("end")String end,@Param("startB") String startB,@Param("endB") String endB,@Param("average")int average);
+    List<NetFlowWater> getNetFlowWaterTop10(@Param("start") String start, @Param("end") String end);
 
-    String getNetFlowWaterTop10LastTime(@Param("end")String end);
+    String getNetFlowWaterTop10LastTime(@Param("end") String end);
 }

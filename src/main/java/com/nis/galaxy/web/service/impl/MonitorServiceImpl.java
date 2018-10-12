@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class MonitorServiceImpl implements MonitorService {
             list.add(nmsServerBean);
         } else {
             if (list == null || list.isEmpty()) {
-                nmsServerBeanTmp = new NmsServiceBeanTmp("2018-09-26 00:00:00","Region Center6","4200","4198","2",22);
+                nmsServerBeanTmp = new NmsServiceBeanTmp("2018-09-26 00:00:00", "Region Center6", "4200", "4198", "2", 22);
                 abnormalBean.add(new AbnormalBean("competer1", "120.213.20"));
                 abnormalBean.add(new AbnormalBean("competer2", "120.213.24"));
 
@@ -82,31 +81,31 @@ public class MonitorServiceImpl implements MonitorService {
     public List<NetWaterMonitor> getNetWaterMonitor(String start, String end) {
         List<NetWaterMonitor> list = new ArrayList<>();
         try {
-            list = monitorDao.getNetWaterMonitor(start, end);
+            String before = DateUtils.getBeforeNminOfTime(start, -5);
+            list = monitorDao.getNetWaterMonitor(start, end, before);
             list.remove(null);
             if (list.get(0).getCount() == 0) {
-                list = null;
+                list = new ArrayList<>();
             }
         } catch (Exception e) {
             logger.error("网络流量监控\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = monitorDao.getNetWaterMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = monitorDao.getNetWaterMonitor(time, DateUtils.getAfter5min(time));
+                list = monitorDao.getNetWaterMonitor(time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
                 list.remove(null);
                 if (list.get(0).getCount() == 0) {
-                    list = null;
+                    list = new ArrayList<>();
                 }
             } catch (Exception e) {
                 logger.error("网络流量监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         //假数据
-        if (list == null || list.isEmpty()) {
-            list =new ArrayList<>();
+        if (list.isEmpty()) {
             list.add(new NetWaterMonitor(start, "astana", "OCTETS", (int) (Math.random() * 150)));
         }
         return list;

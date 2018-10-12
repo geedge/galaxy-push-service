@@ -78,10 +78,10 @@ public class ForNetflowTopNInterface {
         String end = DateUtils.getRangeOf5min(now);
         String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
-        int average = 2048 * 300;
+        int a =1;
         try {
             //获取并封装数据
-            contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, average);
+            contentValue = netflowTopNService.getNetFlowWaterTop10(start, end,a);
         } catch (Exception e) {
             logger.error("1小时内互联网流量TOP10\t查询异常\trestTemplate", e);
         }
@@ -105,12 +105,12 @@ public class ForNetflowTopNInterface {
         }
         String now = DateUtils.getDateTime();
         String end = DateUtils.getRangeOf5min(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before5m);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m*24);
         List contentValue = null;
-        int average = 2048 * 24;
+        int a =24;
         try {
             //获取并封装数据
-            contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, average);
+            contentValue = netflowTopNService.getNetFlowWaterTop10(start, end,a);
         } catch (Exception e) {
             logger.error("24小时内互联网流量TOP10\t查询异常\trestTemplate", e);
         }
@@ -134,12 +134,12 @@ public class ForNetflowTopNInterface {
         }
         String now = DateUtils.getDateTime();
         String end = DateUtils.getRangeOf5min(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before5m);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m*24*7);
+        int a =7 ;
         List contentValue = null;
-        int average = 2048 * 7;
         try {
             //获取并封装数据
-            contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, average);
+            contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, a);
         } catch (Exception e) {
             logger.error("7天内互联网流量TOP10\t查询异常\trestTemplate", e);
         }

@@ -186,14 +186,10 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfday(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = netflowService.getNetflowMonitorTxt(start, end);
-
+            contentValue = netflowService.getNetflowMonitorTxt();
         } catch (Exception e) {
             logger.error("文本\t查询异常\trestTemplate", e);
         }
@@ -216,13 +212,10 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfday(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = netflowService.getNetflowMonitorVideo(start, end);
+            contentValue = netflowService.getNetflowMonitorVideo();
 
         } catch (Exception e) {
             logger.error("音视频\t查询异常\trestTemplate", e);
@@ -245,13 +238,10 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfday(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = netflowService.getNetflowMonitorApp(start, end);
+            contentValue = netflowService.getNetflowMonitorApp();
 
         } catch (Exception e) {
             logger.error("APP\t查询异常\trestTemplate", e);
@@ -274,13 +264,10 @@ public class ForNetflowInterface {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
         }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfday(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = netflowService.getNetflowMonitorEncrypt(start, end);
+            contentValue = netflowService.getNetflowMonitorEncrypt();
 
         } catch (Exception e) {
             logger.error("加密类型\t查询异常\trestTemplate", e);
@@ -295,6 +282,7 @@ public class ForNetflowInterface {
         logger.info("加密类型\t推送返回结果" + response);
 
     }
+
 
 
     @Scheduled(fixedRate = 999999999)

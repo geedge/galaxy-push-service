@@ -11,24 +11,18 @@
           AND stat_time < #{end}
         ]]>
        GROUP BY ip_addr ,area_id
-       ORDER BY COUNT desc
-       LIMIT 10;
+       ORDER BY COUNT desc;
     </select>
     <!--互联网流量TOP10-->
     <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
-        SELECT #{start} as time,(sum(a.INOCTETS)+sum(a.OUTOCTETS)-b.count)/#{average} as count
-        FROM traffic_netflow_port_info a,(SELECT sum(INOCTETS)+sum(OUTOCTETS) as count
-                FROM traffic_netflow_port_info
-                WHERE RECV_TIME >= #{startB}
-                AND RECV_TIME < #{endB}) b
-        WHERE RECV_TIME >= #{start}
-        AND RECV_TIME < #{end}
-        order by count desc;
+        select #{start} time,(sum(INOCTETS+OUTOCTETS))/300/2048 count
+        from traffic_netflow_port_info
+        GROUP BY RECV_TIME
+        HAVING RECV_TIME>= #{start}
+        and RECV_TIME< #{end};
         ]]>
-
     </select>
-
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：5分钟内活跃IP流量TOP10-->

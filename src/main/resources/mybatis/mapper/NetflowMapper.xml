@@ -54,6 +54,17 @@
          GROUP BY port;
         ]]>
     </select>
+    <!--文本-->
+    <select id="getNetflowMonitor" resultType="com.nis.galaxy.domain.NetflowMonitor">
+        SELECT b.type,b.url ,b.datetime time
+        FROM(
+        		SELECT type ,max(id) id
+                FROM image_url
+                WHERE module = #{type}
+                group by type) a
+        LEFT JOIN image_url b
+        ON a.id=b.id;
+    </select>
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：5分钟内网络流量统计-->

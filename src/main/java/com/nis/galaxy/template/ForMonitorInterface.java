@@ -28,14 +28,11 @@ public class ForMonitorInterface {
     @Autowired
     MonitorService monitorService;
     private int a = 1;
-    @Value("${REST_URL_PREFIX_CHECK}")
-    private String REST_URL_PREFIX_CHECK;
+
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_MONITOR}")
     private String SERVICE_PATH_MONITOR;
-    @Value("${SERVICE_PATH_NETFLOW}")
-    private String SERVICE_PATH_NETFLOW;
     @Value("${SERVICE_PATH_BLOCKING}")
     private String SERVICE_PATH_BLOCKING;
     @Value("${DICT.WAIT}")
@@ -45,15 +42,6 @@ public class ForMonitorInterface {
     private String scheduledMonitorEnable;
 
 
-    @Scheduled(fixedRate = 999999999)
-    public void run()  throws InterruptedException{
-        if (a++ > 1) {
-            return;
-        }
-        Thread.sleep(DICTWAIT);
-        getIpActiveInfoOf5min();
-        getNetWaterMonitor();
-    }
     /**
      * 系统监控
      */
@@ -104,5 +92,13 @@ public class ForMonitorInterface {
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("网络流量监控\t推送返回结果" + response);
     }
-
+    @Scheduled(fixedRate = 999999999)
+    public void run()  throws InterruptedException{
+        if (a++ > 1) {
+            return;
+        }
+        Thread.sleep(DICTWAIT);
+        getIpActiveInfoOf5min();
+        getNetWaterMonitor();
+    }
 }

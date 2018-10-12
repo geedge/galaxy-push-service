@@ -15,7 +15,7 @@ public class NetWaterMonitor {
     private String time;
     private String area;
     private String type;
-    private int count;
+    private double count;
 
     public String getArea() {
         return "astana";

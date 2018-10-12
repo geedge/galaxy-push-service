@@ -28,4 +28,6 @@ public interface NetflowDao {
     String getPortNetflowOf5minLastTime(@Param("end") String end);
 
     List<PortBPSTime> getPortNetflowOf5min(@Param("start") String start, @Param("end") String end);
+
+    List<NetflowMonitor> getNetflowMonitor(@Param("type") String type);
 }

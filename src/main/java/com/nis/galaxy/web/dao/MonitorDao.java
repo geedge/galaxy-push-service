@@ -20,7 +20,7 @@ public interface MonitorDao {
     List<AbnormalBean> getMonitorOf1m02(int id);
 
 
-    List<NetWaterMonitor> getNetWaterMonitor(@Param("start") String start, @Param("end") String end);
+    List<NetWaterMonitor> getNetWaterMonitor(@Param("start") String start, @Param("end") String end, @Param("before") String before);
 
     String getNetWaterMonitorLastTime(@Param("end")String end);
 

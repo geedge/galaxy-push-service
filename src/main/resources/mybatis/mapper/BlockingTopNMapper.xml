@@ -14,8 +14,7 @@
           AND report_time < #{end}
         ]]>
 		GROUP BY service , entrance_id
-		ORDER BY count desc
-		LIMIT 10;
+		ORDER BY count desc;
      </select>
     <!--1小时内全国阻断URLTOP10 1h/条 小时报-->
     <select id="getBlockTop10URLOf1h" resultType="com.nis.galaxy.domain.NtcRejectUrlStatistic">
@@ -74,8 +73,7 @@
           AND report_time < #{end}
         ]]>
 		  GROUP BY tag
-		  ORDER BY count desc
-		  LIMIT 10;
+		  ORDER BY count desc;
     </select>
 
     <!--5分钟内全国阻断标签TOP10_____映射-->
@@ -87,8 +85,7 @@
           AND report_time < #{end}
         ]]>
 			GROUP BY tag
-			order by count desc
-          LIMIT 10;
+			order by count desc;
     </select>
 
     <!--最近数据时间的获取 and 小于参数end-->

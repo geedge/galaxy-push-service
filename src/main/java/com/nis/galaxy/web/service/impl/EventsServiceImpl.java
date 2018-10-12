@@ -118,7 +118,6 @@ public class EventsServiceImpl implements EventsService {
             logger.error("来函统计报表\t查询异常\tserviceImpl", e);
         }
         //假数据
-        list = new ArrayList<>();
         if (list.isEmpty()) {
             int i = (int) (Math.random() * 100);
             list.add(new EventsLetterCount("2018-04-05", "Request Title", 12 + i));
@@ -141,6 +140,7 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsServiceCount> getServiceCount(String start, String end) {
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         List<EventsServiceCount> list = new ArrayList<>();
+        List<EventsServiceCount> result = new ArrayList<>();
         try {
             list = eventsDao.getServiceCount(start, end);
         } catch (Exception e) {
@@ -168,7 +168,11 @@ public class EventsServiceImpl implements EventsService {
                     } else if (languageChose == 3) {
                         eventsServiceCount.setType(ntcServiceDict.getServiceNameRu());
                     }
+                    result.add(eventsServiceCount);
                 }
+            }
+            if(!result.isEmpty()){
+                return result;
             }
         }
         //假数据
@@ -243,13 +247,20 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsMonitor> getEventsMonitor(String end) {
         List<EventsMonitor> list = new ArrayList<>();
-        list.add(new EventsMonitor("双面间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsMonitor("两会", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsMonitor("测试专项", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsMonitor("一个假任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsMonitor("测试删除", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsMonitor("测试", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsMonitor("taskName", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+        try {
+            list = eventsDao.getEventsMonitor();
+        } catch (Exception e) {
+            logger.error("事件监测\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            list.add(new EventsMonitor("双面间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("两会", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("测试专项", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("一个假任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("测试删除", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("测试", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("taskName", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+        }
         return list;
     }
 
@@ -262,14 +273,21 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsBlock> getEventsBlock(String end) {
         List<EventsBlock> list = new ArrayList<>();
-        list.add(new EventsBlock("间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("测试", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("第二任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("两会", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("会议", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("taskName", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("某事件", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-        list.add(new EventsBlock("会面事件", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+        try {
+            list = eventsDao.getEventsBlock();
+        } catch (Exception e) {
+            logger.error("事件封堵\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            list.add(new EventsBlock("间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("测试", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("第二任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("两会", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("会议", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("taskName", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("某事件", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("会面事件", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+        }
         return list;
     }
 
