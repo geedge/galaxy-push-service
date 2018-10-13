@@ -11,8 +11,6 @@
         <![CDATA[
           WHERE report_time >= #{start}
           AND report_time < #{end}
-
-
         ]]>
     </select>
 
@@ -65,7 +63,7 @@
       SELECT  report_time time,s_ip src_ip,d_ip dst_ip,service type
         FROM ntc_service_behav_statistic
         ORDER BY stat_id desc
-        LIMIT 100;
+        LIMIT 500;
     </select>
 
     <!--热力图接口 5min/次 粒度5min_____映射 -->
@@ -82,7 +80,7 @@
 
     <!--全国协议配置信息_________做映射用-->
     <select id="getAllCfgInfoOnly" resultType="com.nis.galaxy.domain.CfgTypeCount">
-      SELECT service_id type, count(cfg_type) count
+      SELECT service_id type, count(0) count
         FROM ui_cfg_num_statistics
         WHERE cfg_state = 1
       GROUP BY service_id

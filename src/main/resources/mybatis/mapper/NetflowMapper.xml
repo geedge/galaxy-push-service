@@ -31,8 +31,39 @@
         <![CDATA[
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-
         ]]>
+    </select>
+    <!--地域流量-->
+    <select id="getAreaNetflowOf5min" resultType="com.nis.galaxy.domain.AreaBPSTime">
+        <![CDATA[
+        	SELECT #{start} time,t.node_ip area,sum(t.speed) bps
+        	        from ( SELECT RECV_TIME,NODE_IP,INOCTETS_SPEED+OUTOCTETS_SPEED as speed FROM traffic_netflow_port_info
+                   where RECV_TIME >= #{start}
+                   and RECV_TIME < #{end} ) t
+            GROUP BY area;
+        ]]>
+    </select>
+    <!--端口流量-->
+    <select id="getPortNetflowOf5min" resultType="com.nis.galaxy.domain.PortBPSTime">
+        <![CDATA[
+        SELECT #{start} time,t.port port ,avg(t.speed)  bps
+        from ( SELECT RECV_TIME,PORT,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
+               FROM traffic_netflow_port_info
+              where RECV_TIME >= #{start}
+			  and RECV_TIME < #{end} ) t
+         GROUP BY port;
+        ]]>
+    </select>
+    <!--文本-->
+    <select id="getNetflowMonitor" resultType="com.nis.galaxy.domain.NetflowMonitor">
+        SELECT b.type,b.url ,b.datetime time
+        FROM(
+        		SELECT type ,max(id) id
+                FROM image_url
+                WHERE module = #{type}
+                group by type) a
+        LEFT JOIN image_url b
+        ON a.id=b.id;
     </select>
 
     <!--最近数据时间的获取 and 小于参数end-->
@@ -64,6 +95,26 @@
         where stat_time < #{end}
          ]]>
         ORDER BY stat_time desc
+        LIMIT 1;
+    </select>
+    <!--时间：地域流量-->
+    <select id="getAreaNetflowOf5minLastTime" resultType="String">
+       SELECT RECV_TIME
+        FROM traffic_netflow_port_info
+        <![CDATA[
+        where RECV_TIME < #{end}
+         ]]>
+        ORDER BY RECV_TIME desc
+        LIMIT 1;
+    </select>
+    <!--时间：端口流量-->
+    <select id="getPortNetflowOf5minLastTime" resultType="String">
+       SELECT RECV_TIME
+        FROM traffic_netflow_port_info
+        <![CDATA[
+        where RECV_TIME < #{end}
+         ]]>
+        ORDER BY RECV_TIME desc
         LIMIT 1;
     </select>
 </mapper>

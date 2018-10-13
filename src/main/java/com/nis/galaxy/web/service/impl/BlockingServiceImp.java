@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -56,7 +57,7 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List getAllBlockInformation(String start, String end) {
         List<NtcTypeCount> result = new CopyOnWriteArrayList<>();
-        List<NtcTotalReport> list = null;
+        List<NtcTotalReport> list = new ArrayList<>();
         try {
             list = blockingDao.getAllBlockInformation(start, end);
         } catch (Exception e) {
@@ -110,7 +111,8 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List<NtcEntranceReport> getDNSDeceiveInformation(String start, String end) {
         HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
-        List<NtcEntranceReport> list = null;
+        List<NtcEntranceReport> list = new ArrayList<>();
+        List<NtcEntranceReport> result = new ArrayList<>();
         try {
             list = blockingDao.getDNSDeceiveInformationOnly(start, end);
         } catch (Exception e) {
@@ -142,6 +144,9 @@ public class BlockingServiceImp implements BlockingService {
                     }
                 }
             }
+            if(!result.isEmpty()){
+                return result;
+            }
         }
         return list;
     }
@@ -155,7 +160,8 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<TimeTypeCount> get24hAllBlockEachProtocol(String start, String end) {
-        List<TimeTypeCount> list = null;
+        List<TimeTypeCount> list = new ArrayList<>();
+        List<TimeTypeCount> result = new ArrayList<>();
         try {
             list = blockingDao.get24hAllBlockEachProtocolOnly(start, end);
         } catch (Exception e) {
@@ -190,8 +196,12 @@ public class BlockingServiceImp implements BlockingService {
                             //俄文
                             timeTypeCount.setType(ntcServiceDict.getServiceNameRu());
                         }
+                        result.add(timeTypeCount);
                     }
                 }
+            }
+            if(!result.isEmpty()){
+                return result;
             }
         }
         return list;
@@ -207,9 +217,10 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List<NtcDisReport> getDisBlockInformation(String start, String end) {
         List<NtcDisReport> list = new ArrayList<>();
-        List<NtcDisReport> list1 = null;
-        List<NtcDisReport> list2 = null;
-        List<NtcDisReport> list3 = null;
+        List<NtcDisReport> result = new ArrayList<>();
+        List<NtcDisReport> list1 = new ArrayList<>();
+        List<NtcDisReport> list2 = new ArrayList<>();
+        List<NtcDisReport> list3 = new ArrayList<>();
         try {
             list1 = blockingDao.getDisBlockInformationOnly(start, end, a, b);
             list2 = blockingDao.getDisBlockInformationOnly(start, end, c, d);
@@ -263,9 +274,13 @@ public class BlockingServiceImp implements BlockingService {
                                 ntcDisReport.setArea(uiSysDictInfo.getItemValue());
                                 ntcDisReport.setType(ntcServiceDict.getServiceNameRu());
                             }
+                            result.add(ntcDisReport);
                         }
                     }
                 }
+            }
+            if(!result.isEmpty()){
+                return result;
             }
         }
         return list;
@@ -278,7 +293,8 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<HotStatistic> getAllHotStatistis(String start, String end) {
-        List<HotStatistic> list = null;
+        List<HotStatistic> list = new ArrayList<>();
+        List<HotStatistic> result = new ArrayList<>();
         try {
             list = blockingDao.getAllHotStatistisOnly(start, end);
         } catch (Exception e) {
@@ -316,14 +332,18 @@ public class BlockingServiceImp implements BlockingService {
                                 //中文
                                 hotStatistic.setArea(uiSysDictInfo.getItemDesc());
                                 hotStatistic.setType(ntcServiceDict.getServiceNameZh());
-                            } else {
+                            } else if(languageChose==3){
                                 //俄文
                                 hotStatistic.setArea(uiSysDictInfo.getItemValue());
                                 hotStatistic.setType(ntcServiceDict.getServiceNameRu());
                             }
+                            result.add(hotStatistic);
                         }
                     }
                 }
+            }
+            if(!result.isEmpty()){
+                return result;
             }
         }
         return list;
@@ -337,7 +357,8 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List<PointMap> getPointMapOf10s() {
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
-        List<PointMap> list = null;
+        List<PointMap> list = new ArrayList<>();
+        List<PointMap> result = new ArrayList<>();
         try {
             list = blockingDao.getPointMapOf10sOnly();
         } catch (Exception e) {
@@ -359,8 +380,12 @@ public class BlockingServiceImp implements BlockingService {
                             //俄文
                             pointMap.setType(ntcServiceDict.getServiceNameRu());
                         }
+                        result.add(pointMap);
                     }
                 }
+            }
+            if(!result.isEmpty()){
+                return result;
             }
         }
         return list;
@@ -376,6 +401,7 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List<AreaCount> getDisBlockMap(String start, String end) {
         List<AreaCount> list = new ArrayList<>();
+        List<AreaCount> result = new ArrayList<>();
         List<AreaCount> list1 = null;
         List<AreaCount> list2 = null;
         List<AreaCount> list3 = null;
@@ -424,9 +450,13 @@ public class BlockingServiceImp implements BlockingService {
                             //俄文
                             areaCount.setArea(uiSysDictInfo.getItemValue());
                         }
+                        result.add(areaCount);
                     }
                 }
             }
+        }
+        if(!result.isEmpty()){
+            return result;
         }
         return list;
     }
@@ -438,7 +468,8 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<CfgTypeCount> getAllCfgInfo() {
-        List<CfgTypeCount> list = null;
+        List<CfgTypeCount> list = new ArrayList<>();
+        List<CfgTypeCount> result = new ArrayList<>();
         HashMap<String, NtcServiceDict> listNtcService = listNtcService();
         try {
             list = blockingDao.getAllCfgInfoOnly();
@@ -459,8 +490,12 @@ public class BlockingServiceImp implements BlockingService {
                         //俄文
                         cfgTypeCount.setType(ntcServiceDict.getServiceNameRu());
                     }
+                    result.add(cfgTypeCount);
                 }
             }
+        }
+        if(!result.isEmpty()){
+            return result;
         }
         return list;
     }

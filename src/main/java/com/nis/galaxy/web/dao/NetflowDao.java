@@ -1,10 +1,7 @@
 package com.nis.galaxy.web.dao;
 
 
-import com.nis.galaxy.domain.IpActiveInfo;
-import com.nis.galaxy.domain.NetflowProtocol;
-import com.nis.galaxy.domain.PointMap;
-import com.nis.galaxy.domain.TimeTypeCount;
+import com.nis.galaxy.domain.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,4 +20,14 @@ public interface NetflowDao {
     String getProtocolStatisticOf1hLastTime(@Param("end") String end);
 
     String getIpActiveInfoOf5minLastTime(@Param("end") String end);
+
+    List<AreaBPSTime> getAreaNetflowOf5min(@Param("start") String start, @Param("end") String end);
+
+    String getAreaNetflowOf5minLastTime(@Param("end") String end);
+
+    String getPortNetflowOf5minLastTime(@Param("end") String end);
+
+    List<PortBPSTime> getPortNetflowOf5min(@Param("start") String start, @Param("end") String end);
+
+    List<NetflowMonitor> getNetflowMonitor(@Param("type") String type);
 }

@@ -1,5 +1,6 @@
 package com.nis.galaxy.web.service;
 
+import com.nis.galaxy.domain.NetWaterMonitor;
 import com.nis.galaxy.domain.NmsServerBean;
 
 import java.util.List;
@@ -11,5 +12,6 @@ import java.util.List;
 public interface MonitorService {
 
     List<NmsServerBean> getMonitorOf1m();
+    List<NetWaterMonitor> getNetWaterMonitor(String start, String end);
 
 }
