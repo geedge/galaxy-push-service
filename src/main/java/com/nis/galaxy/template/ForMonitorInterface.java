@@ -1,6 +1,7 @@
 package com.nis.galaxy.template;
 
 import com.nis.galaxy.common.InterfaceBase;
+import com.nis.galaxy.config.PushParams;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.service.MonitorService;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ public class ForMonitorInterface {
     private int before5m = -5;
     @Autowired
     MonitorService monitorService;
+    @Autowired
+    PushParams pushParams;
     private int a = 1;
 
     @Value("${REST_URL_PREFIX_PUSH}")
@@ -56,11 +59,8 @@ public class ForMonitorInterface {
         } catch (Exception e) {
             logger.info("系统监控\t查询异常\trestTemplate", e);
         }
-        if(contentValue ==null){
-            return;
-        }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("system_monitoring.global.gis", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"system_monitoring.global.gis", contentValue);
         logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity, String.class);
         logger.info("系统监控\t推送返回结果" + response);
@@ -83,11 +83,8 @@ public class ForMonitorInterface {
         } catch (Exception e) {
             logger.info("网络流量监控\t查询异常\trestTemplate", e);
         }
-        if (contentValue == null) {
-            return;
-        }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("network.waterflow", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"network.waterflow", contentValue);
         logger.info("开始推送======>>>网络流量监控\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("网络流量监控\t推送返回结果" + response);

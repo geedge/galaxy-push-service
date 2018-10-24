@@ -25,7 +25,7 @@ public class NmsServerBean {
     private int abnormal;
     private List<AbnormalBean> abnormalmachines;
     public void setTime(String time) {
-        this.time = time.substring(0,time.length()-2);
+        this.time = time.substring(0,time.indexOf("."));
     }
     public String getSystem() {
         return this.system = "ntc";

@@ -2,9 +2,7 @@ package com.nis.galaxy.web.dao;
 
 import com.nis.galaxy.domain.dict.*;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author GouGe
@@ -13,8 +11,9 @@ import java.util.Map;
 
 @Mapper
 public interface DictDao {
-    List<UiSysDictInfo> getUiSysDictInfo();
     List<NtcServiceDict> getNtcServiceDict();
     List<ProtocolDict> getProtocolDict();
-    List<UiTagDicInfo> getUiTagDicInfo();
+    List<UiTagDictInfo> getUiTagDicInfo();
+    List<UiAreaDictInfo> getUiAreaDictInfo();
+    List<UiCarrierDictInfo> getUiCarrierDictInfo();
 }

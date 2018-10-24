@@ -2,7 +2,6 @@ package com.nis.galaxy.web.service;
 
 import com.nis.galaxy.domain.NetWaterMonitor;
 import com.nis.galaxy.domain.NmsServerBean;
-
 import java.util.List;
 
 /**

@@ -17,6 +17,6 @@ public class NetflowMonitor {
     private String time;    // 时间
 
     public void setTime(String time) {
-        this.time = time.substring(0, time.length() - 2);
+        this.time = time.substring(0, time.indexOf("."));
     }
 }

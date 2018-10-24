@@ -11,12 +11,13 @@
           AND stat_time < #{end}
         ]]>
        GROUP BY ip_addr ,area_id
-       ORDER BY COUNT desc;
+       ORDER BY COUNT desc
+       LIMIT 10;
     </select>
     <!--互联网流量TOP10-->
     <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
-        select #{start} time,(sum(INOCTETS+OUTOCTETS))/300/2048 count
+        select #{start} time,CONVERT((sum(INOCTETS+OUTOCTETS))/300/2048,int) count
         from traffic_netflow_port_info
         GROUP BY RECV_TIME
         HAVING RECV_TIME>= #{start}

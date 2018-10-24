@@ -2,6 +2,7 @@ package com.nis.galaxy.template;
 
 
 import com.nis.galaxy.common.InterfaceBase;
+import com.nis.galaxy.config.PushParams;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.service.EventsService;
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ public class ForEventsInterface {
     RestTemplate restTemplate;
     @Autowired
     EventsService systemService;
+    @Autowired
+    PushParams pushParams;
 
     private int a = 1;
     private int before1day = -60 * 24;
@@ -60,7 +63,7 @@ public class ForEventsInterface {
             logger.error("系统总计\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("system.total", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"system.total", contentValue);
         logger.info("开始推送=======>>系统总计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("系统总计\t推送返回结果" + response);
@@ -83,11 +86,8 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\trestTemplate", e);
         }
-        if (contentValue == null) {
-            return;
-        }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("specific.app", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"specific.app", contentValue);
         logger.info("开始推送=======>>特定APP访问监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("特定APP访问监控\t推送返回结果" + response);
@@ -106,11 +106,8 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("来函统计报表\t查询异常\trestTemplate", e);
         }
-        if (contentValue == null) {
-            return;
-        }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("letter.count", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"letter.count", contentValue);
         logger.info("开始推送=======>>来函统计报表 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("来函统计报表\t推送返回结果" + response);
@@ -134,7 +131,7 @@ public class ForEventsInterface {
             logger.error("业务类型统计报表\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("trans.type", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"trans.type", contentValue);
         logger.info("开始推送=======>>业务类型统计报表 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("业务类型统计报表\t推送返回结果" + response);
@@ -156,7 +153,7 @@ public class ForEventsInterface {
             logger.error("重点保障事件总览\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("events.key.protection", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.key.protection", contentValue);
         logger.info("开始推送=======>>重点保障事件总览 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("重点保障事件总览\t推送返回结果" + response);
@@ -178,7 +175,7 @@ public class ForEventsInterface {
             logger.error("特定网站监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("specific.websites", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"specific.websites", contentValue);
         logger.info("开始推送=======>>特定网站监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("特定网站监控\t推送返回结果" + response);
@@ -200,7 +197,7 @@ public class ForEventsInterface {
             logger.error("事件监测\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("events.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.monitor", contentValue);
         logger.info("开始推送=======>>事件监测 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("事件监测\t推送返回结果" + response);
@@ -222,7 +219,7 @@ public class ForEventsInterface {
             logger.error("事件封堵\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("events.block", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.block", contentValue);
         logger.info("开始推送=======>>事件封堵 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("事件封堵\t推送返回结果" + response);
@@ -245,7 +242,7 @@ public class ForEventsInterface {
             logger.error("音频监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("audio.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"audio.monitor", contentValue);
         logger.info("开始推送=======>>音频监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("音频监控\t推送返回结果" + response);
@@ -269,7 +266,7 @@ public class ForEventsInterface {
             logger.error("视频监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("vedio.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"vedio.monitor", contentValue);
         logger.info("开始推送=======>>视频监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("视频监控\t推送返回结果" + response);
@@ -292,7 +289,7 @@ public class ForEventsInterface {
             logger.error("图片监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("image.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"image.monitor", contentValue);
         logger.info("开始推送=======>>图片监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("图片监控\t推送返回结果" + response);
@@ -315,7 +312,7 @@ public class ForEventsInterface {
             logger.error("VOIP监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("voip.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"voip.monitor", contentValue);
         logger.info("开始推送=======>>VOIP监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("VOIP监控\t推送返回结果" + response);
@@ -339,22 +336,22 @@ public class ForEventsInterface {
             logger.error("网络行为预警\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("ddos.alarm", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"ddos.alarm", contentValue);
         logger.info("开始推送=======>>网络行为预警 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("网络行为预警\t推送返回结果" + response);
     }
     /**
-     * 目标行为网络监测 1小时送一次数据
+     * 目标行为网络监测 24小时送一次数据
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @Scheduled(cron = "${24h.scheduled.cron.plan}")
     public void getTargetNetwork() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
         }
         String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfhour(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        String end = DateUtils.getRangeOfday(now);
+        String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
             contentValue = systemService.getTargetNetwork(start, end);
@@ -362,7 +359,7 @@ public class ForEventsInterface {
             logger.error("目标行为网络监测\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("target.network", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"target.network", contentValue);
         logger.info("开始推送=======>>目标行为网络监测 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("目标行为网络监测\t推送返回结果" + response);
@@ -385,7 +382,7 @@ public class ForEventsInterface {
             logger.error("部署设备数量\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("device.num", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"device.num", contentValue);
         logger.info("开始推送=======>>部署设备数量 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("部署设备数量\t推送返回结果" + response);
@@ -409,7 +406,7 @@ public class ForEventsInterface {
             logger.error("运行状态\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity("running.state", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"running.state", contentValue);
         logger.info("开始推送=======>>运行状态 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("运行状态\t推送返回结果" + response);

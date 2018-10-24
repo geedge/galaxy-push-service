@@ -1,7 +1,6 @@
 package com.nis.galaxy.web.service;
 
 import com.nis.galaxy.domain.*;
-
 import java.util.List;
 
 public interface NetflowService {

@@ -14,7 +14,8 @@
           AND report_time < #{end}
         ]]>
 		GROUP BY service , entrance_id
-		ORDER BY count desc;
+		ORDER BY count desc
+		LIMIT 10;
      </select>
     <!--1小时内全国阻断URLTOP10 1h/条 小时报-->
     <select id="getBlockTop10URLOf1h" resultType="com.nis.galaxy.domain.NtcRejectUrlStatistic">
@@ -76,16 +77,17 @@
 		  ORDER BY count desc;
     </select>
 
-    <!--5分钟内全国阻断标签TOP10_____映射-->
+    <!--1h内全国阻断标签TOP100-->
     <select id="getBlockTop10Tag5mOnly" resultType="com.nis.galaxy.domain.NtcTagReport">
+		<![CDATA[
         SELECT  #{start} time,tag type ,SUM(sum) count
         FROM ntc_tag_report
-		<![CDATA[
-          WHERE report_time >= #{start}
-          AND report_time < #{end}
+        WHERE report_time >= #{start}
+        AND report_time < #{end}
+		GROUP BY type
+		ORDER BY count desc
+		LIMIT 100;
         ]]>
-			GROUP BY tag
-			order by count desc;
     </select>
 
     <!--最近数据时间的获取 and 小于参数end-->
@@ -149,7 +151,7 @@
           ORDER BY stat_time desc
           LIMIT 1;
     </select>
-    <!--时间：5分钟内全国阻断标签TOP10-->
+    <!--时间：1h内全国阻断标签TOP100-->
     <select id="getBlockTop10Tag5mOnlyLastTime" resultType="String">
         select report_time
           FROM ntc_tag_report

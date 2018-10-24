@@ -5,7 +5,7 @@
 <mapper namespace="com.nis.galaxy.web.dao.BlockingDao">
     <!-- 封堵信息总体显示 5min/条、粒度5min-->
     <select id="getAllBlockInformation" resultType="com.nis.galaxy.domain.NtcTotalReport">
-        SELECT reject_num rejectNum ,monitor_num monitorNum,c2s_byte_len c2sByteLen,s2c_byte_len s2cByteLen,
+        SELECT reject_num rejectNum ,monitor_num monitorNum,CONVERT(c2s_byte_len*8/300,int) c2sByteLen,CONVERT(s2c_byte_len*8/300,int) s2cByteLen,
         new_uni_conn_num newUniConnNum,live_conn_num liveConnNum,drop_conn_num dropConnNum,loop_conn_num loopConnNum
         FROM ntc_total_report
         <![CDATA[
@@ -16,18 +16,20 @@
 
     <!--封堵信息分布显示_____映射-->
     <select id="getDisBlockInformationOnly" resultType="com.nis.galaxy.domain.NtcDisReport">
+      	<![CDATA[
       	SELECT #{start} time,entrance_id area,service type,SUM(sum) count
       	FROM ntc_entrance_report
-      	<![CDATA[
           WHERE report_time >= #{start}
           AND report_time < #{end}
+	    GROUP BY entrance_id,service
+	    HAVING  service BETWEEN #{a} AND #{b}
+		or service BETWEEN #{c} AND #{d}
+		or service BETWEEN #{e} AND #{f};
         ]]>
-	      AND  service BETWEEN #{a} AND #{b}
-	    GROUP BY entrance_id,service;
     </select>
     <!--DNS欺骗信息显示 5min/条、粒度5min______映射局点表-->
     <select id="getDNSDeceiveInformationOnly" resultType="com.nis.galaxy.domain.NtcEntranceReport">
-        SELECT entrance_id type,sum(sum) count
+        SELECT #{start} time,entrance_id area,sum(sum) count
         FROM ntc_entrance_report
 		<![CDATA[
           WHERE report_time >= #{start}
@@ -60,7 +62,7 @@
 
     <!--实时打点图10s/次___映射-->
     <select id="getPointMapOf10sOnly" resultType="com.nis.galaxy.domain.PointMap">
-      SELECT  report_time time,s_ip src_ip,d_ip dst_ip,service type
+      SELECT  report_time time,s_ip src_ip,d_ip dst_ip,service type,sum count
         FROM ntc_service_behav_statistic
         ORDER BY stat_id desc
         LIMIT 500;
@@ -68,14 +70,16 @@
 
     <!--热力图接口 5min/次 粒度5min_____映射 -->
     <select id="getDisBlockMapOnly" resultType="com.nis.galaxy.domain.AreaCount">
-       SELECT #{start} time, entrance_id area,sum(sum) count
+       SELECT #{start} time,service,entrance_id area,sum(sum) count
        FROM ntc_entrance_report
         <![CDATA[
           WHERE report_time >= #{start}
           AND report_time < #{end}
         ]]>
-          AND service between #{a} and #{b}
-        GROUP BY entrance_id;
+        GROUP BY entrance_id
+        HAVING service between #{a} and #{b}
+        or service between #{c} and #{d}
+        or service between #{e} and #{f}
     </select>
 
     <!--全国协议配置信息_________做映射用-->

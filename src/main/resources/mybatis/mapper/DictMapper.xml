@@ -3,20 +3,35 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.nis.galaxy.web.dao.DictDao">
-    <select id="getUiSysDictInfo" resultType="com.nis.galaxy.domain.dict.UiSysDictInfo">
-        SELECT item_code sysDictId,item_value itemValue,item_desc itemDesc,item_type itemType
-        FROM ui_sys_dict_info;
+    <!--地域表-->
+    <select id="getUiAreaDictInfo" resultType="com.nis.galaxy.domain.dict.UiAreaDictInfo">
+      SELECT item_code areaId,item_value itemValue
+      FROM ui_sys_dict_info
+      WHERE item_type=1
+      AND is_valid=1;
     </select>
+    <!--运行商表-->
+    <select id="getUiCarrierDictInfo" resultType="com.nis.galaxy.domain.dict.UiCarrierDictInfo">
+      SELECT item_code CarrierId,item_value itemValue
+      FROM ui_sys_dict_info
+      WHERE item_type=2
+      AND is_valid=1;
+    </select>
+    <!--业务表-->
     <select id="getNtcServiceDict" resultType="com.nis.galaxy.domain.dict.NtcServiceDict">
         SELECT service_code serviceCode,service_name_zh serviceNameZh,service_name_en serviceNameEn,service_name_ru serviceNameRu
         FROM ntc_service_dic;
     </select>
+    <!--协议表-->
     <select id="getProtocolDict" resultType="com.nis.galaxy.domain.dict.ProtocolDict">
       SELECT view_code viewCode,protocol_type protocolType
           FROM ui_code_protocol_type_dic;
     </select>
-    <select id="getUiTagDicInfo" resultType="com.nis.galaxy.domain.dict.UiTagDicInfo">
-      SELECT service_dict_id serviceDictId,item_type itemType,item_value itemValue
-      FROM ui_service_dict_info;
+    <!--标签表-->
+    <select id="getUiTagDicInfo" resultType="com.nis.galaxy.domain.dict.UiTagDictInfo">
+      SELECT service_dict_id tagId,item_value itemValue
+      FROM ui_service_dict_info
+      WHERE item_type=3
+      AND is_valid=1;
     </select>
 </mapper>

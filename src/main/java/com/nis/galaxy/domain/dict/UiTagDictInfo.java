@@ -13,9 +13,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Data
 @Accessors(chain=true)
-public class UiTagDicInfo {
-
-    private int serviceDictId;
+public class UiTagDictInfo {
+    private String tagId;
     private String itemValue;
-    private int itemType;
 }

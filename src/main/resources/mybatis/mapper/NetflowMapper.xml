@@ -25,12 +25,12 @@
   </select>
     <!--5分钟内活跃IP信息 5min __映射-->
     <select id="getIpActiveInfoOf5minOnly" resultType="com.nis.galaxy.domain.IpActiveInfo">
-       SELECT stat_time time ,ip_addr ip,area_id area,link_num links,c2s_pkt_num+s2c_pkt_num packets,
+        <![CDATA[
+       SELECT #{start} time ,ip_addr ip,area_id area,link_num links,c2s_pkt_num+s2c_pkt_num packets,
         c2s_byte_len+s2c_byte_len bytes
         FROM traffic_ip_active_statistic
-        <![CDATA[
-          WHERE stat_time >= #{start}
-          AND stat_time < #{end}
+        WHERE stat_time >= #{start}
+        AND stat_time < #{end}
         ]]>
     </select>
     <!--地域流量-->

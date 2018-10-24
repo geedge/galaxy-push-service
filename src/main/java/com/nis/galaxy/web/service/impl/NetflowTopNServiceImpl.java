@@ -3,7 +3,8 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.IpActiveInt;
 import com.nis.galaxy.domain.NetFlowWater;
-import com.nis.galaxy.domain.dict.UiSysDictInfo;
+import com.nis.galaxy.domain.dict.UiAreaDictInfo;
+import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowTopNDao;
 import com.nis.galaxy.web.service.NetflowTopNService;
@@ -12,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +27,18 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
+    @Value("${Open.False.Data}")
+    private boolean OPENFALSEDATA;
 
 
-    //局点表
-    public HashMap<String, UiSysDictInfo> listDictUiSys() {
-        return myLoad.listDictUiSys;
+    //地域表
+    public HashMap<String, UiAreaDictInfo> listArea() {
+        return myLoad.listUiAreaDicInfo;
+    }
+
+    //运营商表
+    public HashMap<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
+        return myLoad.listUiCarrierDictInfo;
     }
 
     /**
@@ -44,14 +51,13 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     @Override
     public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end) {
         List<IpActiveInt> list = new ArrayList<>();
-        List<IpActiveInt> result = new ArrayList<>();
-        HashMap<String, UiSysDictInfo> listDictUiSys = listDictUiSys();
+        HashMap<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (list == null || list.size() == 0) {
+        if (list.isEmpty()) {
             try {
                 String lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -61,32 +67,41 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 logger.error("5分钟内活跃IP流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list != null && list.size() != 0) {
+        if (!list.isEmpty()) {
             for (IpActiveInt ipActiveInt : list) {
                 String area = ipActiveInt.getArea();
-                if (area != null && listDictUiSys != null) {
-                    UiSysDictInfo dict = listDictUiSys.get(area);
-                    if (dict != null && dict.getItemType() == 1) {
-                        if (languageChose == 2) {
-                            ipActiveInt.setArea(dict.getItemValue());
-                        } else if (languageChose == 1) {
-                            ipActiveInt.setArea(dict.getItemDesc());
-                        } else {
-                            ipActiveInt.setArea(dict.getItemDesc());
-                        }
-                        result.add(ipActiveInt);
-                        if (result.size() >= 10) {
-                            return result;
-                        }
-                    }
+                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
+                if (uiCarrierDictInfo != null) {
+                    ipActiveInt.setArea(uiCarrierDictInfo.getItemValue());
                 }
             }
-            if (!result.isEmpty()) {
-                return result;
-            }
         }
-        if (list.size() >= 10) {
-            return list.subList(0, 10);
+        if (list.isEmpty() && OPENFALSEDATA) {
+            int i = (int) (Math.random() * 200);
+            logger.info("5分钟内活跃IP流量TOP10------->假数据");
+            if (languageChose == 2) {
+                list.add(new IpActiveInt(start, "Akmola", "119.108.229.153", i + 20));
+                list.add(new IpActiveInt(start, "Almaty", "121.236.4.78", i + 16));
+                list.add(new IpActiveInt(start, "Akmola", "192.158.229.15", i + 15));
+                list.add(new IpActiveInt(start, "Almaty", "192.168.99.153", i + 14));
+                list.add(new IpActiveInt(start, "Akmola", "119.188.29.125", i + 12));
+                list.add(new IpActiveInt(start, "Almaty", "119.168.229.45", i + 6));
+                list.add(new IpActiveInt(start, "Almaty", "119.168.229.11", i + 5));
+                list.add(new IpActiveInt(start, "Akmola", "119.168.229.1", i + 3));
+                list.add(new IpActiveInt(start, "Almaty", "119.168.229.6", i + 2));
+                list.add(new IpActiveInt(start, "Akmola", "119.168.229.8", i));
+            } else {
+                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.108.229.153", i + 20));
+                list.add(new IpActiveInt(start, "алматы", "121.236.4.78", i + 16));
+                list.add(new IpActiveInt(start, "Ақмолаоблысы", "192.158.229.15", i + 15));
+                list.add(new IpActiveInt(start, "алматы", "192.168.99.153", i + 14));
+                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.188.29.125", i + 12));
+                list.add(new IpActiveInt(start, "алматы", "119.168.229.45", i + 6));
+                list.add(new IpActiveInt(start, "алматы", "119.168.229.11", i + 5));
+                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.168.229.1", i + 3));
+                list.add(new IpActiveInt(start, "алматы", "119.168.229.6", i + 2));
+                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.168.229.8", i));
+            }
         }
         return list;
     }
@@ -126,10 +141,10 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 logger.error("互联网流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        double avg = 0;
+        int avg = 0;
         int size = list.size();
         for (int i = size; i > 1; i--) {
-            double count = list.get(i - 1).getCount() - list.get(i - 2).getCount();
+            int count = list.get(i - 1).getCount() - list.get(i - 2).getCount();
             if (count >= 0) {
                 avg = avg + count;
             } else {
@@ -142,13 +157,22 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             avg = avg / (size - 1);
         }
         if (!list.isEmpty()) {
-            resule.add(new NetFlowWater(start, "astana", avg));
+            if (languageChose == 2) {
+                resule.add(new NetFlowWater(start, "Akmola", avg));
+            } else {
+                resule.add(new NetFlowWater(start, "Ақмолаоблысы", avg));
+            }
             return resule;
         }
         //假数据
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty() && OPENFALSEDATA) {
             list = new ArrayList<>();
-            list.add(new NetFlowWater(start, "astana", (int) (Math.random() * 1000)));
+            logger.info("互联网流量TOP10------->假数据");
+            if (languageChose == 2) {
+                list.add(new NetFlowWater(start, "Akmola", (int) (Math.random() * 1000)));
+            } else {
+                list.add(new NetFlowWater(start, "Ақмолаоблысы", (int) (Math.random() * 1000)));
+            }
         }
         return list;
     }

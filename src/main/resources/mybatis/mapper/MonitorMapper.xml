@@ -27,15 +27,32 @@
     <!--网络流量监控_5min-->
     <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
         <![CDATA[
-        SELECT  #{start} time,if((sum(b.OUTOCTETS+b.INOCTETS) - a.count )>0  ,(sum(b.OUTOCTETS+b.INOCTETS) - a.count)/300 ,sum(b.OUTOCTETS+b.INOCTETS)/300) as count
+        SELECT #{start} time,c.area area ,'INOCTETS' type,c.INOCTETS count  FROM (
+				(SELECT if((sum(b.INOCTETS) - a.INOCTETS ) >0  ,sum(b.INOCTETS) - a.INOCTETS ,sum(b.INOCTETS)) as INOCTETS,
+								if((sum(b.OUTOCTETS) - a.OUTOCTETS ) >0  ,sum(b.OUTOCTETS) - a.OUTOCTETS ,sum(b.OUTOCTETS)) as OUTOCTETS,
+								'Ақмолаоблысы' area
         FROM (
-              SELECT  (sum(INOCTETS)+sum(OUTOCTETS)) count
+              SELECT  sum(INOCTETS) INOCTETS,sum(OUTOCTETS) OUTOCTETS
+              FROM traffic_netflow_port_info
+              WHERE RECV_TIME >= #{before}
+              AND RECV_TIME <#{start}) a,
+              traffic_netflow_port_info b
+        WHERE b.RECV_TIME >= #{start}
+        AND b.RECV_TIME <  #{end}) c
+				)
+				union all
+				SELECT #{start} time,c.area area ,'OUTOCTETS' type,c.OUTOCTETS count  FROM (
+				(SELECT if((sum(b.INOCTETS) - a.INOCTETS ) >0  ,sum(b.INOCTETS) - a.INOCTETS ,sum(b.INOCTETS)) as INOCTETS,
+								if((sum(b.OUTOCTETS) - a.OUTOCTETS ) >0  ,sum(b.OUTOCTETS) - a.OUTOCTETS ,sum(b.OUTOCTETS)) as OUTOCTETS,
+								'Ақмолаоблысы' area
+        FROM (
+              SELECT  sum(INOCTETS) INOCTETS,sum(OUTOCTETS) OUTOCTETS
               FROM traffic_netflow_port_info
               WHERE RECV_TIME >= #{before}
               AND RECV_TIME < #{start}) a,
               traffic_netflow_port_info b
         WHERE b.RECV_TIME >= #{start}
-        AND b.RECV_TIME <  #{end}
+        AND b.RECV_TIME <  #{end}) c)
         ]]>
     </select>
 

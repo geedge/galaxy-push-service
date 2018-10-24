@@ -49,7 +49,7 @@
     <!--重点保障事件总览 天/次-->
     <select id="getKeyPointSafaguardThing" resultType="com.nis.galaxy.domain.EventsKeyPointSafaguardThing">
         <![CDATA[
-       SELECT  #{end} time,task.task_name teskName, count(lwhh.id) letterNum,COALESCE(sum(num.cfg_num),0) configNum,COALESCE( sum(num.reject_sum),0) monitorNum,COALESCE( sum(num.monit_sum),0) controlNum
+       SELECT  #{end} time,task.audit_time taskTime,task.task_name taskName, count(lwhh.id) letterNum,COALESCE(sum(num.cfg_num),0) configNum,COALESCE( sum(num.reject_sum),0) monitorNum,COALESCE( sum(num.monit_sum),0) controlNum
         FROM (select * from ui_task_info where is_valid=1) task left join (select * from ui_request_info  where is_valid=1) lwhh on task.id = lwhh.task_id left join  ( SELECT req.request_id, count(req.compile_id) cfg_num, sum(pz.reject_sum) reject_sum, sum(pz.monit_sum) monit_sum FROM (
           SELECT  t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) req
           LEFT JOIN ( SELECT s.cfg_id, SUM(s.reject_sum) reject_sum, SUM(s.monit_sum) monit_sum FROM (
@@ -73,7 +73,7 @@
     <!--音频监控 小时/次-->
     <select id="getEventsAudioMonitor" resultType="com.nis.galaxy.domain.EventsAudioMonitor">
         <![CDATA[
-            SELECT pid id,num,LOG_URI url
+            SELECT pid audioId,num,LOG_URI url
               FROM MM_AUDIO_REPORT
               where report_time >= #{start}
               and report_time < #{end}
@@ -84,7 +84,7 @@
     <!--视频监控 小时/次-->
     <select id="getVedioMonitor" resultType="com.nis.galaxy.domain.EventsVedioMonitor">
         <![CDATA[
-            SELECT pid id,num,LOG_URI url
+            SELECT pid vedioId,num,LOG_URI url
               FROM MM_VIDEO_REPORT
               where report_time >= #{start}
               and report_time < #{end}
@@ -95,7 +95,7 @@
     <!--图片监控 小时/次-->
     <select id="getImageMonitor" resultType="com.nis.galaxy.domain.EventsImageMonitor">
         <![CDATA[
-            SELECT pid id,num,LOG_URI url
+            SELECT pid imageId,num,LOG_URI url
               FROM MM_PIC_REPORT
               where report_time >= #{start}
               and report_time < #{end}
@@ -121,6 +121,18 @@
         FROM pxy_total_report
         WHERE REPORT_TIME >= #{start}
        AND REPORT_TIME < #{end}
+     ]]>
+    </select>
+    <!--目标行为网络监测-->
+    <select id="getTargetNetwork" resultType="com.nis.galaxy.domain.EvevtsTargetNetwork">
+    <![CDATA[
+        SELECT #{start} time,ACCOUNT account,NAS_IP nas_ip,sum(num) num
+        FROM ntc_radius_report
+        WHERE report_time >= #{start}
+            AND report_time < #{end}
+            GROUP BY ACCOUNT ,NAS_IP
+            ORDER BY num DESC
+             LIMIT 100;
      ]]>
     </select>
    <!--事件封堵-->
@@ -243,6 +255,16 @@
     <select id="getRunningStateLastTime" resultType="String">
         SELECT REPORT_TIME
         FROM  pxy_total_report
+        <![CDATA[
+        where REPORT_TIME < #{end}
+         ]]>
+        ORDER BY REPORT_TIME desc
+        LIMIT 1;
+    </select>
+<!--时间：目标行为网络监测-->
+    <select id="getTargetNetworkLastTime" resultType="String">
+        SELECT REPORT_TIME
+        FROM  ntc_radius_report
         <![CDATA[
         where REPORT_TIME < #{end}
          ]]>

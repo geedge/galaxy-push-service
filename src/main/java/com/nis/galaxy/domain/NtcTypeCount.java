@@ -16,12 +16,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain=true)
 public class NtcTypeCount {
     private String type;
-    private int count;
-
-    public NtcTypeCount(String type, int count) {
-        this.type = type;
-        this.count = count;
-    }
 
     public String getType() {
         return type;
@@ -38,4 +32,12 @@ public class NtcTypeCount {
     public void setCount(int count) {
         this.count = count;
     }
+
+    public NtcTypeCount(String type, int count) {
+        this.type = type;
+        this.count = count;
+    }
+
+    private int count;
+
 }

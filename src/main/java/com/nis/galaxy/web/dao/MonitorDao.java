@@ -1,7 +1,6 @@
 package com.nis.galaxy.web.dao;
 
 import com.nis.galaxy.domain.AbnormalBean;
-import com.nis.galaxy.domain.CountryMonitorProxy;
 import com.nis.galaxy.domain.NetWaterMonitor;
 import com.nis.galaxy.domain.NmsServiceBeanTmp;
 import org.apache.ibatis.annotations.Mapper;
