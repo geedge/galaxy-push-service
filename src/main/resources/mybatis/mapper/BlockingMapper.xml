@@ -5,10 +5,10 @@
 <mapper namespace="com.nis.galaxy.web.dao.BlockingDao">
     <!-- 封堵信息总体显示 5min/条、粒度5min-->
     <select id="getAllBlockInformation" resultType="com.nis.galaxy.domain.NtcTotalReport">
-        SELECT reject_num rejectNum ,monitor_num monitorNum,CONVERT(c2s_byte_len*8/300,int) c2sByteLen,CONVERT(s2c_byte_len*8/300,int) s2cByteLen,
-        new_uni_conn_num newUniConnNum,live_conn_num liveConnNum,drop_conn_num dropConnNum,loop_conn_num loopConnNum
-        FROM ntc_total_report
         <![CDATA[
+        select #{start} time,reject_num controlNum,monitor_num monitorNum,CONVERT(c2s_byte_len*8/300,int)+CONVERT(s2c_byte_len*8/300,int) networkFlowNum,CONVERT(c2s_byte_len*8/300,int) upstreamNum,CONVERT(s2c_byte_len*8/300,int) downstreamNum,
+          new_uni_conn_num newLinkNum,live_conn_num activeConNum,drop_conn_num dropConNum,loop_conn_num refluxConNum
+          from NTC_TOTAL_REPORT
           WHERE report_time >= #{start}
           AND report_time < #{end}
         ]]>

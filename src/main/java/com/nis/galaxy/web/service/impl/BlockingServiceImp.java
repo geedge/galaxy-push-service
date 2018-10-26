@@ -53,7 +53,6 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List getAllBlockInformation(String start, String end) {
-        List<NtcTypeCount> result = new CopyOnWriteArrayList<>();
         List<NtcTotalReport> list = new ArrayList<>();
         try {
             list = blockingDao.getAllBlockInformation(start, end);
@@ -70,79 +69,7 @@ public class BlockingServiceImp implements BlockingService {
                 logger.error("封堵信息整体显示\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (!list.isEmpty()) {
-            NtcTotalReport listParams = list.get(0);
-            if (languageChose == 2) {
-                result.add(new NtcTypeCount("CONTROL NUMBER", listParams.getRejectNum()));
-                result.add(new NtcTypeCount("MONITOR NUMBER", listParams.getMonitorNum()));
-                result.add(new NtcTypeCount("NETWORK WATERFLOW", (listParams.getS2cByteLen() + listParams.getC2sByteLen())));
-                result.add(new NtcTypeCount("UP BPS", listParams.getC2sByteLen()));
-                result.add(new NtcTypeCount("DOWN BPS", listParams.getS2cByteLen()));
-                result.add(new NtcTypeCount("NEW CONNECTION NUMBER", listParams.getNewUniConnNum()));
-                result.add(new NtcTypeCount("ACTIVE CONNECTIONS", listParams.getLiveConnNum()));
-                result.add(new NtcTypeCount("DISCARD CONNECTIONS", listParams.getDropConnNum()));
-                result.add(new NtcTypeCount("REFLUX LINK NUMBER", listParams.getLoopConnNum()));
-            } else if (languageChose == 1) {
-                result.add(new NtcTypeCount("管控数量", listParams.getRejectNum()));
-                result.add(new NtcTypeCount("监测数量", listParams.getMonitorNum()));
-                result.add(new NtcTypeCount("网络流量数量", (listParams.getS2cByteLen() + listParams.getC2sByteLen())));
-                result.add(new NtcTypeCount("上行数量", listParams.getC2sByteLen()));
-                result.add(new NtcTypeCount("下行数量", listParams.getS2cByteLen()));
-                result.add(new NtcTypeCount("新建连接数", listParams.getNewUniConnNum()));
-                result.add(new NtcTypeCount("活跃连接数", listParams.getLiveConnNum()));
-                result.add(new NtcTypeCount("丢弃连接数", listParams.getDropConnNum()));
-                result.add(new NtcTypeCount("回流链接数", listParams.getLoopConnNum()));
-            } else {
-                result.add(new NtcTypeCount("Контролируемые количество", listParams.getRejectNum()));
-                result.add(new NtcTypeCount("Мониторинг количества", listParams.getMonitorNum()));
-                result.add(new NtcTypeCount("Количество сетевой трафик", (listParams.getS2cByteLen() + listParams.getC2sByteLen())));
-                result.add(new NtcTypeCount("Четное количество", listParams.getC2sByteLen()));
-                result.add(new NtcTypeCount("Нечетное количество", listParams.getS2cByteLen()));
-                result.add(new NtcTypeCount("Новый количество соединений", listParams.getNewUniConnNum()));
-                result.add(new NtcTypeCount("Число активных соединений", listParams.getLiveConnNum()));
-                result.add(new NtcTypeCount("Выбрасывать количество соединений", listParams.getDropConnNum()));
-                result.add(new NtcTypeCount("Обратный ссылки число", listParams.getLoopConnNum()));
-            }
-        }
-        if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("封堵信息整体显示------->测试数据");
-            int a = (int) (Math.random() * 1000);
-            int b = (int) (Math.random() * 1000);
-            int c = (int) (Math.random() * 1000);
-            int d = (int) (Math.random() * 1000);
-            if (languageChose == 2) {
-                result.add(new NtcTypeCount("CONTROL NUMBER", a));
-                result.add(new NtcTypeCount("MONITOR NUMBER", a));
-                result.add(new NtcTypeCount("NETWORK WATERFLOW", b));
-                result.add(new NtcTypeCount("UP BPS", b));
-                result.add(new NtcTypeCount("DOWN BPS", c));
-                result.add(new NtcTypeCount("NEW CONNECTION NUMBER", c));
-                result.add(new NtcTypeCount("ACTIVE CONNECTIONS", d));
-                result.add(new NtcTypeCount("DISCARD CONNECTIONS", d));
-                result.add(new NtcTypeCount("REFLUX LINK NUMBER", a));
-            } else if (languageChose == 1) {
-                result.add(new NtcTypeCount("管控数量", a));
-                result.add(new NtcTypeCount("监测数量", a));
-                result.add(new NtcTypeCount("网络流量数量", b));
-                result.add(new NtcTypeCount("上行数量", b));
-                result.add(new NtcTypeCount("下行数量", c));
-                result.add(new NtcTypeCount("新建连接数", c));
-                result.add(new NtcTypeCount("活跃连接数", d));
-                result.add(new NtcTypeCount("丢弃连接数", d));
-                result.add(new NtcTypeCount("回流链接数", a));
-            } else {
-                result.add(new NtcTypeCount("Контролируемые количество", a));
-                result.add(new NtcTypeCount("Мониторинг количества", a));
-                result.add(new NtcTypeCount("Количество сетевой трафик", b));
-                result.add(new NtcTypeCount("Четное количество", b));
-                result.add(new NtcTypeCount("Нечетное количество", c));
-                result.add(new NtcTypeCount("Новый количество соединений", c));
-                result.add(new NtcTypeCount("Число активных соединений", d));
-                result.add(new NtcTypeCount("Выбрасывать количество соединений", d));
-                result.add(new NtcTypeCount("Обратный ссылки число", a));
-            }
-        }
-        return result;
+        return list;
     }
 
 
