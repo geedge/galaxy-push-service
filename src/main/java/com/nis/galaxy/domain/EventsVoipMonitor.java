@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EventsVoipMonitor {
-    private int phonenum;// 电话号码
+    private long phonenum;// 电话号码
     private long num;     // 次数
     private String url;      // 现场片段url
 

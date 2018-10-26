@@ -14,6 +14,6 @@ import lombok.experimental.Accessors;
 public class EventsSpecificWebsites {
     private String time;    // 时间
     private String name;    // 网站名称
-    private int num;    //数量
+    private long num;    //数量
 
 }

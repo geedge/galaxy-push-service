@@ -105,7 +105,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("封堵信息整体显示------->假数据");
+            logger.info("封堵信息整体显示------->测试数据");
             int a = (int) (Math.random() * 1000);
             int b = (int) (Math.random() * 1000);
             int c = (int) (Math.random() * 1000);
@@ -182,9 +182,9 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("DNS欺骗信息显示------->假数据");
-            list.add(new NtcEntranceReport(start, "Kazakhtelecom", (int) (Math.random() * 1000)));
-            list.add(new NtcEntranceReport(start, "Transtelecom", (int) (Math.random() * 1000)));
+            logger.info("DNS欺骗信息显示------->测试数据");
+            list.add(new NtcEntranceReport(start, "Kazakhtelecom", (int) (Math.random() * 100)));
+            list.add(new NtcEntranceReport(start, "Transtelecom", (int) (Math.random() * 100)));
         }
 
         return list;
@@ -240,9 +240,9 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("24小时全国范围阻断协议信息------->假数据");
-            list.add(new TimeTypeCount(start, "mail_monit", (int) (Math.random())));
-            list.add(new TimeTypeCount(start, "ctrl_http_monit", (int) (Math.random())));
+            logger.info("24小时全国范围阻断协议信息------->测试数据");
+            list.add(new TimeTypeCount(start, "ip_monit", (int) (Math.random()*100)));
+            list.add(new TimeTypeCount(start, "website_http_monit", (int) (Math.random()*100)));
         }
         return list;
     }
@@ -268,12 +268,12 @@ public class BlockingServiceImp implements BlockingService {
         }
         if (list.isEmpty()) {
             try {
-                String lastTime = blockingDao.getDisBlockInformationLastTime(end);
+                String lastTime = blockingDao.getDisBlockInformationLastTime(end,a, b, c, d, e, f);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
                 list = blockingDao.getDisBlockInformationOnly(time, DateUtils.getAfter5min(time), a, b, c, d, e, f);
             } catch (Exception e) {
-                logger.error("整体封堵数量\t最近数据\t查询异常\tserviceImpl", e);
+                logger.error("封堵信息分布显示\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         if (!list.isEmpty()) {
@@ -298,11 +298,11 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("封堵信息分布显示------->假数据");
-            list.add(new NtcDisReport(start, "Almaty", "website_http_reject", (int) (Math.random() * 100)));
-            list.add(new NtcDisReport(start, "Almaty", "ssl_reject", (int) (Math.random() * 100)));
-            list.add(new NtcDisReport(start, "Atyrau", "socks_reject", (int) (Math.random() * 100)));
-            list.add(new NtcDisReport(start, "Atyrau", "basic_protocol_reject", (int) (Math.random() * 100)));
+            logger.info("封堵信息分布显示------->测试数据");
+            list.add(new NtcDisReport(start, "Kazakhtelecom", "website_http_reject", (int) (Math.random() * 100)));
+            list.add(new NtcDisReport(start, "kazTransCom", "ssl_reject", (int) (Math.random() * 100)));
+            list.add(new NtcDisReport(start, "Kazakhtelecom", "socks_reject", (int) (Math.random() * 100)));
+            list.add(new NtcDisReport(start, "kazTransCom", "basic_protocol_reject", (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -354,10 +354,10 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("24小时内全国热力图------->假数据");
-            list.add(new HotStatistic(start, "Kazakhtelecom", "103.227.81.43", "10.11.36.42", "", (int) (Math.random() * 1000)));
-            list.add(new HotStatistic(start, "kazTransCom", "103.227.81.1", "10.11.36.12", "", (int) (Math.random() * 1000)));
-            list.add(new HotStatistic(start, "Transtelecom", "103.227.81.36", "10.11.36.11", "", (int) (Math.random() * 1000)));
+            logger.info("24小时内全国热力图------->测试数据");
+            list.add(new HotStatistic(start, "Kazakhtelecom", "103.227.81.43", "10.11.36.42", "ip_monit", (int) (Math.random() * 100)));
+            list.add(new HotStatistic(start, "kazTransCom", "103.227.81.1", "10.11.36.12", "dst_ip", (int) (Math.random() * 100)));
+            list.add(new HotStatistic(start, "Transtelecom", "103.227.81.36", "10.11.36.11", "website_dns_reject", (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -397,7 +397,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("实时打点图------->假数据");
+            logger.info("实时打点图------->测试数据");
             String time = DateUtils.getDateTime();
             list.add(new PointMap(time, "103.227.81.43", "10.11.36.42", "website_http_monit", (int) (Math.random())));
             list.add(new PointMap(time, "103.227.81.33", "10.11.36.4", "website_http_monit", (int) (Math.random())));
@@ -425,7 +425,7 @@ public class BlockingServiceImp implements BlockingService {
         //如果此次没有查询到数据查上一个5min的数据
         if (list.isEmpty()) {
             try {
-                String lastTime = blockingDao.getDisBlockMapLastTime(end);
+                String lastTime = blockingDao.getDisBlockMapLastTime(end, a, b, c, d, e, f);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
                 list = blockingDao.getDisBlockMapOnly(time, DateUtils.getAfter5min(time), a, b, c, d, e, f);
@@ -444,10 +444,9 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("热力图接口------->假数据");
-            list.add(new AreaCount(start, "Almaty", (int) (Math.random() * 1000)));
-            list.add(new AreaCount(start, "Aktau", (int) (Math.random() * 1000)));
-            list.add(new AreaCount(start, "Aktubinsk", (int) (Math.random() * 1000)));
+            logger.info("热力图接口------->测试数据");
+            list.add(new AreaCount(start, "Kazakhtelecom", (int) (Math.random() * 1000)));
+            list.add(new AreaCount(start, "kazTransCom", (int) (Math.random() * 1000)));
         }
         return list;
     }
@@ -484,11 +483,12 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("全国协议配置信息------->假数据");
+            logger.info("全国协议配置信息------->测试数据");
             String time = DateUtils.getRangeOfday(DateUtils.getDateTime());
-            list.add(new CfgTypeCount(time, "audio_sample_reject", (int) (Math.random() * 20)));
-            list.add(new CfgTypeCount(time, "video_sample_reject", (int) (Math.random() * 20)));
-            list.add(new CfgTypeCount(time, "voip_sample_reject", (int) (Math.random() * 20)));
+            list.add(new CfgTypeCount(time, "av_content_url_reject", (int) (Math.random() * 20)));
+            list.add(new CfgTypeCount(time, "ctrl_http_replace", (int) (Math.random() * 20)));
+            list.add(new CfgTypeCount(time, "app_protocol_ip_monit", (int) (Math.random() * 20)));
+            list.add(new CfgTypeCount(time, "ip_drop", (int) (Math.random() * 20)));
         }
         return list;
     }

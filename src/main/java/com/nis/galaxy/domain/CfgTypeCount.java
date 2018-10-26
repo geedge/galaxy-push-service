@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 public class CfgTypeCount {
     private String time;
     private String type;
-    private int count;
+    private long count;
     public String getTime() {
         return time= DateUtils.getRangeOfday(DateUtils.getDateTime());
     }

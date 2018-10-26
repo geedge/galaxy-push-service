@@ -14,5 +14,5 @@ import lombok.experimental.Accessors;
 public class EventsServiceCount {
     private String time;     // 时间
     private String type;    // 业务分类
-    private int num;     //数量
+    private long num;     //数量
 }

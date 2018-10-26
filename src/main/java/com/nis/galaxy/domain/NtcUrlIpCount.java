@@ -21,5 +21,5 @@ public class NtcUrlIpCount {
     private String time;
     private String ip;
     private String type;
-    private int count;
+    private long count;
 }

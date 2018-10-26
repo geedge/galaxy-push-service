@@ -16,5 +16,5 @@ import java.util.Date;
 public class NtcRejectUrlStatistic {
     private String time;
     private String type;
-    private Integer count;
+    private long count;
 }

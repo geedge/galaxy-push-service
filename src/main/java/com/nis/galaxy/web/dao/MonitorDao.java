@@ -16,11 +16,11 @@ import java.util.List;
 public interface MonitorDao {
     NmsServiceBeanTmp getMonitorOf1m01();
 
-    List<AbnormalBean> getMonitorOf1m02(int id);
+    List<AbnormalBean> getMonitorOf1m02(long id);
 
 
     List<NetWaterMonitor> getNetWaterMonitor(@Param("start") String start, @Param("end") String end, @Param("before") String before);
 
-    String getNetWaterMonitorLastTime(@Param("end")String end);
+    String getNetWaterMonitorLastTime(@Param("end") String end);
 
 }

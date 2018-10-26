@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +40,10 @@ public class MyLoad {
     //运营商表
     public HashMap<String, UiCarrierDictInfo> listUiCarrierDictInfo = new HashMap<>();
 
-
-
     public HashMap<String, UiCarrierDictInfo> getListUiCarrierDictInfo() {
         return listUiCarrierDictInfo;
     }
+
     public HashMap<String, UiAreaDictInfo> getListUiAreaDicInfo() {
         return listUiAreaDicInfo;
     }
@@ -65,38 +65,37 @@ public class MyLoad {
         logger.info("执行初始化字典表：地域表\t运营商表\t业务表\t协议表\t标签表");
 
 
-
         //地域表的预加载
         List<UiAreaDictInfo> uiAreaDictInfo = new ArrayList<>();
         try {
             uiAreaDictInfo = dictService.getUiAreaDictInfo();
         } catch (Exception e) {
-            logger.info("地域表预加载出现异常",e);
+            logger.error("地域表预加载出现异常", e);
         }
         for (UiAreaDictInfo areaDictInfo : uiAreaDictInfo) {
-            listUiAreaDicInfo.put(areaDictInfo.getAreaId(),areaDictInfo);
+            listUiAreaDicInfo.put(areaDictInfo.getAreaId(), areaDictInfo);
         }
-        logger.info("地域表的预加载结果\t"+listUiAreaDicInfo);
+        logger.info("地域表的预加载结果\t" + listUiAreaDicInfo);
 
         //运营商表的预加载
         List<UiCarrierDictInfo> uiCarrierDictInfo = new ArrayList<>();
         try {
             uiCarrierDictInfo = dictService.getUiCarrierDictInfo();
         } catch (Exception e) {
-            logger.info("运营商表预加载出现异常",e);
+            logger.error("运营商表预加载出现异常", e);
         }
         for (UiCarrierDictInfo carrierDictInfo : uiCarrierDictInfo) {
-            listUiCarrierDictInfo.put(carrierDictInfo.getCarrierId(),carrierDictInfo);
+            listUiCarrierDictInfo.put(carrierDictInfo.getCarrierId(), carrierDictInfo);
         }
 
-        logger.info("运营商表的预加载结果\t"+listUiCarrierDictInfo);
+        logger.info("运营商表的预加载结果\t" + listUiCarrierDictInfo);
 
         //业务表的预加载(中英俄)
         List<NtcServiceDict> ntcServiceDict = new ArrayList<>();
         try {
             ntcServiceDict = dictService.getNtcServiceDict();
         } catch (Exception e) {
-            logger.info("业务表预加载出现异常", e);
+            logger.error("业务表预加载出现异常", e);
         }
         if (!ntcServiceDict.isEmpty()) {
             for (NtcServiceDict serviceDict : ntcServiceDict) {
@@ -110,7 +109,7 @@ public class MyLoad {
         try {
             protocolDict = dictService.getProtocolDict();
         } catch (Exception e) {
-            logger.info("协议表的预加载出现异常", e);
+            logger.error("协议表的预加载出现异常", e);
         }
         if (!protocolDict.isEmpty()) {
             for (ProtocolDict dict : protocolDict) {
@@ -124,7 +123,7 @@ public class MyLoad {
         try {
             uiTagDicInfo = dictService.getUiTagDicInfo();
         } catch (Exception e) {
-            logger.info("标签表的预加载出现异常", e);
+            logger.error("标签表的预加载出现异常", e);
         }
         if (!uiTagDicInfo.isEmpty()) {
             for (UiTagDictInfo tagDicInfo : uiTagDicInfo) {
@@ -134,7 +133,6 @@ public class MyLoad {
         logger.info("标签表的预加载结果为\t" + listUiTagDicInfo);
         logger.info("初始化字典表操作执行完成");
     }
-
     @Scheduled(fixedRate = 999999999)
     public void run() {
         if (a++ > 1) {

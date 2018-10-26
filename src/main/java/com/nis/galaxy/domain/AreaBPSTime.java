@@ -13,6 +13,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain=true)
 public class AreaBPSTime {
     private String area;
-    private int bps;
+    private long bps;
     private String time;
 }

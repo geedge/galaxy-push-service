@@ -14,6 +14,6 @@ import lombok.experimental.Accessors;
 public class EventsLetterCount {
     private String time;  // 时间
     private String letter;    // 来函
-    private int num;
+    private long num;
 
 }

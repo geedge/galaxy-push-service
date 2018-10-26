@@ -7,6 +7,6 @@ mybatis:
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver              # mariadb驱动包
-    url: jdbc:mariadb://192.168.10.204:3306/galaxy        # 数据库名称
+    url: jdbc:mariadb://192.168.10.204:3306/galaxy-dev        # 数据库名称
     username: ENC(L0d9FkUJX6BIaxPyy57bqQ==)
     password: ENC(0WPm6y8me4cavVjpk2BuBQ==)

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,30 +79,17 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         }
         if (list.isEmpty() && OPENFALSEDATA) {
             int i = (int) (Math.random() * 200);
-            logger.info("5分钟内活跃IP流量TOP10------->假数据");
-            if (languageChose == 2) {
-                list.add(new IpActiveInt(start, "Akmola", "119.108.229.153", i + 20));
-                list.add(new IpActiveInt(start, "Almaty", "121.236.4.78", i + 16));
-                list.add(new IpActiveInt(start, "Akmola", "192.158.229.15", i + 15));
-                list.add(new IpActiveInt(start, "Almaty", "192.168.99.153", i + 14));
-                list.add(new IpActiveInt(start, "Akmola", "119.188.29.125", i + 12));
-                list.add(new IpActiveInt(start, "Almaty", "119.168.229.45", i + 6));
-                list.add(new IpActiveInt(start, "Almaty", "119.168.229.11", i + 5));
-                list.add(new IpActiveInt(start, "Akmola", "119.168.229.1", i + 3));
-                list.add(new IpActiveInt(start, "Almaty", "119.168.229.6", i + 2));
-                list.add(new IpActiveInt(start, "Akmola", "119.168.229.8", i));
-            } else {
-                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.108.229.153", i + 20));
-                list.add(new IpActiveInt(start, "алматы", "121.236.4.78", i + 16));
-                list.add(new IpActiveInt(start, "Ақмолаоблысы", "192.158.229.15", i + 15));
-                list.add(new IpActiveInt(start, "алматы", "192.168.99.153", i + 14));
-                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.188.29.125", i + 12));
-                list.add(new IpActiveInt(start, "алматы", "119.168.229.45", i + 6));
-                list.add(new IpActiveInt(start, "алматы", "119.168.229.11", i + 5));
-                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.168.229.1", i + 3));
-                list.add(new IpActiveInt(start, "алматы", "119.168.229.6", i + 2));
-                list.add(new IpActiveInt(start, "Ақмолаоблысы", "119.168.229.8", i));
-            }
+            logger.info("5分钟内活跃IP流量TOP10------->测试数据");
+            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.108.229.153", i + 20));
+            list.add(new IpActiveInt(start, "kazTransCom", "121.236.4.78", i + 16));
+            list.add(new IpActiveInt(start, "Kazakhtelecom", "192.158.229.15", i + 15));
+            list.add(new IpActiveInt(start, "kazTransCom", "192.168.99.153", i + 14));
+            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.188.29.125", i + 12));
+            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.168.229.45", i + 6));
+            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.168.229.11", i + 5));
+            list.add(new IpActiveInt(start, "kazTransCom", "119.168.229.1", i + 3));
+            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.168.229.6", i + 2));
+            list.add(new IpActiveInt(start, "kazTransCom", "119.168.229.8", i));
         }
         return list;
     }
@@ -164,14 +152,14 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             }
             return resule;
         }
-        //假数据
+        //测试数据
         if (list.isEmpty() && OPENFALSEDATA) {
             list = new ArrayList<>();
-            logger.info("互联网流量TOP10------->假数据");
-            if (languageChose == 2) {
-                list.add(new NetFlowWater(start, "Akmola", (int) (Math.random() * 1000)));
-            } else {
+            logger.info("互联网流量TOP10------->测试数据");
+            if (languageChose == 3) {
                 list.add(new NetFlowWater(start, "Ақмолаоблысы", (int) (Math.random() * 1000)));
+            } else {
+                list.add(new NetFlowWater(start, "Akmola", (int) (Math.random() * 1000)));
             }
         }
         return list;

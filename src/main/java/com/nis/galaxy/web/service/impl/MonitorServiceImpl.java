@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class MonitorServiceImpl implements MonitorService {
         }
         List<AbnormalBean> abnormalBean = new ArrayList<>();
         if (nmsServerBeanTmp != null) {
-            int id = nmsServerBeanTmp.getId();
+            long id = nmsServerBeanTmp.getId();
             abnormalBean = monitorDao.getMonitorOf1m02(id);
             //结果的封装
             NmsServerBean nmsServerBean = new NmsServerBean();
@@ -48,25 +49,25 @@ public class MonitorServiceImpl implements MonitorService {
             nmsServerBean.setArea(nmsServerBeanTmp.getArea());
             nmsServerBean.setTotal(Integer.parseInt(nmsServerBeanTmp.getTotal()));
             nmsServerBean.setNormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
-            nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
+            nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getAbnormal()));
             nmsServerBean.setAbnormalmachines(abnormalBean);
             list.add(nmsServerBean);
-        } else {
-            if (list.isEmpty() && OPENFALSEDATA) {
-                logger.info("系统监控------->假数据");
-                nmsServerBeanTmp = new NmsServiceBeanTmp(DateUtils.getDateTime(), "Region Center6", "" + (int) (Math.random() * 5000), (int) (Math.random() * 5000) + "", "2", 22);
-                abnormalBean.add(new AbnormalBean("competer1", "120.213." + (int) (Math.random() * 50)));
-                abnormalBean.add(new AbnormalBean("competer2", "120.213." + (int) (Math.random() * 20)));
-                //结果的封装
-                NmsServerBean nmsServerBean = new NmsServerBean();
-                nmsServerBean.setTime(nmsServerBeanTmp.getTime());
-                nmsServerBean.setArea(nmsServerBeanTmp.getArea());
-                nmsServerBean.setTotal(Integer.parseInt(nmsServerBeanTmp.getTotal()));
-                nmsServerBean.setNormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
-                nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
-                nmsServerBean.setAbnormalmachines(abnormalBean);
-                list.add(nmsServerBean);
-            }
+            list.remove(null);
+        }
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("系统监控------->测试数据");
+            nmsServerBeanTmp = new NmsServiceBeanTmp(DateUtils.getDateTime(), "Region Center6", "" + (int) (Math.random() * 5000), (int) (Math.random() * 5000) + "", "2", 22);
+            abnormalBean.add(new AbnormalBean("competer1", "120.213." + (int) (Math.random() * 50)));
+            abnormalBean.add(new AbnormalBean("competer2", "120.213." + (int) (Math.random() * 20)));
+            //结果的封装
+            NmsServerBean nmsServerBean = new NmsServerBean();
+            nmsServerBean.setTime(nmsServerBeanTmp.getTime());
+            nmsServerBean.setArea(nmsServerBeanTmp.getArea());
+            nmsServerBean.setTotal(Integer.parseInt(nmsServerBeanTmp.getTotal()));
+            nmsServerBean.setNormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
+            nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getAbnormal()));
+            nmsServerBean.setAbnormalmachines(abnormalBean);
+            list.add(nmsServerBean);
         }
         return list;
     }
@@ -105,15 +106,26 @@ public class MonitorServiceImpl implements MonitorService {
                 logger.error("网络流量监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //假数据
+        if (!list.isEmpty()) {
+            List<NetWaterMonitor> result = new ArrayList<>();
+            if (languageChose == 3) {
+                result.add(new NetWaterMonitor(list.get(0).getTime(), "Ақмолаоблысы", "INOCTETS", list.get(0).getCount()));
+                result.add(new NetWaterMonitor(list.get(1).getTime(), "Ақмолаоблысы", "INOCTETS", list.get(1).getCount()));
+            } else {
+                result.add(new NetWaterMonitor(list.get(0).getTime(), "Akmola", "INOCTETS", list.get(0).getCount()));
+                result.add(new NetWaterMonitor(list.get(1).getTime(), "Akmola", "OUTOCTETS", list.get(1).getCount()));
+            }
+            return result;
+        }
+        //测试数据
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("网络流量监控------->假数据");
-            if (languageChose == 2) {
+            logger.info("网络流量监控------->测试数据");
+            if (languageChose == 3) {
+                list.add(new NetWaterMonitor(start, "Ақмолаоблысы", "INOCTETS", (int) (Math.random() * 20000)));
+                list.add(new NetWaterMonitor(start, "Ақмолаоблысы", "OUTOCTETS", (int) (Math.random() * 20000)));
+            } else {
                 list.add(new NetWaterMonitor(start, "Akmola", "OUTOCTETS", (int) (Math.random() * 20000)));
                 list.add(new NetWaterMonitor(start, "Akmola", "INOCTETS", (int) (Math.random() * 20000)));
-            } else {
-                list.add(new NetWaterMonitor(start, "Ақмолаоблысы", "OUTOCTETS", (int) (Math.random() * 20000)));
-                list.add(new NetWaterMonitor(start, "Ақмолаоблысы", "INOCTETS", (int) (Math.random() * 20000)));
             }
         }
         return list;

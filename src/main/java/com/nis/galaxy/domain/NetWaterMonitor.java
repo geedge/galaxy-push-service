@@ -15,5 +15,5 @@ public class NetWaterMonitor {
     private String time;
     private String area;
     private String type;
-    private int count;
+    private long count;
 }

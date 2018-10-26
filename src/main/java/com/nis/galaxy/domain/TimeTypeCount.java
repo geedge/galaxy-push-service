@@ -14,6 +14,5 @@ import lombok.experimental.Accessors;
 public class TimeTypeCount {
     private String time;
     private String type;
-    private int count;
-
+    private long count;
 }

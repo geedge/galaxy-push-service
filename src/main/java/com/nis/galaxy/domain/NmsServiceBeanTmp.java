@@ -22,5 +22,5 @@ public class NmsServiceBeanTmp {
     private String total;
     private String normal;
     private String abnormal;
-    private int id;
+    private long id;
 }

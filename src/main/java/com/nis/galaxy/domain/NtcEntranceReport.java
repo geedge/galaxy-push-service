@@ -13,5 +13,5 @@ import lombok.experimental.Accessors;
 public class NtcEntranceReport {
     private String time;
     private String area;
-    private int count;
+    private long count;
 }

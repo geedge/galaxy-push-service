@@ -14,7 +14,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     private String IMAGEPATH;
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        if (IMAGEPATH == null || IMAGEPATH.equals("")) {
+        if (IMAGEPATH == null || "".equals(IMAGEPATH)) {
             try {
                 IMAGEPATH = new File("").getCanonicalPath() + "/image/";
             } catch (IOException e) {

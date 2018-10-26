@@ -77,7 +77,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("1小时内全国阻断URLTOP10------->假数据");
+            logger.info("1小时内全国阻断URLTOP10------->测试数据");
             int i = (int) (Math.random() * 200);
             list.add(new NtcRejectUrlStatistic(start, "www.bing.com/fd/ls/lsp.aspx", i + 20));
             list.add(new NtcRejectUrlStatistic(start, "www.bing.com/fd/ls/lsp.aspx?", i + 18));
@@ -120,7 +120,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("1小时内全国阻断网站TOP10------->假数据");
+            logger.info("1小时内全国阻断网站TOP10------->测试数据");
             int i = (int) (Math.random() * 200);
             list.add(new NtcRejectWebsiteStatistic(start, "7.au.download.windowsupdate.com", i + 40));
             list.add(new NtcRejectWebsiteStatistic(start, "3.au.download.windowsupdate.com", i + 33));
@@ -188,31 +188,17 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("24小时区域阻断协议TOP10------->假数据");
+            logger.info("24小时区域阻断协议TOP10------->测试数据");
             int i = (int) (Math.random() * 400);
-            if (languageChose == 2) {
-                list.add(new AreaBlockProtocol(start, "Almaty", "ssl_reject", i + 40));
-                list.add(new AreaBlockProtocol(start, "Almaty", "file_transfer_digest_reject", i + 31));
-                list.add(new AreaBlockProtocol(start, "Akmola", "p2p_reject", i + 20));
-                list.add(new AreaBlockProtocol(start, "Almaty", "encrypted_tunnel_behavior_reject", i + 18));
-                list.add(new AreaBlockProtocol(start, "Akmola", "website_dns_monit", i + 17));
-                list.add(new AreaBlockProtocol(start, "Akmola", "mail_monit", i + 16));
-                list.add(new AreaBlockProtocol(start, "Almaty", "ipsec_monit", i + 10));
-                list.add(new AreaBlockProtocol(start, "Akmola", "socks_monit", i + 8));
-                list.add(new AreaBlockProtocol(start, "Almaty", "bgp_monit", i + 7));
-            } else {
-                list.add(new AreaBlockProtocol(start, "алматы", "ssl_reject", i + 40));
-                list.add(new AreaBlockProtocol(start, "Ақмолаоблысы", "p2p_monit", i));
-                list.add(new AreaBlockProtocol(start, "алматы", "file_transfer_digest_reject", i + 31));
-                list.add(new AreaBlockProtocol(start, "Ақмолаоблысы", "p2p_reject", i + 20));
-                list.add(new AreaBlockProtocol(start, "алматы", "encrypted_tunnel_behavior_reject", i + 18));
-                list.add(new AreaBlockProtocol(start, "Ақмолаоблысы", "website_dns_monit", i + 17));
-                list.add(new AreaBlockProtocol(start, "Ақмолаоблысы", "mail_monit", i + 16));
-                list.add(new AreaBlockProtocol(start, "алматы", "ipsec_monit", i + 10));
-                list.add(new AreaBlockProtocol(start, "Ақмолаоблысы", "socks_monit", i + 8));
-                list.add(new AreaBlockProtocol(start, "алматы", "bgp_monit", i + 7));
-                list.add(new AreaBlockProtocol(start, "Ақмолаоблысы", "p2p_monit", i));
-            }
+                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "ssl_reject", i + 40));
+                list.add(new AreaBlockProtocol(start, "kazTransCom", "file_transfer_digest_reject", i + 31));
+                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "p2p_reject", i + 20));
+                list.add(new AreaBlockProtocol(start, "kazTransCom", "encrypted_tunnel_behavior_reject", i + 18));
+                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "website_dns_monit", i + 17));
+                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "mail_monit", i + 16));
+                list.add(new AreaBlockProtocol(start, "kazTransCom", "ipsec_monit", i + 10));
+                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "socks_monit", i + 8));
+                list.add(new AreaBlockProtocol(start, "kazTransCom", "bgp_monit", i + 7));
         }
         return list;
     }
@@ -245,7 +231,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("5分钟内全国阻断URLTOP10------->假数据");
+            logger.info("5分钟内全国阻断URLTOP10------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/ls/lsp.aspx", i + 70));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/ls/lsp.aspx?", i + 64));
@@ -288,7 +274,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("5分钟内全国阻断website------->假数据");
+            logger.info("5分钟内全国阻断website------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/ls/ls", i + 10));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/ls/ldfs", i + 9));
@@ -297,9 +283,9 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/lg345if", i + 5));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/lif7e?", i + 4));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/xg/d4564d", i + 3));
-            list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/567ww", i + 2));
+            list.add(new NtcUrlIpCount(start, "204.79.197.200", "p3.qhimgs0.com", i + 2));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/4t78t", i + 1));
-            list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/dre565t", i));
+            list.add(new NtcUrlIpCount(start, "204.79.197.200", "7.au.download.windowsupdate.com", i));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/rde23t", i));
         }
         return list;
@@ -342,14 +328,13 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("1h内全国阻断标签TOP100------->假数据");
+            logger.info("1h内全国阻断标签TOP100------->测试数据");
             int i = (int) (Math.random() * 200);
             list.add(new NtcTagReport(start, "News", i + 30));
             list.add(new NtcTagReport(start, "kill", i + 30));
-            list.add(new NtcTagReport(start, "金三胖", i + 30));
+            list.add(new NtcTagReport(start, "golden Three fat", i + 30));
             list.add(new NtcTagReport(start, "SaDam", i + 30));
-            list.add(new NtcTagReport(start, "两会", i + 30));
-            list.add(new NtcTagReport(start, "袁大头", i + 30));
+            list.add(new NtcTagReport(start, "Two Sessions", i + 30));
         }
         return list;
     }

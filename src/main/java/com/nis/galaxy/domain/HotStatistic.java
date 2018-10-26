@@ -23,5 +23,5 @@ public class HotStatistic {
     private String src_ip; // 源IP
     private String dst_ip;   // 目的IP
     private String type;  // 类型，如：url封堵、网站封堵等
-    private int count;
+    private long count;
 }

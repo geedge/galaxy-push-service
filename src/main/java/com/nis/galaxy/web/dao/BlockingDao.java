@@ -26,7 +26,7 @@ public interface BlockingDao {
 
     String getAllBlockInformationLastTime(@Param("end") String end);
 
-    String getDisBlockInformationLastTime(@Param("end") String end);
+    String getDisBlockInformationLastTime(@Param("end") String end,@Param("a") int a, @Param("b") int b, @Param("c") int c, @Param("d") int d, @Param("e") int e, @Param("f") int f);
 
     String getDNSDeceiveInformationLastTime(@Param("end") String end);
 
@@ -34,5 +34,6 @@ public interface BlockingDao {
 
     String getAllHotStatistisLastTime(@Param("end") String end);
 
-    String getDisBlockMapLastTime(@Param("end") String end);
+    String getDisBlockMapLastTime(@Param("end") String end,@Param("a") int a, @Param("b") int b, @Param("c") int c, @Param("d") int d, @Param("e") int e, @Param("f") int f);
+
 }

@@ -14,14 +14,14 @@ import java.io.Serializable;
 @Accessors(chain=true)
 public class NtcTotalReport implements Serializable {
 
-  private int rejectNum;//封堵数量
-  private int monitorNum;//监测数量
-  private int c2sByteLen;//字节数
-  private int s2cByteLen;
-  private int newUniConnNum;//新建连接数
-  private int liveConnNum;//活跃连接数
-  private int dropConnNum;//丢弃连接数
+  private long rejectNum;//封堵数量
+  private long monitorNum;//监测数量
+  private long c2sByteLen;//字节数
+  private long s2cByteLen;
+  private long newUniConnNum;//新建连接数
+  private long liveConnNum;//活跃连接数
+  private long dropConnNum;//丢弃连接数
   private String reportTime;//统计时间
-  private int loopConnNum;//回流数
+  private long loopConnNum;//回流数
 
 }

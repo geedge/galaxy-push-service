@@ -12,10 +12,10 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class SystemTotal {
-    private int totalNum;     // 总流量
-    private int configNum;   // 配置总数
-    private int blockNum;  // 阻断数量
-    private int monitorNum; // 监测数量
-    private int discardedNum; // 丢弃数量
-    private int refluxNum;//回流数量
+    private long totalNum;     // 总流量
+    private long configNum;   // 配置总数
+    private long blockNum;  // 阻断数量
+    private long monitorNum; // 监测数量
+    private long discardedNum; // 丢弃数量
+    private long refluxNum;//回流数量
 }

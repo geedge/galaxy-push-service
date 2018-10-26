@@ -14,5 +14,5 @@ import lombok.experimental.Accessors;
 public class EventsAppMonitor {
     private String time;
     private String name;
-    private int num;
+    private long num;
 }
