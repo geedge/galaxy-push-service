@@ -7,74 +7,74 @@
 
     <!--1.24小时区域阻断协议TOP10 24h/条 粒度5min 5min的汇总 分钟报___映射-->
     <select id="getAreaBlockTop10ProtocolOf24hOnly" resultType="com.nis.galaxy.domain.AreaBlockProtocol">
+       <![CDATA[
        SELECT #{start} time,entrance_id area,service type,sum(sum) count
         FROM ntc_entrance_report
-       <![CDATA[
           WHERE report_time >= #{start}
           AND report_time < #{end}
-        ]]>
 		GROUP BY service , entrance_id
 		ORDER BY count desc
 		LIMIT 10;
+        ]]>
      </select>
     <!--1小时内全国阻断URLTOP10 1h/条 小时报-->
     <select id="getBlockTop10URLOf1h" resultType="com.nis.galaxy.domain.NtcRejectUrlStatistic">
+        <![CDATA[
         SELECT #{start} time,url type,SUM(sum) count
         FROM ntc_reject_url_statistic
-        <![CDATA[
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-        ]]>
         GROUP BY url
         ORDER BY count desc
         LIMIT 10;
+        ]]>
     </select>
     <!--5分钟内全国阻断URL TOP10  5m/条 Top10-->
     <select id="getBlockTop10URLOf5m" resultType="com.nis.galaxy.domain.NtcUrlIpCount">
+        <![CDATA[
         SELECT #{start} time,url type,ip_addr ip,SUM(sum) count
            FROM ntc_reject_url_statistic
-        <![CDATA[
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-        ]]>
            GROUP BY url,ip_addr
            ORDER BY count desc
            LIMIT 10;
+        ]]>
     </select>
     <!--1小时内全国阻断网站TOP10 1h/条-->
     <select id="getBlockTop10WebsiteOf1h" resultType="com.nis.galaxy.domain.NtcRejectWebsiteStatistic">
+        <![CDATA[
         SELECT #{start} time ,website type ,sum(sum) count
         FROM ntc_reject_website_statistic
-        <![CDATA[
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-        ]]>
         group by website
         ORDER BY count desc
         LIMIT 10;
+        ]]>
     </select>
     <!--5min 内全国阻断网站TOP10 5min/条-->
     <select id="getBlockTop10WebsiteOf5m" resultType="com.nis.galaxy.domain.NtcWebIpCount">
+        <![CDATA[
       SELECT #{start} time,website type,ip_addr ip,sum count
           FROM ntc_reject_website_statistic
-        <![CDATA[
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-        ]]>
           GROUP BY website ,ip_addr
           ORDER BY count desc
           LIMIT 10;
+        ]]>
     </select>
     <!--1.24小时内封堵标签TOP10 1h/条 粒度5min 1h的汇总_____映射-->
     <select id="getBlockTop10Tag24hOnly" resultType="com.nis.galaxy.domain.NtcTagReport">
+		<![CDATA[
         SELECT #{start} time,tag type ,SUM(sum) count
         FROM ntc_tag_report
-		<![CDATA[
           WHERE report_time >= #{start}
           AND report_time < #{end}
-        ]]>
 		  GROUP BY tag
 		  ORDER BY count desc;
+        ]]>
     </select>
 
     <!--1h内全国阻断标签TOP100-->
@@ -93,73 +93,73 @@
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：24小时区域阻断协议TOP10_分钟报-->
     <select id="getAreaBlockTop10ProtocolOf24hLastTime" resultType="String">
+        <![CDATA[
         select report_time
           FROM ntc_entrance_report
-        <![CDATA[
           WHERE report_time < #{end}
-        ]]>
           ORDER BY report_time desc
           LIMIT 1;
+        ]]>
     </select>
     <!--时间：1小时内全国阻断URLTOP10-->
     <select id="getBlockTop10URLOf1hLastTime" resultType="String">
+        <![CDATA[
         select stat_time
           FROM ntc_reject_url_statistic
-        <![CDATA[
           WHERE stat_time < #{end}
-        ]]>
           ORDER BY stat_time desc
           LIMIT 1;
+        ]]>
     </select>
     <!--时间：1小时内全国阻断网站TOP10-->
     <select id="getBlockTop10WebsiteOf1hLastTime" resultType="String">
+        <![CDATA[
         select stat_time
           FROM ntc_reject_website_statistic
-        <![CDATA[
           WHERE stat_time < #{end}
-        ]]>
           ORDER BY stat_time desc
           LIMIT 1;
+        ]]>
     </select>
     <!--时间：24小时内封堵标签TOP10-->
     <select id="getBlockTop10Tag24hLastTime" resultType="String">
+        <![CDATA[
         select report_time
           FROM ntc_tag_report
-        <![CDATA[
           WHERE report_time < #{end}
-        ]]>
           ORDER BY report_time desc
           LIMIT 1;
+        ]]>
     </select>
     <!--时间：5分钟内全国阻断URLTOP10-->
     <select id="getBlockTop10URLOf5mLastTime" resultType="String">
+        <![CDATA[
         select stat_time
           FROM ntc_reject_url_statistic
-        <![CDATA[
           WHERE stat_time < #{end}
-        ]]>
           ORDER BY stat_time desc
           LIMIT 1;
+        ]]>
     </select>
     <!--时间：5分钟内全国阻断websiteTOP10-->
     <select id="getBlockTop10WebsiteOf5mLastTime" resultType="String">
+        <![CDATA[
         select stat_time
           FROM ntc_reject_website_statistic
-        <![CDATA[
           WHERE stat_time < #{end}
-        ]]>
           ORDER BY stat_time desc
           LIMIT 1;
+        ]]>
     </select>
     <!--时间：1h内全国阻断标签TOP100-->
     <select id="getBlockTop10Tag5mOnlyLastTime" resultType="String">
+        <![CDATA[
         select report_time
           FROM ntc_tag_report
-        <![CDATA[
           WHERE report_time < #{end}
-        ]]>
           ORDER BY report_time desc
           LIMIT 1;
+        ]]>
     </select>
 
 </mapper>

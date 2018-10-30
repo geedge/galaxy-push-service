@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NetflowServiceImpl implements NetflowService {
@@ -36,17 +37,17 @@ public class NetflowServiceImpl implements NetflowService {
 
 
     //协议表
-    public HashMap<String, String> listProtocolDict() {
+    public Map<String, String> listProtocolDict() {
         return myLoad.listProtocolDict;
     }
 
     //地域表
-    public HashMap<String, UiAreaDictInfo> listArea() {
+    public Map<String, UiAreaDictInfo> listArea() {
         return myLoad.listUiAreaDicInfo;
     }
 
     //运营商表
-    public HashMap<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
+    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
         return myLoad.listUiCarrierDictInfo;
     }
 
@@ -60,13 +61,14 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<TimeTypeCount> getNetflowStatistic5m(String start, String end) {
         List<TimeTypeCount> list = new ArrayList<>();
-        HashMap<String, String> listProtocolDict = listProtocolDict();
+        Map<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getNetflowStatistic5mOnly(start, end);
         } catch (Exception e) {
             logger.error("5分钟内网络流量统计\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
+            logger.warn("5分钟内网络流量统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowDao.getNetflowStatistic5mLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -82,7 +84,6 @@ public class NetflowServiceImpl implements NetflowService {
                 if (type != null && listProtocolDict != null) {
                     String s = listProtocolDict.get(type);
                     if (s != null) {
-                        //协议类型字典表
                         timeTypeCount.setType(s);
                     }
                 }
@@ -114,13 +115,14 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end) {
         List<NetflowProtocol> list = new ArrayList<>();
-        HashMap<String, String> listProtocolDict = listProtocolDict();
+        Map<String, String> listProtocolDict = listProtocolDict();
         try {
             list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
         } catch (Exception e) {
             logger.error("1小时内网络协议统计\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
+            logger.warn("1小时内网络协议统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowDao.getProtocolStatisticOf1hLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -170,13 +172,14 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
         List<IpActiveInfo> list = new ArrayList<>();
-        HashMap<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
         try {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP信息\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
+            logger.warn("5分钟内活跃IP信息\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowDao.getIpActiveInfoOf5minLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -216,14 +219,26 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<AreaBPSTime> getAreaNetflowOf5min(String start, String end) {
+    public List<AreaBPSTime> getAreaNetflowOf5min(String start, String end, int areaNetqueryExpTimes) {
         List<AreaBPSTime> list = new ArrayList<>();
         try {
             list = netflowDao.getAreaNetflowOf5min(start, end);
+            //根据查询失败次数，最大向前查询3次
+            if (areaNetqueryExpTimes > 0) {
+                if (areaNetqueryExpTimes >= 3) {
+                    areaNetqueryExpTimes = 3;
+                }
+                for (int i = 1; i <= areaNetqueryExpTimes; i++) {
+                    String exTime = DateUtils.getBeforeNminOfTime(start, -5 * i);
+                    list.addAll(netflowDao.getAreaNetflowOf5min(exTime, DateUtils.getAfter5min(exTime)));
+                }
+            }
         } catch (Exception e) {
             logger.error("地域流量\t查询异常\tserviceImpl", e);
+            throw new RuntimeException();
         }
         if (list.isEmpty()) {
+            logger.warn("地域流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowDao.getAreaNetflowOf5minLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -264,14 +279,26 @@ public class NetflowServiceImpl implements NetflowService {
      * @return
      */
     @Override
-    public List<PortBPSTime> getPortNetflowOf5min(String start, String end) {
+    public List<PortBPSTime> getPortNetflowOf5min(String start, String end, int portNetqueryExpTimes) {
         List<PortBPSTime> list = new ArrayList<>();
         try {
             list = netflowDao.getPortNetflowOf5min(start, end);
+            //根据查询失败次数，最大向前查询3次
+            if (portNetqueryExpTimes > 0) {
+                if (portNetqueryExpTimes >= 3) {
+                    portNetqueryExpTimes = 3;
+                }
+                for (int i = 1; i <= portNetqueryExpTimes; i++) {
+                    String exTime = DateUtils.getBeforeNminOfTime(start, -5 * i);
+                    list.addAll(netflowDao.getPortNetflowOf5min(exTime, DateUtils.getAfter5min(exTime)));
+                }
+            }
         } catch (Exception e) {
             logger.error("端口流量\t查询异常\tserviceImpl", e);
+            throw new RuntimeException();
         }
         if (list.isEmpty()) {
+            logger.warn("端口流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowDao.getPortNetflowOf5minLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);

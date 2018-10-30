@@ -17,7 +17,7 @@ public interface NetflowService {
      * @param end
      * @return
      */
-    List<AreaBPSTime> getAreaNetflowOf5min(String start, String end);
+    List<AreaBPSTime> getAreaNetflowOf5min(String start, String end,int areaNetqueryExpTimes);
 
     /**
      * 端口流量
@@ -26,7 +26,7 @@ public interface NetflowService {
      * @param end
      * @return
      */
-    List<PortBPSTime> getPortNetflowOf5min(String start, String end);
+    List<PortBPSTime> getPortNetflowOf5min(String start, String end,int portNetqueryExpTimes);
 
     /**
      * 文本

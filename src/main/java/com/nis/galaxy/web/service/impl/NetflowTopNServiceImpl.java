@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NetflowTopNServiceImpl implements NetflowTopNService {
@@ -33,12 +34,12 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
 
 
     //地域表
-    public HashMap<String, UiAreaDictInfo> listArea() {
+    public Map<String, UiAreaDictInfo> listArea() {
         return myLoad.listUiAreaDicInfo;
     }
 
     //运营商表
-    public HashMap<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
+    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
         return myLoad.listUiCarrierDictInfo;
     }
 
@@ -52,13 +53,14 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     @Override
     public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end) {
         List<IpActiveInt> list = new ArrayList<>();
-        HashMap<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, end);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("5分钟内活跃IP流量TOP10\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -102,7 +104,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
      * @return
      */
     @Override
-    public List<NetFlowWater> getNetFlowWaterTop10(String start, String end, int a) {
+    public List<NetFlowWater> getNetFlowWaterTop10(String start, String end, int range) {
         List<NetFlowWater> list = new ArrayList<>();
         List<NetFlowWater> resule = new ArrayList<>();
         try {
@@ -111,15 +113,16 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             logger.error("互联网流量TOP10\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
                 String lastEnd = DateUtils.getAfter5min(time);
                 String lastStart = null;
-                if (a == 1) {
+                if (range == 1) {
                     lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60);
-                } else if (a == 7) {
+                } else if (range == 7) {
                     lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24 * 7);
                 } else {
                     lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24);

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author GouGe
@@ -29,34 +31,45 @@ public class MyLoad {
 
     @Autowired
     DictService dictService;
-    //业务表
-    public HashMap<String, NtcServiceDict> listNtcService = new HashMap<>();
-    //协议表
-    public HashMap<String, String> listProtocolDict = new HashMap<>();
-    //标签表
-    public HashMap<String, UiTagDictInfo> listUiTagDicInfo = new HashMap<>();
-    //地域表
-    public HashMap<String, UiAreaDictInfo> listUiAreaDicInfo = new HashMap<>();
-    //运营商表
-    public HashMap<String, UiCarrierDictInfo> listUiCarrierDictInfo = new HashMap<>();
+    /**
+     * 业务表
+     */
+    public Map<String, NtcServiceDict> listNtcService = new ConcurrentHashMap<>();
+    /**
+     * 协议表
+     */
+    public Map<String, String> listProtocolDict = new ConcurrentHashMap<>();
+    ;
+    /**
+     * 标签表
+     */
+    public Map<String, UiTagDictInfo> listUiTagDicInfo = new ConcurrentHashMap<>();
+    /**
+     * 地域表
+     */
+    public Map<String, UiAreaDictInfo> listUiAreaDicInfo = new ConcurrentHashMap<>();
+    /**
+     * 运营商表
+     */
+    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo = new ConcurrentHashMap<>();
 
-    public HashMap<String, UiCarrierDictInfo> getListUiCarrierDictInfo() {
+    public Map<String, UiCarrierDictInfo> getListUiCarrierDictInfo() {
         return listUiCarrierDictInfo;
     }
 
-    public HashMap<String, UiAreaDictInfo> getListUiAreaDicInfo() {
+    public Map<String, UiAreaDictInfo> getListUiAreaDicInfo() {
         return listUiAreaDicInfo;
     }
 
-    public HashMap<String, UiTagDictInfo> getListUiTagDicInfo() {
+    public Map<String, UiTagDictInfo> getListUiTagDicInfo() {
         return listUiTagDicInfo;
     }
 
-    public HashMap<String, String> getListProtocolDict() {
+    public Map<String, String> getListProtocolDict() {
         return listProtocolDict;
     }
 
-    public HashMap<String, NtcServiceDict> getListNtcService() {
+    public Map<String, NtcServiceDict> getListNtcService() {
         return listNtcService;
     }
 
@@ -65,7 +78,6 @@ public class MyLoad {
         logger.info("执行初始化字典表：地域表\t运营商表\t业务表\t协议表\t标签表");
 
 
-        //地域表的预加载
         List<UiAreaDictInfo> uiAreaDictInfo = new ArrayList<>();
         try {
             uiAreaDictInfo = dictService.getUiAreaDictInfo();
@@ -77,7 +89,6 @@ public class MyLoad {
         }
         logger.info("地域表的预加载结果\t" + listUiAreaDicInfo);
 
-        //运营商表的预加载
         List<UiCarrierDictInfo> uiCarrierDictInfo = new ArrayList<>();
         try {
             uiCarrierDictInfo = dictService.getUiCarrierDictInfo();
@@ -90,7 +101,6 @@ public class MyLoad {
 
         logger.info("运营商表的预加载结果\t" + listUiCarrierDictInfo);
 
-        //业务表的预加载(中英俄)
         List<NtcServiceDict> ntcServiceDict = new ArrayList<>();
         try {
             ntcServiceDict = dictService.getNtcServiceDict();
@@ -104,7 +114,6 @@ public class MyLoad {
         }
         logger.info("业务表的预加载结果\t" + listNtcService);
 
-        //协议表的预加载
         List<ProtocolDict> protocolDict = new ArrayList<>();
         try {
             protocolDict = dictService.getProtocolDict();
@@ -118,7 +127,6 @@ public class MyLoad {
         }
         logger.info("协议表的预加载结果为\t" + listProtocolDict);
 
-        //标签表的预加载
         List<UiTagDictInfo> uiTagDicInfo = new ArrayList<>();
         try {
             uiTagDicInfo = dictService.getUiTagDicInfo();
@@ -133,6 +141,7 @@ public class MyLoad {
         logger.info("标签表的预加载结果为\t" + listUiTagDicInfo);
         logger.info("初始化字典表操作执行完成");
     }
+
     @Scheduled(fixedRate = 999999999)
     public void run() {
         if (a++ > 1) {

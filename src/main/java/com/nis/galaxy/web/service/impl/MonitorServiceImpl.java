@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author GouGe
@@ -82,40 +84,33 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public List<NetWaterMonitor> getNetWaterMonitor(String start, String end) {
         List<NetWaterMonitor> list = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
         try {
             String before = DateUtils.getBeforeNminOfTime(start, -5);
-            list = monitorDao.getNetWaterMonitor(start, end, before);
-            list.remove(null);
-            if (list.get(0).getCount() == 0) {
-                list = new ArrayList<>();
-            }
+            map = monitorDao.getNetWaterMonitor(start, end, before);
         } catch (Exception e) {
             logger.error("网络流量监控\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (map.size() == 2) {
+            logger.warn("网络流量监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = monitorDao.getNetWaterMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = monitorDao.getNetWaterMonitor(time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
-                list.remove(null);
-                if (list.get(0).getCount() == 0) {
-                    list = new ArrayList<>();
-                }
+                map = monitorDao.getNetWaterMonitor(time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
             } catch (Exception e) {
                 logger.error("网络流量监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (!list.isEmpty()) {
-            List<NetWaterMonitor> result = new ArrayList<>();
+        if (map.size() != 2) {
+            String time = map.get("time").toString();
             if (languageChose == 3) {
-                result.add(new NetWaterMonitor(list.get(0).getTime(), "Ақмолаоблысы", "INOCTETS", list.get(0).getCount()));
-                result.add(new NetWaterMonitor(list.get(1).getTime(), "Ақмолаоблысы", "INOCTETS", list.get(1).getCount()));
+                list.add(new NetWaterMonitor(time, "Ақмолаоблысы", "INOCTETS", (long)map.get("INOCTETS")));
+                list.add(new NetWaterMonitor(time, "Ақмолаоблысы", "OUTOCTETS", (long)map.get("OUTOCTETS")));
             } else {
-                result.add(new NetWaterMonitor(list.get(0).getTime(), "Akmola", "INOCTETS", list.get(0).getCount()));
-                result.add(new NetWaterMonitor(list.get(1).getTime(), "Akmola", "OUTOCTETS", list.get(1).getCount()));
+                list.add(new NetWaterMonitor(time, "Akmola", "INOCTETS",Long.valueOf(map.get("INOCTETS").toString())));
+                list.add(new NetWaterMonitor(time, "Akmola", "OUTOCTETS", Long.valueOf(map.get("OUTOCTETS").toString())));
             }
-            return result;
         }
         //测试数据
         if (list.isEmpty() && OPENFALSEDATA) {

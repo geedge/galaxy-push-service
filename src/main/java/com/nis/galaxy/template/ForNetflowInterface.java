@@ -29,7 +29,8 @@ public class ForNetflowInterface {
     PushParams pushParams;
     private int a = 1;
     private int before5m = -5;
-    private int before1day = -60*24;
+    private int areaNetqueryExpTimes = 0;
+    private int portNetqueryExpTimes = 0;
 
     @Value("${scheduled.netflow.enable}")
     private String scheduledNetflowEnable;
@@ -62,7 +63,7 @@ public class ForNetflowInterface {
             logger.error("5分钟内网络流量统计\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.5min.waterflow", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.5min.waterflow", contentValue);
         logger.info("开始推送========>>>5分钟内网络流量统计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("5分钟内网络流量统计\t推送返回结果" + response);
@@ -87,7 +88,7 @@ public class ForNetflowInterface {
             logger.error("1小时内网络协议统计\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.1hour.protocol", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.1hour.protocol", contentValue);
         logger.info("开始推送======>>>1小时内网络协议统计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("1小时内网络协议统计\t推送返回结果" + response);
@@ -113,12 +114,13 @@ public class ForNetflowInterface {
             logger.error("5分钟内活跃IP信息\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.5min.ip.active", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.5min.ip.active", contentValue);
         logger.info("开始推送======>>>5分钟内活跃IP信息 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("5分钟内活跃IP信息\t推送返回结果" + response);
 
     }
+
     /**
      * 地域流量 5分钟/次
      */
@@ -133,17 +135,22 @@ public class ForNetflowInterface {
         List contentValue = null;
         try {
             //获取并封装推送数据
-            contentValue = netflowService.getAreaNetflowOf5min(start, end);
+            contentValue = netflowService.getAreaNetflowOf5min(start, end, areaNetqueryExpTimes);
         } catch (Exception e) {
             logger.error("地域流量\t查询异常\trestTemplate", e);
+            areaNetqueryExpTimes++;
+        }
+        if (areaNetqueryExpTimes > 0 && contentValue != null) {
+            //清零查询异常次数
+            areaNetqueryExpTimes = 0;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.area.netflow", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.area.netflow", contentValue);
         logger.info("开始推送======>>>地域流量 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("地域流量\t推送返回结果" + response);
-
     }
+
     /**
      * 端口流量 5分钟/次
      */
@@ -157,17 +164,23 @@ public class ForNetflowInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            contentValue = netflowService.getPortNetflowOf5min(start, end);
+            contentValue = netflowService.getPortNetflowOf5min(start, end, portNetqueryExpTimes);
         } catch (Exception e) {
             logger.error("端口流量\t查询异常\trestTemplate", e);
+            ++portNetqueryExpTimes;
+        }
+        if (portNetqueryExpTimes > 0 && contentValue != null) {
+            //清零查询异常次数
+            portNetqueryExpTimes = 0;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.port.netflow", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.port.netflow", contentValue);
         logger.info("开始推送======>>>端口流量 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("端口流量\t推送返回结果" + response);
 
     }
+
     /**
      * 文本 天/次
      */
@@ -184,7 +197,7 @@ public class ForNetflowInterface {
             logger.error("文本\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.monitor.txt", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.txt", contentValue);
         logger.info("开始推送======>>>文本 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("文本\t推送返回结果" + response);
@@ -207,12 +220,13 @@ public class ForNetflowInterface {
             logger.error("音视频\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.monitor.video", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.video", contentValue);
         logger.info("开始推送======>>>音视频 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("音视频\t推送返回结果" + response);
 
     }
+
     /**
      * APP 天/次
      */
@@ -230,12 +244,13 @@ public class ForNetflowInterface {
             logger.error("APP\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.monitor.app", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.app", contentValue);
         logger.info("开始推送======>>>APP 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("APP\t推送返回结果" + response);
 
     }
+
     /**
      * 加密类型 天/次
      */
@@ -253,7 +268,7 @@ public class ForNetflowInterface {
             logger.error("加密类型\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.monitor.encrypt", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.encrypt", contentValue);
         logger.info("开始推送======>>>加密类型 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
         logger.info("加密类型\t推送返回结果" + response);
@@ -261,9 +276,8 @@ public class ForNetflowInterface {
     }
 
 
-
     @Scheduled(fixedRate = 999999999)
-    public void run()  throws InterruptedException{
+    public void run() throws InterruptedException {
         if (a++ > 1) {
             return;
         }
@@ -271,7 +285,7 @@ public class ForNetflowInterface {
         getNetflowStatistic5m();
         getProtocolStatisticOf1h();
         getIpActiveInfoOf5min();
-        getAreaNetflowOf5min();
+        //getAreaNetflowOf5min();
         getPortNetflowOf5min();
         getNetflowMonitorTxt();
         getNetflowMonitorVideo();

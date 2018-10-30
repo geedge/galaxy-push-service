@@ -6,11 +6,13 @@ import java.util.List;
 
 public interface NetflowTopNService {
     List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end);
+
     /**
      * 互联网流量TOP10
      * @param start
      * @param end
+     * @param range
      * @return
      */
-    List<NetFlowWater> getNetFlowWaterTop10(String start, String end,int a);
+    List<NetFlowWater> getNetFlowWaterTop10(String start, String end,int range);
 }

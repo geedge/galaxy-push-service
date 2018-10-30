@@ -15,9 +15,9 @@
     </select>
 
     <select id="getNationalAgencyMonitor" resultType="String">
+        <![CDATA[
         SELECT REDIRECT_NUM ,MONITOR_NUM,REPLACE_NUM
         FROM pxy_total_report
-        <![CDATA[
             WHERE REPORT_TIME >= #{start}
             AND REPORT_TIME < #{end}
         ]]>
@@ -25,42 +25,28 @@
 
 
     <!--网络流量监控_5min-->
-    <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
+    <select id="getNetWaterMonitor" resultType="Map">
         <![CDATA[
-        SELECT #{start} time,c.area area ,'INOCTETS' type,c.INOCTETS count  FROM (
-				(SELECT if((sum(b.INOCTETS) - a.INOCTETS ) >0  ,sum(b.INOCTETS) - a.INOCTETS ,sum(b.INOCTETS)) as INOCTETS,
-								if((sum(b.OUTOCTETS) - a.OUTOCTETS ) >0  ,sum(b.OUTOCTETS) - a.OUTOCTETS ,sum(b.OUTOCTETS)) as OUTOCTETS,
-								'Ақмолаоблысы' area
+        SELECT if((sum(b.INOCTETS) - a.INOCTETS ) >0  ,sum(b.INOCTETS) - a.INOCTETS ,sum(b.INOCTETS)) as INOCTETS,
+				if((sum(b.OUTOCTETS) - a.OUTOCTETS ) >0  ,sum(b.OUTOCTETS) - a.OUTOCTETS ,sum(b.OUTOCTETS)) as OUTOCTETS,
+				'Akmola' area,
+				#{start} time
         FROM (
               SELECT  sum(INOCTETS) INOCTETS,sum(OUTOCTETS) OUTOCTETS
               FROM traffic_netflow_port_info
               WHERE RECV_TIME >= #{before}
-              AND RECV_TIME <#{start}) a,
+              and RECV_TIME<#{start}) a,
               traffic_netflow_port_info b
         WHERE b.RECV_TIME >= #{start}
-        AND b.RECV_TIME <  #{end}) c
-				)
-				union all
-				SELECT #{start} time,c.area area ,'OUTOCTETS' type,c.OUTOCTETS count  FROM (
-				(SELECT if((sum(b.INOCTETS) - a.INOCTETS ) >0  ,sum(b.INOCTETS) - a.INOCTETS ,sum(b.INOCTETS)) as INOCTETS,
-								if((sum(b.OUTOCTETS) - a.OUTOCTETS ) >0  ,sum(b.OUTOCTETS) - a.OUTOCTETS ,sum(b.OUTOCTETS)) as OUTOCTETS,
-								'Ақмолаоблысы' area
-        FROM (
-              SELECT  sum(INOCTETS) INOCTETS,sum(OUTOCTETS) OUTOCTETS
-              FROM traffic_netflow_port_info
-              WHERE RECV_TIME >= #{before}
-              AND RECV_TIME < #{start}) a,
-              traffic_netflow_port_info b
-        WHERE b.RECV_TIME >= #{start}
-        AND b.RECV_TIME <  #{end}) c)
+        and b.RECV_TIME < #{end}
         ]]>
     </select>
 
     <!--时间:网络流量监控_5min-->
     <select id="getNetWaterMonitorLastTime" resultType="String">
+        <![CDATA[
         SELECT RECV_TIME
         FROM traffic_netflow_port_info
-        <![CDATA[
           WHERE RECV_TIME < #{end}
           ORDER BY RECV_TIME desc
           LIMIT 1;

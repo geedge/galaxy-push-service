@@ -11,10 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 
 @Service
 public class EventsServiceImpl implements EventsService {
@@ -40,7 +38,7 @@ public class EventsServiceImpl implements EventsService {
     private int DeviceAdcNum;
 
     //业务表
-    public HashMap<String, NtcServiceDict> listNtcService() {
+    public Map<String, NtcServiceDict> listNtcService() {
         return myLoad.listNtcService;
     }
 
@@ -60,6 +58,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("系统总计\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("系统总计\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -94,6 +93,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("特定APP访问监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -152,7 +152,7 @@ public class EventsServiceImpl implements EventsService {
      */
     @Override
     public List<EventsServiceCount> getServiceCount(String start, String end) {
-        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
+        Map<String, NtcServiceDict> listNtcService = listNtcService();
         List<EventsServiceCount> list = new ArrayList<>();
         try {
             list = eventsDao.getServiceCount(start, end);
@@ -160,6 +160,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("业务类型统计报表\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getServiceCountLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -319,6 +320,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("音频监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("音频监控\tMM_AUDIO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -361,6 +363,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("视频监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("视频监控\tMM_VIDEO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getVedioMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -403,6 +406,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("图片监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("图片监控\tMM_PIC_REPORT" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getImageMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -445,6 +449,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("VOIP监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("VOIP监控\tMM_VOIP_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getVoipMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -504,6 +509,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("目标行为网络监测\t查询异常\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getTargetNetworkLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -557,6 +563,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("运行状态\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("运行状态\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getRunningStateLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);

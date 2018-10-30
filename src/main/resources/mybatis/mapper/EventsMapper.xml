@@ -183,94 +183,92 @@
 
     <!--时间：系统总计 -->
     <select id="getSystemTotalOf1DayLastTime" resultType="String">
+        <![CDATA[
         SELECT report_time
         FROM NTC_TOTAL_REPORT
-        <![CDATA[
         where report_time < #{end}
-         ]]>
         ORDER BY report_time desc
         LIMIT 1;
+         ]]>
     </select>
     <!--时间：特定APP访问监控-->
     <select id="getSpecifiedAPPMonitorLastTime" resultType="String">
+        <![CDATA[
         SELECT stat_time
         FROM TRAFFIC_APP_STATISTIC
-        <![CDATA[
         where stat_time < #{end}
-         ]]>
         ORDER BY stat_time desc
         LIMIT 1;
+         ]]>
     </select>
     <!--时间：业务类型统计报表-->
     <select id="getServiceCountLastTime" resultType="String">
+        <![CDATA[
         SELECT report_time
         FROM NTC_SERVICE_REPORT
-        <![CDATA[
         where report_time < #{end}
-         ]]>
         ORDER BY report_time desc
         LIMIT 1;
+         ]]>
     </select>
     <!--时间：音频监控-->
     <select id="getEventsAudioMonitorLastTime" resultType="String">
+        <![CDATA[
         SELECT report_time
         FROM  MM_AUDIO_REPORT
-        <![CDATA[
         where report_time < #{end}
-         ]]>
         ORDER BY report_time desc
         LIMIT 1;
+         ]]>
     </select>
     <!--时间：音频监控-->
     <select id="getVedioMonitorLastTime" resultType="String">
+        <![CDATA[
         SELECT report_time
         FROM  MM_VIDEO_REPORT
-        <![CDATA[
         where report_time < #{end}
-         ]]>
         ORDER BY report_time desc
         LIMIT 1;
+         ]]>
     </select>
     <!--时间：音频监控-->
     <select id="getImageMonitorLastTime" resultType="String">
+        <![CDATA[
         SELECT report_time
         FROM   MM_PIC_REPORT
-        <![CDATA[
         where report_time < #{end}
-         ]]>
         ORDER BY report_time desc
         LIMIT 1;
+         ]]>
     </select>
     <!--时间：VOIP监控-->
     <select id="getVoipMonitorLastTime" resultType="String">
+        <![CDATA[
         SELECT report_time
         FROM  MM_VOIP_REPORT
-        <![CDATA[
         where report_time < #{end}
-         ]]>
         ORDER BY report_time desc
         LIMIT 1;
+         ]]>
     </select>
  <!--时间：运行状态-->
     <select id="getRunningStateLastTime" resultType="String">
+        <![CDATA[
         SELECT REPORT_TIME
         FROM  pxy_total_report
-        <![CDATA[
         where REPORT_TIME < #{end}
-         ]]>
         ORDER BY REPORT_TIME desc
         LIMIT 1;
+         ]]>
     </select>
 <!--时间：目标行为网络监测-->
     <select id="getTargetNetworkLastTime" resultType="String">
+        <![CDATA[
         SELECT REPORT_TIME
         FROM  ntc_radius_report
-        <![CDATA[
         where REPORT_TIME < #{end}
-         ]]>
         ORDER BY REPORT_TIME desc
         LIMIT 1;
+         ]]>
     </select>
-
-
 </mapper>
