@@ -24,5 +24,6 @@ public class NtcTotalReport implements Serializable {
     private long newLinkNum;// 新建连接数
     private long activeConNum;// 活跃连接数
     private long dropConNum; // 丢弃连接数
+    private long refluxConNum; // 回流连接数
 
 }
