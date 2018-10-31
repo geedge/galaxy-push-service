@@ -16,5 +16,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain=true)
 public class ProtocolDict {
     private String protocolType;
-    private int viewCode;
+    private String viewCode;
 }

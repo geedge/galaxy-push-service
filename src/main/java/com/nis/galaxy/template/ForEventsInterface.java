@@ -37,8 +37,6 @@ public class ForEventsInterface {
 
     @Value("${scheduled.events.enable}")
     private String scheduledEventsEnable;
-    @Value("${REST_URL_PREFIX_CHECK}")
-    private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_EVENTS}")

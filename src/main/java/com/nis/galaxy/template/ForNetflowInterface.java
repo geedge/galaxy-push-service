@@ -34,8 +34,6 @@ public class ForNetflowInterface {
 
     @Value("${scheduled.netflow.enable}")
     private String scheduledNetflowEnable;
-    @Value("${REST_URL_PREFIX_CHECK}")
-    private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_NETFLOW}")
@@ -124,7 +122,7 @@ public class ForNetflowInterface {
     /**
      * 地域流量 5分钟/次
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @Scheduled(cron = "${1s.scheduled.cron.plan}")
     public void getAreaNetflowOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -137,8 +135,7 @@ public class ForNetflowInterface {
             //获取并封装推送数据
             contentValue = netflowService.getAreaNetflowOf5min(start, end, areaNetqueryExpTimes);
         } catch (Exception e) {
-            logger.error("地域流量\t查询异常\trestTemplate", e);
-            areaNetqueryExpTimes++;
+            logger.error("地域流量\t查询异常\trestTemplate\t异常次数："+ ++areaNetqueryExpTimes, e);
         }
         if (areaNetqueryExpTimes > 0 && contentValue != null) {
             //清零查询异常次数
@@ -166,8 +163,7 @@ public class ForNetflowInterface {
         try {
             contentValue = netflowService.getPortNetflowOf5min(start, end, portNetqueryExpTimes);
         } catch (Exception e) {
-            logger.error("端口流量\t查询异常\trestTemplate", e);
-            ++portNetqueryExpTimes;
+            logger.error("端口流量\t查询异常\trestTemplate\t异常次数："+ ++portNetqueryExpTimes, e);
         }
         if (portNetqueryExpTimes > 0 && contentValue != null) {
             //清零查询异常次数
@@ -285,7 +281,7 @@ public class ForNetflowInterface {
         getNetflowStatistic5m();
         getProtocolStatisticOf1h();
         getIpActiveInfoOf5min();
-        //getAreaNetflowOf5min();
+        getAreaNetflowOf5min();
         getPortNetflowOf5min();
         getNetflowMonitorTxt();
         getNetflowMonitorVideo();

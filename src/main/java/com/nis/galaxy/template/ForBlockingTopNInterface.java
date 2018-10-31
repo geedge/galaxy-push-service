@@ -33,8 +33,6 @@ public class ForBlockingTopNInterface {
 
     @Value("${scheduled.block.topn.enable}")
     private String scheduledBlockTopnEnable;
-    @Value("${REST_URL_PREFIX_CHECK}")
-    private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_BLOCKING}")

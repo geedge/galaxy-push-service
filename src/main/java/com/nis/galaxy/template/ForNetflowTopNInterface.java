@@ -31,8 +31,6 @@ public class ForNetflowTopNInterface {
     private int before60m = -60;
     @Value("${scheduled.netflow.topn.enable}")
     private String scheduledNetflowTopnEnable;
-    @Value("${REST_URL_PREFIX_CHECK}")
-    private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_NETFLOW}")

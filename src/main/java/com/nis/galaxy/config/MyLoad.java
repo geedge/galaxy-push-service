@@ -122,7 +122,7 @@ public class MyLoad {
         }
         if (!protocolDict.isEmpty()) {
             for (ProtocolDict dict : protocolDict) {
-                listProtocolDict.put(String.valueOf(dict.getViewCode()), dict.getProtocolType());
+                listProtocolDict.put(dict.getViewCode(), dict.getProtocolType());
             }
         }
         logger.info("协议表的预加载结果为\t" + listProtocolDict);

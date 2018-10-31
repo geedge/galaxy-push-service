@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EventsVedioMonitor {
-    private long vedioId;       // 节目id
+    private String vedioId;       // 节目id
     private long num;     // 次数
     private String url;      // 现场片段url
 

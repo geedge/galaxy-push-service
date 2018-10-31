@@ -36,8 +36,6 @@ public class ForBlockingInterface {
     private String scheduledBlockEnable;
     @Value("${DICT.WAIT}")
     private int DICTWAIT;
-    @Value("${REST_URL_PREFIX_CHECK}")
-    private String REST_URL_PREFIX_CHECK;
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_BLOCKING}")
@@ -211,9 +209,9 @@ public class ForBlockingInterface {
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.thermodynamic", contentValue);
-        logger.info("开始推送======>>>热力图\t请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>热力图接口\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
-        logger.info("热力图\t推送返回结果" + response);
+        logger.info("热力图接口\t推送返回结果" + response);
     }
 
     /**

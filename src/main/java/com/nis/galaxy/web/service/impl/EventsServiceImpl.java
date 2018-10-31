@@ -333,16 +333,16 @@ public class EventsServiceImpl implements EventsService {
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("音频监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 160, "http://baidu/video/er/h66"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 152, "http://360/video/eefrev/fj=4"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 125, "http://sougou/video/gh/8"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 112, "http://google/video/ert/h686"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 100, "http://haset/video/fd/86"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 57, "http://1234/video/eefv/whbr866"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 23, "http://jindong/videweo/eefwev/86"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 20, "http://taobaoe/video/eeewfv/86"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 11, "http://baidu/video/eefv/56"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 1, "http://goedge/video/eefdv/586"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 160, "http://baidu/video/er/h66"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 152, "http://360/video/eefrev/fj=4"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 125, "http://sougou/video/gh/8"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 112, "http://google/video/ert/h686"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 100, "http://haset/video/fd/86"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 57, "http://1234/video/eefv/whbr866"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 23, "http://jindong/videweo/eefwev/86"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 20, "http://taobaoe/video/eeewfv/86"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 11, "http://baidu/video/eefv/56"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 1, "http://goedge/video/eefdv/586"));
         }
         return list;
     }
@@ -376,16 +376,16 @@ public class EventsServiceImpl implements EventsService {
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("视频监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 320, "http://baidu/video/eefv/h66"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 311, "http://sougou/dig/86/ty"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 258, "http://hashie/y/eeefv/5"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 240, "http://google/r4/e/fe=4"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 121, "http://wiieh440/big/eefv/23df=4"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 100, "http://jdong/date/eefv/h66"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 88, "http://taohjdg/message/eefv/dfyue=56"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 55, "http://360bug/viddeo/eefv/fe=2"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 14, "http://1234/imaged/eefv/iei"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 12, "http://wanguyi/bigdate/eefv/h66"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 320, "http://baidu/video/eefv/h66"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 311, "http://sougou/dig/86/ty"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 258, "http://hashie/y/eeefv/5"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 240, "http://google/r4/e/fe=4"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 121, "http://wiieh440/big/eefv/23df=4"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 100, "http://jdong/date/eefv/h66"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 88, "http://taohjdg/message/eefv/dfyue=56"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 55, "http://360bug/viddeo/eefv/fe=2"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 14, "http://1234/imaged/eefv/iei"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 12, "http://wanguyi/bigdate/eefv/h66"));
         }
         return list;
     }
@@ -419,16 +419,16 @@ public class EventsServiceImpl implements EventsService {
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("图片监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 320, "http://baidu/dfedf/h66"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 310, "http://souhu/users/sign_in"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 300, "http://ttt/users/iamgcom"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 258, "http://baidu/diver/iamgem"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 213, "http://wangyi/message/iamgoopm"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 200, "http://string/usee/iamge.html.m"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 189, "http://baidu/dfes/ibhase55m"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 158, "http://baidu/usefreers/iamg5m"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 120, "http://souhu/usersef/ieamge7"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 100, "http://sougoole/useeers/iamgeui"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 320, "http://baidu/dfedf/h66"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 310, "http://souhu/users/sign_in"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 300, "http://ttt/users/iamgcom"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 258, "http://baidu/diver/iamgem"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 213, "http://wangyi/message/iamgoopm"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 200, "http://string/usee/iamge.html.m"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 189, "http://baidu/dfes/ibhase55m"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 158, "http://baidu/usefreers/iamg5m"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 120, "http://souhu/usersef/ieamge7"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 100, "http://sougoole/useeers/iamgeui"));
         }
         return list;
     }
@@ -462,16 +462,16 @@ public class EventsServiceImpl implements EventsService {
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("VOIP监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1982345254, i + 560, "http://baidu/iphi/picture/grennd/efd=3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1760145025, i + 230, "http://sougoole/news/vedio/id=3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1655693574, i + 200, "http://firfox/videi/secondes/efd?"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1266548966, i + 123, "http://google/ladid/big/dateid=r3r5"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1813676445, i + 58, "http://safait/ioite/gie/egter3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1502897475, i + 22, "http://few/Sptinhgboot/mage/efd=3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1256733494, i + 11, "http://baidu/news/message/efd?e=e"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1887465275, i + 3, "http://souhu/jdong/picture/cart=45"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1876117576, i + 2, "http://taobao/item/job/efe3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1760145025, i + 1, "http://baidu/timenews/sege/edfe=t5"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1982345254, i + 560, "http://baidu/iphi/picture/grennd/efd=3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1760145025, i + 230, "http://sougoole/news/vedio/id=3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1655693574, i + 200, "http://firfox/videi/secondes/efd?"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1266548966, i + 123, "http://google/ladid/big/dateid=r3r5"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1813676445, i + 58, "http://safait/ioite/gie/egter3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1502897475, i + 22, "http://few/Sptinhgboot/mage/efd=3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1256733494, i + 11, "http://baidu/news/message/efd?e=e"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1887465275, i + 3, "http://souhu/jdong/picture/cart=45"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1876117576, i + 2, "http://taobao/item/job/efe3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1760145025, i + 1, "http://baidu/timenews/sege/edfe=t5"));
         }
         return list;
     }

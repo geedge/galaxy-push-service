@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 @Service
@@ -38,7 +39,6 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
         return myLoad.listUiCarrierDictInfo;
     }
-
 
     //标签表
     public Map<String, UiTagDictInfo> listUiTagDicInfo() {
@@ -107,17 +107,17 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         try {
             list = blockingTopNDao.getBlockTop10WebsiteOf1h(start, end);
         } catch (Exception e) {
-            logger.error("全国阻断网站TOP10\t查询异常\tserviceImpl", e);
+            logger.error("1小时内全国阻断网站TOP10\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
-            logger.warn("全国阻断网站TOP10\tNTC_REJECT_WEBSITE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            logger.warn("1小时内全国阻断网站TOP10\tNTC_REJECT_WEBSITE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = blockingTopNDao.getBlockTop10WebsiteOf1hLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
                 list = blockingTopNDao.getBlockTop10WebsiteOf1h(time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
-                logger.error("全国阻断网站TOP10\t最近数据\t查询异常\tserviceImpl", e);
+                logger.error("1小时内全国阻断网站TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
@@ -190,15 +190,15 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("24小时区域阻断协议TOP10------->测试数据");
             int i = (int) (Math.random() * 400);
-                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "ssl_reject", i + 40));
-                list.add(new AreaBlockProtocol(start, "kazTransCom", "file_transfer_digest_reject", i + 31));
-                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "p2p_reject", i + 20));
-                list.add(new AreaBlockProtocol(start, "kazTransCom", "encrypted_tunnel_behavior_reject", i + 18));
-                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "website_dns_monit", i + 17));
-                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "mail_monit", i + 16));
-                list.add(new AreaBlockProtocol(start, "kazTransCom", "ipsec_monit", i + 10));
-                list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "socks_monit", i + 8));
-                list.add(new AreaBlockProtocol(start, "kazTransCom", "bgp_monit", i + 7));
+            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "ssl_reject", i + 40));
+            list.add(new AreaBlockProtocol(start, "kazTransCom", "file_transfer_digest_reject", i + 31));
+            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "p2p_reject", i + 20));
+            list.add(new AreaBlockProtocol(start, "kazTransCom", "encrypted_tunnel_behavior_reject", i + 18));
+            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "website_dns_monit", i + 17));
+            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "mail_monit", i + 16));
+            list.add(new AreaBlockProtocol(start, "kazTransCom", "ipsec_monit", i + 10));
+            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "socks_monit", i + 8));
+            list.add(new AreaBlockProtocol(start, "kazTransCom", "bgp_monit", i + 7));
         }
         return list;
     }
