@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EventsServiceImpl implements EventsService {
@@ -27,9 +24,21 @@ public class EventsServiceImpl implements EventsService {
     MyLoad myLoad;
     @Value("${Language.Chose}")
     private int languageChose;
+    @Value("${Open.False.Data}")
+    private boolean OPENFALSEDATA;
+    @Value("${Device.Server.Num}")
+    private int DeviceServerNum;
+    @Value("${Device.CoreSwtich.Num}")
+    private int DeviceCoreSwtichNum;
+    @Value("${Device.AccessSwitch.Num}")
+    private int DeviceAccessSwitchNum;
+    @Value("${Device.Asem.Num}")
+    private int DeviceAsemNum;
+    @Value("${Device.Adc.Num}")
+    private int DeviceAdcNum;
 
     //业务表
-    public HashMap<String, NtcServiceDict> listNtcService() {
+    public Map<String, NtcServiceDict> listNtcService() {
         return myLoad.listNtcService;
     }
 
@@ -49,6 +58,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("系统总计\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("系统总计\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -58,8 +68,9 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("系统总计\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //假数据
-        if (list.isEmpty()) {
+        //测试数据
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("系统总计------->测试数据");
             int i = (int) (Math.random() * 20);
             list.add(new SystemTotal(i + 182, i + 2836, i + 3026, i + 442688, i + 4565, i + 463));
         }
@@ -82,6 +93,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("特定APP访问监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -91,13 +103,14 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("特定APP访问监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //假数据
-        if (list.isEmpty()) {
+        //测试数据
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("特定APP访问监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsAppMonitor(start, "Youtube", i + 66));
             list.add(new EventsAppMonitor(start, "Periscope", i + 45));
             list.add(new EventsAppMonitor(start, "Viber", i + 41));
-            list.add(new EventsAppMonitor(start, "Twitter", i + 34));
+            list.add(new EventsAppMonitor(start, "Teamviewer", i + 34));
             list.add(new EventsAppMonitor(start, "Vkontakte", i + 30));
             list.add(new EventsAppMonitor(start, "Telegram", i + 26));
         }
@@ -117,8 +130,9 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("来函统计报表\t查询异常\tserviceImpl", e);
         }
-        //假数据
-        if (list.isEmpty()) {
+        //测试数据
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("来函统计报表------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsLetterCount("2018-04-05", "Request Title", 12 + i));
             list.add(new EventsLetterCount("2018-07-19", "test letter num", 19 + i));
@@ -138,15 +152,15 @@ public class EventsServiceImpl implements EventsService {
      */
     @Override
     public List<EventsServiceCount> getServiceCount(String start, String end) {
-        HashMap<String, NtcServiceDict> listNtcService = listNtcService();
+        Map<String, NtcServiceDict> listNtcService = listNtcService();
         List<EventsServiceCount> list = new ArrayList<>();
-        List<EventsServiceCount> result = new ArrayList<>();
         try {
             list = eventsDao.getServiceCount(start, end);
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getServiceCountLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -168,19 +182,15 @@ public class EventsServiceImpl implements EventsService {
                     } else if (languageChose == 3) {
                         eventsServiceCount.setType(ntcServiceDict.getServiceNameRu());
                     }
-                    result.add(eventsServiceCount);
                 }
             }
-            if(!result.isEmpty()){
-                return result;
-            }
         }
-        //假数据
-        if (list.isEmpty()) {
-            list.add(new EventsServiceCount(start, "ip_monit", (int) (Math.random() * 100)));
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("业务类型统计报表------->测试数据");
+            list.add(new EventsServiceCount(start, "video_sample_reject", (int) (Math.random() * 100)));
             list.add(new EventsServiceCount(start, "file_transfer_digest_reject", (int) (Math.random() * 100)));
             list.add(new EventsServiceCount(start, "pptp_monit", (int) (Math.random() * 100)));
-            list.add(new EventsServiceCount(start, "ANS_POLICY_REJECT", (int) (Math.random() * 100)));
+            list.add(new EventsServiceCount(start, "ctrl_http_monit", (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -199,11 +209,12 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\tserviceImpl", e);
         }
-        //假数据
-        if (list.isEmpty()) {
-            list.add(new EventsKeyPointSafaguardThing(end, "双面间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-            list.add(new EventsKeyPointSafaguardThing(end, "第二个任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-            list.add(new EventsKeyPointSafaguardThing(end, "测试专项", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+        //测试数据
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("重点保障事件总览------->测试数据");
+            list.add(new EventsKeyPointSafaguardThing(end, "double agent", end, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(end, "Second task", end, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(end, "Subject Tests", end, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -221,8 +232,9 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("特定网站监控\t查询异常\tserviceImpl", e);
         }
-        //假数据
-        if (list.isEmpty()) {
+        //测试数据
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("特定网站监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsSpecificWebsites(end, "Facebook", i + 100));
             list.add(new EventsSpecificWebsites(end, "Wikipedia", i + 90));
@@ -252,13 +264,14 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("事件监测\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
-            list.add(new EventsMonitor("双面间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsMonitor("两会", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsMonitor("测试专项", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsMonitor("一个假任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsMonitor("测试删除", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsMonitor("测试", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("事件监测------->测试数据");
+            list.add(new EventsMonitor("double agent", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("nuclear program", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("Subject Tests", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("fake task", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("savage", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsMonitor("satellite", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
             list.add(new EventsMonitor("taskName", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
         }
         return list;
@@ -278,15 +291,15 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("事件封堵\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
-            list.add(new EventsBlock("间谍", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsBlock("测试", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsBlock("第二任务", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsBlock("两会", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsBlock("会议", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("事件封堵------->测试数据");
+            list.add(new EventsBlock("spy", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("test", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("second task", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("Two Sessions", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
             list.add(new EventsBlock("taskName", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsBlock("某事件", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
-            list.add(new EventsBlock("会面事件", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("ACTIVATING EVENT", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
+            list.add(new EventsBlock("Meeting event", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
         }
         return list;
     }
@@ -307,6 +320,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("音频监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("音频监控\tMM_AUDIO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -316,18 +330,19 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("音频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("音频监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 160, "http://baidu/video/er/h66"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 152, "http://360/video/eefrev/fj=4"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 125, "http://sougou/video/gh/8"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 112, "http://google/video/ert/h686"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 100, "http://haset/video/fd/86"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 57, "http://1234/video/eefv/whbr866"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 23, "http://jindong/videweo/eefwev/86"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 20, "http://taobaoe/video/eeewfv/86"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 11, "http://baidu/video/eefv/56"));
-            list.add(new EventsAudioMonitor((int) (Math.random() * 50), i + 1, "http://goedge/video/eefdv/586"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 160, "http://baidu/video/er/h66"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 152, "http://360/video/eefrev/fj=4"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 125, "http://sougou/video/gh/8"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 112, "http://google/video/ert/h686"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 100, "http://haset/video/fd/86"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 57, "http://1234/video/eefv/whbr866"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 23, "http://jindong/videweo/eefwev/86"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 20, "http://taobaoe/video/eeewfv/86"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 11, "http://baidu/video/eefv/56"));
+            list.add(new EventsAudioMonitor(""+(int) (Math.random() * 50), i + 1, "http://goedge/video/eefdv/586"));
         }
         return list;
     }
@@ -348,6 +363,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("视频监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("视频监控\tMM_VIDEO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getVedioMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -357,18 +373,19 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("视频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("视频监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 320, "http://baidu/video/eefv/h66"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 311, "http://sougou/dig/86/ty"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 258, "http://hashie/y/eeefv/5"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 240, "http://google/r4/e/fe=4"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 121, "http://wiieh440/big/eefv/23df=4"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 100, "http://jdong/date/eefv/h66"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 88, "http://taohjdg/message/eefv/dfyue=56"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 55, "http://360bug/viddeo/eefv/fe=2"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 14, "http://1234/imaged/eefv/iei"));
-            list.add(new EventsVedioMonitor((int) (Math.random() * 50), i + 12, "http://wanguyi/bigdate/eefv/h66"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 320, "http://baidu/video/eefv/h66"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 311, "http://sougou/dig/86/ty"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 258, "http://hashie/y/eeefv/5"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 240, "http://google/r4/e/fe=4"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 121, "http://wiieh440/big/eefv/23df=4"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 100, "http://jdong/date/eefv/h66"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 88, "http://taohjdg/message/eefv/dfyue=56"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 55, "http://360bug/viddeo/eefv/fe=2"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 14, "http://1234/imaged/eefv/iei"));
+            list.add(new EventsVedioMonitor(""+(int) (Math.random() * 50), i + 12, "http://wanguyi/bigdate/eefv/h66"));
         }
         return list;
     }
@@ -389,6 +406,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("图片监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("图片监控\tMM_PIC_REPORT" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getImageMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -398,18 +416,19 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("图片监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("图片监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 320, "http://baidu/dfedf/h66"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 310, "http://souhu/users/sign_in"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 300, "http://ttt/users/iamgcom"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 258, "http://baidu/diver/iamgem"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 213, "http://wangyi/message/iamgoopm"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 200, "http://string/usee/iamge.html.m"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 189, "http://baidu/dfes/ibhase55m"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 158, "http://baidu/usefreers/iamg5m"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 120, "http://souhu/usersef/ieamge7"));
-            list.add(new EventsImageMonitor((int) (Math.random() * 50), i + 100, "http://sougoole/useeers/iamgeui"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 320, "http://baidu/dfedf/h66"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 310, "http://souhu/users/sign_in"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 300, "http://ttt/users/iamgcom"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 258, "http://baidu/diver/iamgem"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 213, "http://wangyi/message/iamgoopm"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 200, "http://string/usee/iamge.html.m"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 189, "http://baidu/dfes/ibhase55m"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 158, "http://baidu/usefreers/iamg5m"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 120, "http://souhu/usersef/ieamge7"));
+            list.add(new EventsImageMonitor(""+(int) (Math.random() * 50), i + 100, "http://sougoole/useeers/iamgeui"));
         }
         return list;
     }
@@ -430,6 +449,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("VOIP监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("VOIP监控\tMM_VOIP_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getVoipMonitorLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -439,18 +459,19 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("VOIP监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("VOIP监控------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1982345254, i + 560, "http://baidu/iphi/picture/grennd/efd=3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1760145025, i + 230, "http://sougoole/news/vedio/id=3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1655693574, i + 200, "http://firfox/videi/secondes/efd?"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1266548966, i + 123, "http://google/ladid/big/dateid=r3r5"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1813676445, i + 58, "http://safait/ioite/gie/egter3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1502897475, i + 22, "http://few/Sptinhgboot/mage/efd=3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1256733494, i + 11, "http://baidu/news/message/efd?e=e"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1887465275, i + 3, "http://souhu/jdong/picture/cart=45"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1876117576, i + 2, "http://taobao/item/job/efe3"));
-            list.add(new EventsVoipMonitor((int) (Math.random() * 10000) + 1760145025, i + 1, "http://baidu/timenews/sege/edfe=t5"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1982345254, i + 560, "http://baidu/iphi/picture/grennd/efd=3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1760145025, i + 230, "http://sougoole/news/vedio/id=3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1655693574, i + 200, "http://firfox/videi/secondes/efd?"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1266548966, i + 123, "http://google/ladid/big/dateid=r3r5"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1813676445, i + 58, "http://safait/ioite/gie/egter3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1502897475, i + 22, "http://few/Sptinhgboot/mage/efd=3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1256733494, i + 11, "http://baidu/news/message/efd?e=e"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1887465275, i + 3, "http://souhu/jdong/picture/cart=45"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1876117576, i + 2, "http://taobao/item/job/efe3"));
+            list.add(new EventsVoipMonitor(""+(int) (Math.random() * 10000) + 1760145025, i + 1, "http://baidu/timenews/sege/edfe=t5"));
         }
         return list;
     }
@@ -465,9 +486,10 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsDdosAlarm> getDdosAlarm(String start, String end) {
         List<EventsDdosAlarm> list = new ArrayList<>();
-        list.add(new EventsDdosAlarm("DDOS攻击", start, "一级"));
-        list.add(new EventsDdosAlarm("DOS攻击", start, "二级"));
-        list.add(new EventsDdosAlarm("CC攻击", start, "三级"));
+        logger.info("网络行为预警------->测试数据");
+        list.add(new EventsDdosAlarm("DDOS Attack", start, "Level 1"));
+        list.add(new EventsDdosAlarm("DOS Attack", start, "Level 2"));
+        list.add(new EventsDdosAlarm("CC Attack", start, "Level 3"));
         return list;
     }
 
@@ -481,10 +503,30 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EvevtsTargetNetwork> getTargetNetwork(String start, String end) {
         List<EvevtsTargetNetwork> list = new ArrayList<>();
-        list.add(new EvevtsTargetNetwork("admin", "DNS", "10.25.6." + (int) (Math.random() * 50), "10.25.6." + (int) (Math.random() * 100), start));
-        list.add(new EvevtsTargetNetwork("root", "FTPS", "192.78.7." + (int) (Math.random() * 50), "192.78.7." + (int) (Math.random() * 100), start));
-        list.add(new EvevtsTargetNetwork("guest", "IMAP", "10.74.64." + (int) (Math.random() * 50), "10.74.64." + (int) (Math.random() * 100), start));
-        list.add(new EvevtsTargetNetwork("passerby", "SIP", "192.168.6." + (int) (Math.random() * 50), "192.168.6." + (int) (Math.random() * 100), start));
+        try {
+            list = eventsDao.getTargetNetwork(start, end);
+        } catch (Exception e) {
+            logger.error("目标行为网络监测\t查询异常\t查询异常\tserviceImpl", e);
+        }
+        if (list.isEmpty()) {
+            logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            try {
+                String lastTime = eventsDao.getTargetNetworkLastTime(end);
+                String time = DateUtils.getSubstringTime(lastTime);
+                time = DateUtils.getRangeOfday(time);
+                list = eventsDao.getTargetNetwork(time, DateUtils.getAfter24h(time));
+            } catch (Exception e) {
+                logger.error("目标行为网络监测\t最近数据\t查询异常\tserviceImpl", e);
+            }
+        }
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("目标行为网络监测------->测试数据");
+            int i = (int) (Math.random() * 100);
+            list.add(new EvevtsTargetNetwork("admin", "10.25.6." + (int) (Math.random() * 50), i + 10, start));
+            list.add(new EvevtsTargetNetwork("root", "192.78.7.." + (int) (Math.random() * 50), i + 6, start));
+            list.add(new EvevtsTargetNetwork("styel", "192.168.6." + (int) (Math.random() * 50), i + 2, start));
+            list.add(new EvevtsTargetNetwork("onlyadmin", "10.25.6." + (int) (Math.random() * 50), i, start));
+        }
         return list;
     }
 
@@ -497,11 +539,11 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsDeviceNum> getDeviceNum(String end) {
         List<EventsDeviceNum> list = new ArrayList<>();
-        int i = (int) (Math.random() * 20);
-        list.add(new EventsDeviceNum(end, "server", i + 2));
-        list.add(new EventsDeviceNum(end, "switch", i + 15));
-        list.add(new EventsDeviceNum(end, "asem", i + 6));
-        list.add(new EventsDeviceNum(end, "adc", i + 4));
+        list.add(new EventsDeviceNum(end, "server", DeviceServerNum));
+        list.add(new EventsDeviceNum(end, "core swtich", DeviceCoreSwtichNum));
+        list.add(new EventsDeviceNum(end, "access switch", DeviceAccessSwitchNum));
+        list.add(new EventsDeviceNum(end, "asem", DeviceAsemNum));
+        list.add(new EventsDeviceNum(end, "adc", DeviceAdcNum));
         return list;
     }
 
@@ -521,6 +563,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("运行状态\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
+            logger.warn("运行状态\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 String lastTime = eventsDao.getRunningStateLastTime(end);
                 String time = DateUtils.getSubstringTime(lastTime);
@@ -531,8 +574,9 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("运行状态\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //假数据
-        if (list.isEmpty()) {
+        //测试数据
+        if (list.isEmpty() && OPENFALSEDATA) {
+            logger.info("运行状态------->测试数据");
             list.add(new EventsRunningState((int) (Math.random() * 300), (int) (Math.random() * 200), (int) (Math.random() * 300)));
         }
         return list;

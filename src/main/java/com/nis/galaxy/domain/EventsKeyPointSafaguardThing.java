@@ -13,9 +13,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class EventsKeyPointSafaguardThing {
     private String time;
-    private String teskName;
-    private int letterNum;// 来函件数
-    private int configNum;// 配置总数
-    private int monitorNum;// 监测数量
-    private int controlNum;  // 管控数量
+    private String taskName;
+    private String taskTime;
+    private long letterNum;// 来函件数
+    private long configNum;// 配置总数
+    private long monitorNum;// 监测数量
+    private long controlNum;  // 管控数量
 }

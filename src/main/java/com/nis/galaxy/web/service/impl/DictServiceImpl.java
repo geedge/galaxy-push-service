@@ -4,9 +4,7 @@ import com.nis.galaxy.domain.dict.*;
 import com.nis.galaxy.web.dao.DictDao;
 import com.nis.galaxy.web.service.DictService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 /**
@@ -25,19 +23,26 @@ public class DictServiceImpl implements DictService {
         return dictDao.getProtocolDict();
     }
 
-    @Override
-    public List<UiSysDictInfo> getUiSysDictInfo() {
-        return dictDao.getUiSysDictInfo();
-    }
 
     @Override
     public List<NtcServiceDict> getNtcServiceDict() {
         return dictDao.getNtcServiceDict();
     }
 
+
     @Override
-    public List<UiTagDicInfo> getUiTagDicInfo() {
+    public List<UiTagDictInfo> getUiTagDicInfo() {
         return dictDao.getUiTagDicInfo();
+    }
+
+    @Override
+    public List<UiAreaDictInfo> getUiAreaDictInfo() {
+        return dictDao.getUiAreaDictInfo();
+    }
+
+    @Override
+    public List<UiCarrierDictInfo> getUiCarrierDictInfo() {
+        return dictDao.getUiCarrierDictInfo();
     }
 
 }

@@ -13,11 +13,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class EventsMonitor {
     private String event;    // 事件
-    private int ipNum;   // ip数量
-    private int httpNum;  // http数量
-    private int mailNum;  // 邮件数量
-    private int vedioNum; // 视频次数
-    private int agentNum;  // 代理次数
+    private long ipNum;   // ip数量
+    private long httpNum;  // http数量
+    private long mailNum;  // 邮件数量
+    private long vedioNum; // 视频次数
+    private long agentNum;  // 代理次数
     private String time;      // 时间
 
 }

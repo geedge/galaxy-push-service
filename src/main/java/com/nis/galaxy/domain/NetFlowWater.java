@@ -14,8 +14,5 @@ import lombok.experimental.Accessors;
 public class NetFlowWater {
     private String time;
     private String area;
-    private double count;
-    public String getArea() {
-        return "astana";
-    }
+    private int count;
 }

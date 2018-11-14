@@ -4,7 +4,6 @@ import com.nis.galaxy.domain.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -22,13 +21,13 @@ public interface BlockingDao {
 
     List<PointMap> getPointMapOf10sOnly();
 
-    List<NtcDisReport> getDisBlockInformationOnly(@Param("start") String start, @Param("end") String end, @Param("a") int a, @Param("b") int b);
+    List<NtcDisReport> getDisBlockInformationOnly(@Param("start") String start, @Param("end") String end, @Param("a") int a, @Param("b") int b, @Param("c") int c, @Param("d") int d, @Param("e") int e, @Param("f") int f);
 
-    List<AreaCount> getDisBlockMapOnly(@Param("start") String start, @Param("end") String end, @Param("a") int a, @Param("b") int b);
+    List<AreaCount> getDisBlockMapOnly(@Param("start") String start, @Param("end") String end, @Param("a") int a, @Param("b") int b, @Param("c") int c, @Param("d") int d, @Param("e") int e, @Param("f") int f);
 
     String getAllBlockInformationLastTime(@Param("end") String end);
 
-    String getDisBlockInformationLastTime(@Param("end") String end);
+    String getDisBlockInformationLastTime(@Param("end") String end,@Param("a") int a, @Param("b") int b, @Param("c") int c, @Param("d") int d, @Param("e") int e, @Param("f") int f);
 
     String getDNSDeceiveInformationLastTime(@Param("end") String end);
 
@@ -36,5 +35,6 @@ public interface BlockingDao {
 
     String getAllHotStatistisLastTime(@Param("end") String end);
 
-    String getDisBlockMapLastTime(@Param("end") String end);
+    String getDisBlockMapLastTime(@Param("end") String end,@Param("a") int a, @Param("b") int b, @Param("c") int c, @Param("d") int d, @Param("e") int e, @Param("f") int f);
+
 }

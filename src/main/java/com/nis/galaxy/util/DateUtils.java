@@ -299,14 +299,14 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         int length = time.length();
         int cut = 8;
         if (length <= cut) {
-            return null;
+            return "";
         }
         try {
             time = time.substring(0, length - cut);
             time = time.concat("00:00:00");
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
         return time;
     }
@@ -334,7 +334,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             time = time.concat("00:00");
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
         return time;
     }
@@ -354,7 +354,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         int length = time.length();
         int cut = 4;
         if (length <= cut) {
-            return null;
+            return "";
         }
         int max = 5;
         //获取分钟数的个位
@@ -364,7 +364,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             time = time.substring(0, length - cut);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
         if (compare >= 0 && compare < max) {
             time = time.concat("0:00");

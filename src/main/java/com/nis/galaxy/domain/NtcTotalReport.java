@@ -7,85 +7,23 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+
 @SuppressWarnings("serial")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Accessors(chain=true)
+@Accessors(chain = true)
 public class NtcTotalReport implements Serializable {
 
-  private int rejectNum;//封堵数量
-  private int monitorNum;//监测数量
-  private int c2sByteLen;//字节数
-  private int s2cByteLen;
-  private int newUniConnNum;//新建连接数
-  private int liveConnNum;//活跃连接数
-  private int dropConnNum;//丢弃连接数
-  private String reportTime;//统计时间
-  private int loopConnNum;//回流数
-  public int getRejectNum() {
-    return rejectNum;
-  }
+    private String time;        // 时间
+    private long controlNum; // 管控数量
+    private long monitorNum;// 监测数量
+    private int networkFlowNum; // 网络流量数量
+    private int upstreamNum;// 上行数量
+    private int downstreamNum; // 上行数量
+    private long newLinkNum;// 新建连接数
+    private long activeConNum;// 活跃连接数
+    private long dropConNum; // 丢弃连接数
+    private long refluxConNum; // 回流连接数
 
-  public int getLoopConnNum() {
-    return loopConnNum;
-  }
-
-  public void setRejectNum(int rejectNum) {
-    this.rejectNum = rejectNum;
-  }
-
-  public int getMonitorNum() {
-    return monitorNum;
-  }
-
-  public void setMonitorNum(int monitorNum) {
-    this.monitorNum = monitorNum;
-  }
-
-  public int getC2sByteLen() {
-    return c2sByteLen;
-  }
-
-  public void setC2sByteLen(int c2sByteLen) {
-    this.c2sByteLen = c2sByteLen;
-  }
-
-  public int getS2cByteLen() {
-    return s2cByteLen;
-  }
-
-  public void setS2cByteLen(int s2cByteLen) {
-    this.s2cByteLen = s2cByteLen;
-  }
-
-  public int getNewUniConnNum() {
-    return newUniConnNum;
-  }
-
-  public void setNewUniConnNum(int newUniConnNum) {
-    this.newUniConnNum = newUniConnNum;
-  }
-
-  public int getLiveConnNum() {
-    return liveConnNum;
-  }
-  public void setLiveConnNum(int liveConnNum) {
-    this.liveConnNum = liveConnNum;
-  }
-
-  public int getDropConnNum() {
-    return dropConnNum;
-  }
-
-  public void setDropConnNum(int dropConnNum) {
-    this.dropConnNum = dropConnNum;
-  }
-  public String getReportTime() {
-    return reportTime;
-  }
-
-  public void setReportTime(String reportTime) {
-       this.reportTime = reportTime.substring(0,reportTime.length()-2);
-   }
 }

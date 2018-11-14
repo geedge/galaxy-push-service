@@ -12,11 +12,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EvevtsTargetNetwork {
-
     private String account;  // 账号
-    private String type;     // 协议类型
-    private String srcip;    // 源ip
-    private String dstip;    // 目的ip
+    private String nas_ip;    // 接入IP
+    private long num;    // 次数
     private String time;    // 时间
-
 }

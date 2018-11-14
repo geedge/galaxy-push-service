@@ -49,4 +49,8 @@ public interface EventsDao {
     List<EventsMonitor> getEventsMonitor();
 
     List<EventsBlock> getEventsBlock();
+
+    List<EvevtsTargetNetwork> getTargetNetwork(@Param("start") String start, @Param("end") String end);
+
+    String getTargetNetworkLastTime(@Param("end") String end);
 }

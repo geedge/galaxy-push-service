@@ -12,8 +12,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EventsImageMonitor {
-    private int id;     // 节目id
-    private int num;    // 次数
+    private String imageId;     // 节目id
+    private long num;    // 次数
     private String url;   // 现场片段url
 
 }

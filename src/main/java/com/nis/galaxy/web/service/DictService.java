@@ -1,8 +1,6 @@
 package com.nis.galaxy.web.service;
 
-import com.nis.galaxy.domain.TimeTypeCount;
 import com.nis.galaxy.domain.dict.*;
-
 import java.util.List;
 
 /**
@@ -12,9 +10,11 @@ import java.util.List;
 public interface DictService {
     List<ProtocolDict> getProtocolDict();
 
-    List<UiSysDictInfo> getUiSysDictInfo();
-
     List<NtcServiceDict> getNtcServiceDict();
 
-    List<UiTagDicInfo> getUiTagDicInfo();
+    List<UiTagDictInfo> getUiTagDicInfo();
+
+    List<UiAreaDictInfo> getUiAreaDictInfo();
+
+    List<UiCarrierDictInfo> getUiCarrierDictInfo();
 }

@@ -15,13 +15,19 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Accessors(chain=true)
+@Accessors(chain = true)
 public class PointMap {
     private String time;      // 时间
     private String src_ip;    //  源IP
     private String dst_ip;//  目的IP
     private String type; //    类型
+    private long count;
+
     public void setTime(String time) {
-        this.time = time.substring(0,time.length()-2);;
+        if (time != null && time.indexOf(".") > -1) {
+            this.time = time.substring(0, time.indexOf("."));
+        }else {
+            this.time=time;
+        };
     }
 }

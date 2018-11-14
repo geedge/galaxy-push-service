@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class EventsRunningState {
 
-    private int visitsNum;// 访问次数
-    private int controlNum;  // 管控次数
-    private int replaceNum; // 替换次数
+    private long visitsNum;// 访问次数
+    private long controlNum;  // 管控次数
+    private long replaceNum; // 替换次数
 }

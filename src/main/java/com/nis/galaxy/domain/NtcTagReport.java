@@ -15,5 +15,5 @@ import lombok.experimental.Accessors;
 public class NtcTagReport {
     private String time;
     private String type;
-    private int count;
+    private long count;
 }

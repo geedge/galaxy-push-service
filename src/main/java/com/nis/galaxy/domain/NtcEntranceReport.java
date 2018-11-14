@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain=true)
 public class NtcEntranceReport {
-    private String type;
-    private int count;
+    private String time;
+    private String area;
+    private long count;
 }

@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain=true)
 public class PortBPSTime {
 
-    private int port;
-    private int bps;
+    private long port;
+    private long bps;
     private String time;
 }

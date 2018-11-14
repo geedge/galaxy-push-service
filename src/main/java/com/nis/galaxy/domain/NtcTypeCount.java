@@ -12,30 +12,11 @@ import lombok.experimental.Accessors;
 
 @SuppressWarnings("serial")
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-@Accessors(chain=true)
+@Accessors(chain = true)
 public class NtcTypeCount {
     private String type;
-    private int count;
+    private long count;
 
-    public NtcTypeCount(String type, int count) {
-        this.type = type;
-        this.count = count;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 }
