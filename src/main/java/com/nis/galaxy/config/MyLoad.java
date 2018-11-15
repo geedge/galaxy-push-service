@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -98,7 +97,10 @@ public class MyLoad {
         for (UiCarrierDictInfo carrierDictInfo : uiCarrierDictInfo) {
             listUiCarrierDictInfo.put(carrierDictInfo.getCarrierId(), carrierDictInfo);
         }
-
+        listUiCarrierDictInfo.put("0",new UiCarrierDictInfo("0","Астана"));
+        listUiCarrierDictInfo.put("1",new UiCarrierDictInfo("1","Астана"));
+        listUiCarrierDictInfo.put("2",new UiCarrierDictInfo("2","Алматы"));
+        listUiCarrierDictInfo.put("3",new UiCarrierDictInfo("3","Астана"));
         logger.info("运营商表的预加载结果\t" + listUiCarrierDictInfo);
 
         List<NtcServiceDict> ntcServiceDict = new ArrayList<>();

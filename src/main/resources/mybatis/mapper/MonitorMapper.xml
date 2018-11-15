@@ -25,31 +25,58 @@
 
 
     <!--网络流量监控_5min-->
-    <select id="getNetWaterMonitor" resultType="Map">
+    <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
         <![CDATA[
-        SELECT if((sum(b.INOCTETS) - a.INOCTETS ) >0  ,sum(b.INOCTETS) - a.INOCTETS ,sum(b.INOCTETS)) as INOCTETS,
-				if((sum(b.OUTOCTETS) - a.OUTOCTETS ) >0  ,sum(b.OUTOCTETS) - a.OUTOCTETS ,sum(b.OUTOCTETS)) as OUTOCTETS,
-				'Akmola' area,
-				#{start} time
-        FROM (
-              SELECT  sum(INOCTETS) INOCTETS,sum(OUTOCTETS) OUTOCTETS
-              FROM traffic_netflow_port_info
-              WHERE RECV_TIME >= #{before}
-              and RECV_TIME<#{start}) a,
-              traffic_netflow_port_info b
-        WHERE b.RECV_TIME >= #{start}
-        and b.RECV_TIME < #{end}
+SELECT ifnull(d.entrance_id,0)  as  area,'INOCTETS' as type,sum(tt.incount) as count ,time FROM (
+SELECT if((b.INOCTETS - a.INOCTETS ) >0  ,b.INOCTETS - a.INOCTETS ,b.INOCTETS) as incount,
+b.ip2 as ip,
+#{push} time
+FROM
+(SELECT sum(INOCTETS) INOCTETS,NODE_IP ip1
+       FROM traffic_netflow_port_info
+       WHERE RECV_TIME >= #{before}
+       and RECV_TIME< #{start}
+			 GROUP BY ip1) a RIGHT JOIN
+(SELECT  sum(INOCTETS) INOCTETS,NODE_IP ip2
+       FROM traffic_netflow_port_info
+       WHERE RECV_TIME >= #{start}
+       and RECV_TIME< #{end}
+			 GROUP BY ip2) b
+			 on a.ip1=b.ip2 ) tt
+	LEFT JOIN
+	(select entrance_id,manager_ip FROM ntc_device_info ) d
+	on d.manager_ip = tt.ip
+	GROUP BY area
+	UNION ALL
+SELECT ifnull(d.entrance_id,0) as area,'OUTOCTETS' as type,sum(tt.outcount) as count,time FROM (
+SELECT
+if((b.OUTOCTETS - a.OUTOCTETS ) >0  ,b.OUTOCTETS - a.OUTOCTETS ,b.OUTOCTETS) as outcount,
+b.ip2 as ip,
+#{push} time
+FROM
+(SELECT sum(OUTOCTETS) OUTOCTETS,NODE_IP ip1
+       FROM traffic_netflow_port_info
+       WHERE RECV_TIME >= #{before}
+       and RECV_TIME< #{start}
+			 GROUP BY ip1) a RIGHT JOIN
+(SELECT  sum(OUTOCTETS) OUTOCTETS,NODE_IP ip2
+       FROM traffic_netflow_port_info
+       WHERE RECV_TIME >= #{start}
+       and RECV_TIME< #{end}
+			 GROUP BY ip2) b
+			 on a.ip1=b.ip2 ) tt
+	LEFT JOIN
+	(select entrance_id,manager_ip FROM ntc_device_info group by entrance_id,manager_ip) d
+	on d.manager_ip = tt.ip
+GROUP BY area
         ]]>
     </select>
-
     <!--时间:网络流量监控_5min-->
-    <select id="getNetWaterMonitorLastTime" resultType="String">
+    <select id="getNetWaterMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT RECV_TIME
+        SELECT max(RECV_TIME)
         FROM traffic_netflow_port_info
           WHERE RECV_TIME < #{end}
-          ORDER BY RECV_TIME desc
-          LIMIT 1;
         ]]>
     </select>
 </mapper>

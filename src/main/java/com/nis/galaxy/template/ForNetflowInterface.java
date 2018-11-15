@@ -122,7 +122,7 @@ public class ForNetflowInterface {
     /**
      * 地域流量 5分钟/次
      */
-    @Scheduled(cron = "${1s.scheduled.cron.plan}")
+    @Scheduled(cron = "${5m.scheduled.cron.plan}")
     public void getAreaNetflowOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -261,13 +261,13 @@ public class ForNetflowInterface {
             contentValue = netflowService.getNetflowMonitorEncrypt();
 
         } catch (Exception e) {
-            logger.error("加密类型\t查询异常\trestTemplate", e);
+            logger.error("加密管控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.encrypt", contentValue);
-        logger.info("开始推送======>>>加密类型 请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>加密管控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
-        logger.info("加密类型\t推送返回结果" + response);
+        logger.info("加密管控\t推送返回结果" + response);
 
     }
 

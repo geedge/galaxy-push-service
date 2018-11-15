@@ -1,6 +1,8 @@
 package com.nis.galaxy.web.service.impl;
 
+import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
+import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.MonitorDao;
 import com.nis.galaxy.web.service.MonitorService;
@@ -10,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author GouGe
@@ -29,6 +28,15 @@ public class MonitorServiceImpl implements MonitorService {
     MonitorDao monitorDao;
     @Value("${Open.False.Data}")
     private boolean OPENFALSEDATA;
+    @Autowired
+    MyLoad myLoad;
+    @Value("${Open.Recent.Data.Tendency}")
+    private boolean OpenRecentDataTendency;
+
+    //运营商表
+    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
+        return myLoad.listUiCarrierDictInfo;
+    }
 
 
     @Override
@@ -58,7 +66,7 @@ public class MonitorServiceImpl implements MonitorService {
         }
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("系统监控------->测试数据");
-            nmsServerBeanTmp = new NmsServiceBeanTmp(DateUtils.getDateTime(), "Region Center6", "" + (int) (Math.random() * 5000), (int) (Math.random() * 5000) + "", "2", 22);
+            nmsServerBeanTmp = new NmsServiceBeanTmp(DateUtils.getDateTime(), "Астана", "" + (int) (Math.random() * 5000), (int) (Math.random() * 5000) + "", "2", 22);
             abnormalBean.add(new AbnormalBean("competer1", "120.213." + (int) (Math.random() * 50)));
             abnormalBean.add(new AbnormalBean("competer2", "120.213." + (int) (Math.random() * 20)));
             //结果的封装
@@ -84,43 +92,42 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public List<NetWaterMonitor> getNetWaterMonitor(String start, String end) {
         List<NetWaterMonitor> list = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
         try {
             String before = DateUtils.getBeforeNminOfTime(start, -5);
-            map = monitorDao.getNetWaterMonitor(start, end, before);
+            list = monitorDao.getNetWaterMonitor(start,start, end, before);
         } catch (Exception e) {
             logger.error("网络流量监控\t查询异常\tserviceImpl", e);
         }
-        if (map.size() == 2) {
+        if (list.isEmpty() && OpenRecentDataTendency) {
             logger.warn("网络流量监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = monitorDao.getNetWaterMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = monitorDao.getNetWaterMonitorLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                map = monitorDao.getNetWaterMonitor(time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
+                list = monitorDao.getNetWaterMonitor(start,time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
             } catch (Exception e) {
                 logger.error("网络流量监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (map.size() != 2) {
-            String time = map.get("time").toString();
-            if (languageChose == 3) {
-                list.add(new NetWaterMonitor(time, "Ақмолаоблысы", "INOCTETS", (long)map.get("INOCTETS")));
-                list.add(new NetWaterMonitor(time, "Ақмолаоблысы", "OUTOCTETS", (long)map.get("OUTOCTETS")));
-            } else {
-                list.add(new NetWaterMonitor(time, "Akmola", "INOCTETS",Long.valueOf(map.get("INOCTETS").toString())));
-                list.add(new NetWaterMonitor(time, "Akmola", "OUTOCTETS", Long.valueOf(map.get("OUTOCTETS").toString())));
+        if (!list.isEmpty()) {
+            Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+            for (NetWaterMonitor netWaterMonitor : list) {
+                String area = netWaterMonitor.getArea();
+                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
+                if (uiCarrierDictInfo != null) {
+                    netWaterMonitor.setArea(uiCarrierDictInfo.getItemValue());
+                }
             }
         }
         //测试数据
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("网络流量监控------->测试数据");
             if (languageChose == 3) {
-                list.add(new NetWaterMonitor(start, "Ақмолаоблысы", "INOCTETS", (int) (Math.random() * 20000)));
-                list.add(new NetWaterMonitor(start, "Ақмолаоблысы", "OUTOCTETS", (int) (Math.random() * 20000)));
+                list.add(new NetWaterMonitor(start, "Астана", "INOCTETS", (long) (Math.random() * 20000)));
+                list.add(new NetWaterMonitor(start, "Астана", "OUTOCTETS", (long) (Math.random() * 20000)));
             } else {
-                list.add(new NetWaterMonitor(start, "Akmola", "OUTOCTETS", (int) (Math.random() * 20000)));
-                list.add(new NetWaterMonitor(start, "Akmola", "INOCTETS", (int) (Math.random() * 20000)));
+                list.add(new NetWaterMonitor(start, "Astana", "OUTOCTETS", (long) (Math.random() * 20000)));
+                list.add(new NetWaterMonitor(start, "Astana", "INOCTETS", (long) (Math.random() * 20000)));
             }
         }
         return list;

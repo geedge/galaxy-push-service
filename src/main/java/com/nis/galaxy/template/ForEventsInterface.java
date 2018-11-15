@@ -142,11 +142,11 @@ public class ForEventsInterface {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
         }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOfday(now);
+        String end = DateUtils.getRangeOfday(DateUtils.getDateTime());
+        String start = DateUtils.getRangeNdayOfTime(end, -1);
         List contentValue = null;
         try {
-            contentValue = systemService.getKeyPointSafaguardThing(end);
+            contentValue = systemService.getKeyPointSafaguardThing(start);
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\trestTemplate", e);
         }
@@ -364,7 +364,7 @@ public class ForEventsInterface {
     }
 
     /**
-     * 部署设备数量 24小时送一次数据
+     * 硬件设备统计 24小时送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
     public void getDeviceNum() {
@@ -377,17 +377,17 @@ public class ForEventsInterface {
         try {
             contentValue = systemService.getDeviceNum(end);
         } catch (Exception e) {
-            logger.error("部署设备数量\t查询异常\trestTemplate", e);
+            logger.error("硬件设备统计\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"device.num", contentValue);
-        logger.info("开始推送=======>>部署设备数量 请求头和请求体：" + httpEntity);
+        logger.info("开始推送=======>>硬件设备统计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
-        logger.info("部署设备数量\t推送返回结果" + response);
+        logger.info("硬件设备统计\t推送返回结果" + response);
     }
 
     /**
-     * 运行状态 1小时送一次数据
+     * 运行状况 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
     public void getRunningState() {
@@ -401,13 +401,13 @@ public class ForEventsInterface {
         try {
             contentValue = systemService.getRunningState(start,end);
         } catch (Exception e) {
-            logger.error("运行状态\t查询异常\trestTemplate", e);
+            logger.error("运行状况\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"running.state", contentValue);
-        logger.info("开始推送=======>>运行状态 请求头和请求体：" + httpEntity);
+        logger.info("开始推送=======>>运行状况 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
-        logger.info("运行状态\t推送返回结果" + response);
+        logger.info("运行状况\t推送返回结果" + response);
     }
 
 

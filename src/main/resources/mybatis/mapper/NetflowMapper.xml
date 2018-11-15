@@ -5,7 +5,7 @@
     <!--5分钟内网络流量统计 5min_____映射-->
     <select id="getNetflowStatistic5mOnly" resultType="com.nis.galaxy.domain.TimeTypeCount">
         <![CDATA[
-        SELECT #{start} time,proto_type type,SUM(c2s_byte_len)+SUM(s2c_byte_len) count
+        SELECT #{push} time,proto_type type,SUM(c2s_byte_len)+SUM(s2c_byte_len) count
         FROM traffic_protocol_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
@@ -15,7 +15,7 @@
     <!--1小时内网络协议统计_-->
     <select id="getProtocolStatisticOf1hOnly" resultType="com.nis.galaxy.domain.NetflowProtocol">
         <![CDATA[
-      select #{start} time,proto_type type,max(link_num) linknum ,sum(c2s_pkt_num)+sum(s2c_pkt_num) pakeagenum,
+      select #{push} time,proto_type type,max(link_num) linknum ,sum(c2s_pkt_num)+sum(s2c_pkt_num) pakeagenum,
       sum(c2s_byte_len)+sum(s2c_byte_len) bytes
       FROM traffic_protocol_statistic
           WHERE stat_time >= #{start}
@@ -26,37 +26,44 @@
     <!--5分钟内活跃IP信息 5min __映射-->
     <select id="getIpActiveInfoOf5minOnly" resultType="com.nis.galaxy.domain.IpActiveInfo">
         <![CDATA[
-       SELECT #{start} time ,ip_addr ip,area_id area,link_num links,c2s_pkt_num+s2c_pkt_num packets,
-        c2s_byte_len+s2c_byte_len bytes
+       SELECT #{push} time ,ip_addr ip,area_id area,max(link_num) links,sum(c2s_pkt_num+s2c_pkt_num) packets,
+        sum(c2s_byte_len+s2c_byte_len) bytes
         FROM traffic_ip_active_statistic
         WHERE stat_time >= #{start}
         AND stat_time < #{end}
+        group by ip_addr,area_id
         ]]>
     </select>
     <!--地域流量-->
     <select id="getAreaNetflowOf5min" resultType="com.nis.galaxy.domain.AreaBPSTime">
         <![CDATA[
-        	SELECT #{start} time,t.node_ip area,sum(t.speed) bps
-        	        from ( SELECT RECV_TIME,NODE_IP,INOCTETS_SPEED+OUTOCTETS_SPEED as speed FROM traffic_netflow_port_info
-                   where RECV_TIME >= #{start}
-                   and RECV_TIME < #{end} ) t
-            GROUP BY area;
+        	SELECT IFNULL(dic.area,0) as area,sum(rt.bps) bps ,#{push} time FROM(
+SELECT  t.node_ip ip,sum(t.speed) bps
+        from ( SELECT RECV_TIME,NODE_IP,INOCTETS_SPEED+OUTOCTETS_SPEED as speed FROM traffic_netflow_port_info
+          where RECV_TIME >= #{start}
+          and RECV_TIME < #{end} ) t
+   GROUP BY ip ) rt
+	 LEFT JOIN
+	 (SELECT entrance_id area,manager_ip ip FROM ntc_device_info GROUP BY area,ip) dic
+	 on dic.ip = rt.ip
+GROUP BY dic.area
         ]]>
     </select>
     <!--端口流量-->
     <select id="getPortNetflowOf5min" resultType="com.nis.galaxy.domain.PortBPSTime">
         <![CDATA[
-        SELECT #{start} time,t.port port ,avg(t.speed)  bps
-        from ( SELECT RECV_TIME,PORT,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
+        SELECT #{push} time,t.port port ,avg(t.speed)  bps
+        from ( SELECT RECV_TIME,PORT_DESC port,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
                FROM traffic_netflow_port_info
               where RECV_TIME >= #{start}
 			  and RECV_TIME < #{end} ) t
-         GROUP BY port;
+         GROUP BY port
+         having bps != 0;
         ]]>
     </select>
     <!--文本-->
     <select id="getNetflowMonitor" resultType="com.nis.galaxy.domain.NetflowMonitor">
-        SELECT b.type,b.url ,b.datetime time
+        SELECT b.type,concat(#{ip},#{serverPort},b.url) url ,b.datetime time
         FROM(
         		SELECT type ,max(id) id
                 FROM image_url
@@ -68,53 +75,43 @@
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：5分钟内网络流量统计-->
-    <select id="getNetflowStatistic5mLastTime" resultType="String">
+    <select id="getNetflowStatistic5mLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT stat_time
+        SELECT max(stat_time)
         FROM traffic_protocol_statistic
         where stat_time < #{end}
-        ORDER BY stat_time desc
-        LIMIT 1;
          ]]>
     </select>
     <!--时间：1小时内网络协议统计-->
-    <select id="getProtocolStatisticOf1hLastTime" resultType="String">
+    <select id="getProtocolStatisticOf1hLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT stat_time
+        SELECT max(stat_time)
         FROM traffic_protocol_statistic
         where stat_time < #{end}
-        ORDER BY stat_time desc
-        LIMIT 1;
          ]]>
     </select>
     <!--时间：5分钟内活跃IP信息-->
-    <select id="getIpActiveInfoOf5minLastTime" resultType="String">
+    <select id="getIpActiveInfoOf5minLastTime" resultType="java.util.Date">
         <![CDATA[
-       SELECT stat_time
+       SELECT max(stat_time)
         FROM traffic_ip_active_statistic
         where stat_time < #{end}
-        ORDER BY stat_time desc
-        LIMIT 1;
          ]]>
     </select>
     <!--时间：地域流量-->
-    <select id="getAreaNetflowOf5minLastTime" resultType="String">
+    <select id="getAreaNetflowOf5minLastTime" resultType="java.util.Date">
         <![CDATA[
-       SELECT RECV_TIME
+       SELECT max(RECV_TIME)
         FROM traffic_netflow_port_info
         where RECV_TIME < #{end}
-        ORDER BY RECV_TIME desc
-        LIMIT 1;
          ]]>
     </select>
     <!--时间：端口流量-->
-    <select id="getPortNetflowOf5minLastTime" resultType="String">
+    <select id="getPortNetflowOf5minLastTime" resultType="java.util.Date">
         <![CDATA[
-       SELECT RECV_TIME
+       SELECT max(RECV_TIME)
         FROM traffic_netflow_port_info
         where RECV_TIME < #{end}
-        ORDER BY RECV_TIME desc
-        LIMIT 1;
          ]]>
     </select>
 </mapper>

@@ -22,6 +22,7 @@ public class CfgTypeCount {
     private String type;
     private long count;
     public String getTime() {
-        return time= DateUtils.getRangeOfday(DateUtils.getDateTime());
+         time= DateUtils.getRangeOfday(DateUtils.getDateTime());
+        return time=DateUtils.getRangeNdayOfTime(time,-1);
     }
 }

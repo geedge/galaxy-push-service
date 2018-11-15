@@ -5,7 +5,7 @@
     <!--5分钟内活跃IP流量TOP10 5min-->
     <select id="getIpActiveStatisticOf5mOnly" resultType="com.nis.galaxy.domain.IpActiveInt" parameterType="String">
        <![CDATA[
-       SELECT  #{start} time,area_id area,ip_addr IP,SUM(c2s_byte_len)+SUM(s2c_byte_len) COUNT
+       SELECT  #{push} time,area_id area,ip_addr IP,SUM(c2s_byte_len)+SUM(s2c_byte_len) COUNT
        FROM traffic_ip_active_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
@@ -17,33 +17,40 @@
     <!--互联网流量TOP10-->
     <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
-        select #{start} time,CONVERT((sum(INOCTETS+OUTOCTETS))/300/2048,int) count
+        SELECT ifnull(dic.area,0) as area,net.time time,sum(net.count)/1024/1024 count FROM (
+ select RECV_TIME time,sum(INOCTETS+OUTOCTETS) count,NODE_IP ip
         from traffic_netflow_port_info
-        GROUP BY RECV_TIME
+        GROUP BY RECV_TIME,ip
         HAVING RECV_TIME>= #{start}
-        and RECV_TIME< #{end};
+        and RECV_TIME< #{end} ) net
+LEFT JOIN
+(SELECT entrance_id area,manager_ip ip from ntc_device_info) dic
+ on net.ip = dic.ip
+GROUP BY area,net.time
         ]]>
     </select>
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：5分钟内活跃IP流量TOP10-->
-    <select id="getIpActiveStatisticOf5mLastTime" resultType="String">
+    <select id="getIpActiveStatisticOf5mLastTime" resultType="java.util.Date">
         <![CDATA[
-        select stat_time
+        select max(stat_time)
           FROM traffic_ip_active_statistic
           WHERE stat_time < #{end}
-          ORDER BY stat_time desc
-          LIMIT 1;
         ]]>
     </select>
     <!--时间：1小时内互联网流量TOP10-->
-    <select id="getNetFlowWaterTop10LastTime" resultType="String">
+    <select id="getNetFlowWaterTop10LastTime" resultType="java.util.Date">
         <![CDATA[
-        select RECV_TIME
+        select max(RECV_TIME)
         FROM traffic_netflow_port_info
           WHERE RECV_TIME < #{end}
-          ORDER BY RECV_TIME desc
-          LIMIT 1;
         ]]>
+    </select>
+
+    <select id="getIpEntranceRe" resultType="com.nis.galaxy.domain.Entrance">
+        select entrance_id entrance
+        from ntc_device_info
+        group by entrance;
     </select>
 </mapper>

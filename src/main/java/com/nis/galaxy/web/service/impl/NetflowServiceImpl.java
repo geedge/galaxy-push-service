@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class NetflowServiceImpl implements NetflowService {
@@ -34,16 +31,21 @@ public class NetflowServiceImpl implements NetflowService {
     private int serverPort;
     @Value("${Open.False.Data}")
     private boolean OPENFALSEDATA;
+    static String ip = "";
+    static String ipPort = "";
 
+    static {
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        ip = "http://" + ip + ":";
+    }
 
     //协议表
     public Map<String, String> listProtocolDict() {
         return myLoad.listProtocolDict;
-    }
-
-    //地域表
-    public Map<String, UiAreaDictInfo> listArea() {
-        return myLoad.listUiAreaDicInfo;
     }
 
     //运营商表
@@ -63,17 +65,17 @@ public class NetflowServiceImpl implements NetflowService {
         List<TimeTypeCount> list = new ArrayList<>();
         Map<String, String> listProtocolDict = listProtocolDict();
         try {
-            list = netflowDao.getNetflowStatistic5mOnly(start, end);
+            list = netflowDao.getNetflowStatistic5mOnly(start,start, end);
         } catch (Exception e) {
             logger.error("5分钟内网络流量统计\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
             logger.warn("5分钟内网络流量统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = netflowDao.getNetflowStatistic5mLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = netflowDao.getNetflowStatistic5mLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getNetflowStatistic5mOnly(time, DateUtils.getAfter5min(time));
+                list = netflowDao.getNetflowStatistic5mOnly(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("5分钟内网络流量统计\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -117,17 +119,17 @@ public class NetflowServiceImpl implements NetflowService {
         List<NetflowProtocol> list = new ArrayList<>();
         Map<String, String> listProtocolDict = listProtocolDict();
         try {
-            list = netflowDao.getProtocolStatisticOf1hOnly(start, end);
+            list = netflowDao.getProtocolStatisticOf1hOnly(start,start, end);
         } catch (Exception e) {
             logger.error("1小时内网络协议统计\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
             logger.warn("1小时内网络协议统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = netflowDao.getProtocolStatisticOf1hLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = netflowDao.getProtocolStatisticOf1hLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getProtocolStatisticOf1hOnly(time, DateUtils.getAfter5min(time));
+                list = netflowDao.getProtocolStatisticOf1hOnly(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("1小时内网络协议统计\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -174,17 +176,17 @@ public class NetflowServiceImpl implements NetflowService {
         List<IpActiveInfo> list = new ArrayList<>();
         Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
         try {
-            list = netflowDao.getIpActiveInfoOf5minOnly(start, end);
+            list = netflowDao.getIpActiveInfoOf5minOnly(start,start, end);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP信息\t查询异常\tserviceImpl", e);
         }
         if (list == null || list.size() == 0) {
             logger.warn("5分钟内活跃IP信息\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = netflowDao.getIpActiveInfoOf5minLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = netflowDao.getIpActiveInfoOf5minLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getIpActiveInfoOf5minOnly(time, DateUtils.getAfter5min(time));
+                list = netflowDao.getIpActiveInfoOf5minOnly(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("5分钟内活跃IP信息\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -221,8 +223,9 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<AreaBPSTime> getAreaNetflowOf5min(String start, String end, int areaNetqueryExpTimes) {
         List<AreaBPSTime> list = new ArrayList<>();
+        Map<String, UiCarrierDictInfo> uiCarrierDictInfo  = listUiCarrierDictInfo();
         try {
-            list = netflowDao.getAreaNetflowOf5min(start, end);
+            list = netflowDao.getAreaNetflowOf5min(start,start, end);
             //根据查询失败次数，最大向前查询3次
             if (areaNetqueryExpTimes > 0) {
                 if (areaNetqueryExpTimes >= 3) {
@@ -230,7 +233,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
                 for (int i = 1; i <= areaNetqueryExpTimes; i++) {
                     String exTime = DateUtils.getBeforeNminOfTime(start, -5 * i);
-                    list.addAll(netflowDao.getAreaNetflowOf5min(exTime, DateUtils.getAfter5min(exTime)));
+                    list.addAll(netflowDao.getAreaNetflowOf5min(exTime,exTime, DateUtils.getAfter5min(exTime)));
                 }
             }
         } catch (Exception e) {
@@ -240,32 +243,29 @@ public class NetflowServiceImpl implements NetflowService {
         if (list.isEmpty()) {
             logger.warn("地域流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = netflowDao.getAreaNetflowOf5minLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = netflowDao.getAreaNetflowOf5minLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getAreaNetflowOf5min(time, DateUtils.getAfter5min(time));
+                list = netflowDao.getAreaNetflowOf5min(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("地域流量\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         if (!list.isEmpty()) {
-            long bps = 0;
             for (AreaBPSTime areaBPSTime : list) {
-                bps = areaBPSTime.getBps() + bps;
-            }
-            list = new ArrayList<>();
-            if (languageChose == 3) {
-                list.add(new AreaBPSTime("Ақмолаоблысы", bps, start));
-            } else {
-                list.add(new AreaBPSTime("Akmola", bps, start));
+                String area = areaBPSTime.getArea();
+                UiCarrierDictInfo uiCarrierDictInfo1 = uiCarrierDictInfo.get(area);
+                if (uiCarrierDictInfo1 != null) {
+                    areaBPSTime.setArea(uiCarrierDictInfo1.getItemValue());
+                }
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("地域流量------->测试数据");
             if (languageChose == 3) {
-                list.add(new AreaBPSTime("Ақмолаоблысы", (int) (Math.random() * 10000), DateUtils.getDateTime()));
+                list.add(new AreaBPSTime("Астана", (int) (Math.random() * 10000), DateUtils.getDateTime()));
             } else {
-                list.add(new AreaBPSTime("Akmola", (int) (Math.random() * 10000), DateUtils.getDateTime()));
+                list.add(new AreaBPSTime("Astana", (int) (Math.random() * 10000), DateUtils.getDateTime()));
             }
         }
         return list;
@@ -282,7 +282,7 @@ public class NetflowServiceImpl implements NetflowService {
     public List<PortBPSTime> getPortNetflowOf5min(String start, String end, int portNetqueryExpTimes) {
         List<PortBPSTime> list = new ArrayList<>();
         try {
-            list = netflowDao.getPortNetflowOf5min(start, end);
+            list = netflowDao.getPortNetflowOf5min(start,start, end);
             //根据查询失败次数，最大向前查询3次
             if (portNetqueryExpTimes > 0) {
                 if (portNetqueryExpTimes >= 3) {
@@ -290,7 +290,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
                 for (int i = 1; i <= portNetqueryExpTimes; i++) {
                     String exTime = DateUtils.getBeforeNminOfTime(start, -5 * i);
-                    list.addAll(netflowDao.getPortNetflowOf5min(exTime, DateUtils.getAfter5min(exTime)));
+                    list.addAll(netflowDao.getPortNetflowOf5min(exTime,exTime, DateUtils.getAfter5min(exTime)));
                 }
             }
         } catch (Exception e) {
@@ -300,10 +300,10 @@ public class NetflowServiceImpl implements NetflowService {
         if (list.isEmpty()) {
             logger.warn("端口流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = netflowDao.getPortNetflowOf5minLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = netflowDao.getPortNetflowOf5minLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getPortNetflowOf5min(time, DateUtils.getAfter5min(time));
+                list = netflowDao.getPortNetflowOf5min(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("端口流量\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -312,9 +312,9 @@ public class NetflowServiceImpl implements NetflowService {
         if (list.isEmpty() && OPENFALSEDATA) {
             list = new ArrayList<>();
             logger.info("端口流量------->测试数据");
-            list.add(new PortBPSTime((int) (Math.random() * 100), (int) (Math.random() * 150), start));
-            list.add(new PortBPSTime((int) (Math.random() * 100), (int) (Math.random() * 200), start));
-            list.add(new PortBPSTime((int) (Math.random() * 100), (int) (Math.random() * 200), start));
+            list.add(new PortBPSTime("xgei_6/1/12", (int) (Math.random() * 150), start));
+            list.add(new PortBPSTime("xgei_6/1/8", (int) (Math.random() * 200), start));
+            list.add(new PortBPSTime("xgei_6/1/2", (int) (Math.random() * 200), start));
         }
         return list;
     }
@@ -329,24 +329,10 @@ public class NetflowServiceImpl implements NetflowService {
     public List<NetflowMonitor> getNetflowMonitorTxt() {
         List<NetflowMonitor> list = new ArrayList<>();
         String type = "text";
-        String ip = null;
         try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        String ipPort = ip + ":" + serverPort;
-        try {
-            list = netflowDao.getNetflowMonitor(type);
+            list = netflowDao.getNetflowMonitor(type, ip, serverPort);
         } catch (Exception e) {
             logger.error("文本\t查询异常\tserviceImpl", e);
-        }
-        if (!list.isEmpty()) {
-            for (NetflowMonitor netflowMonitor : list) {
-                String url = netflowMonitor.getUrl();
-                netflowMonitor.setUrl(ipPort + url);
-            }
-
         }
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("文本------->测试数据");
@@ -377,7 +363,7 @@ public class NetflowServiceImpl implements NetflowService {
         List<NetflowMonitor> list = new ArrayList<>();
         String type = "audioVideo";
         try {
-            list = netflowDao.getNetflowMonitor(type);
+            list = netflowDao.getNetflowMonitor(type, ip, serverPort);
         } catch (Exception e) {
             logger.error("音视频\t查询异常\tserviceImpl", e);
         }
@@ -402,7 +388,7 @@ public class NetflowServiceImpl implements NetflowService {
         List<NetflowMonitor> list = new ArrayList<>();
         String type = "app";
         try {
-            list = netflowDao.getNetflowMonitor(type);
+            list = netflowDao.getNetflowMonitor(type, ip, serverPort);
         } catch (Exception e) {
             logger.error("APP\t查询异常\tserviceImpl", e);
         }
@@ -429,12 +415,12 @@ public class NetflowServiceImpl implements NetflowService {
         List<NetflowMonitor> list = new ArrayList<>();
         String type = "encryptionControl";
         try {
-            list = netflowDao.getNetflowMonitor(type);
+            list = netflowDao.getNetflowMonitor(type, ip, serverPort);
         } catch (Exception e) {
-            logger.error("加密类型\t查询异常\tserviceImpl", e);
+            logger.error("加密管控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("加密类型------->测试数据");
+            logger.info("加密管控------->测试数据");
             String rangeOfday = DateUtils.getRangeOfday(DateUtils.getDateTime());
             list.add(new NetflowMonitor("PROXY INTERCEPT", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-MMPE.jpg", rangeOfday));
             list.add(new NetflowMonitor("PROXY RATELIMIT", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-IPSEC.jpg", rangeOfday));

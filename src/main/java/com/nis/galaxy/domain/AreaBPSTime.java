@@ -1,6 +1,7 @@
 package com.nis.galaxy.domain;
 
 
+import com.nis.galaxy.util.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

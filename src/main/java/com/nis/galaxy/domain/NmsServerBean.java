@@ -36,4 +36,8 @@ public class NmsServerBean {
     public String getSystem() {
         return this.system = "ntc";
     }
+
+    public String getArea() {
+        return area = "Астана";
+    }
 }

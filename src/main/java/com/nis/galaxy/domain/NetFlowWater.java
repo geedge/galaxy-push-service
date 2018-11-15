@@ -6,13 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 @SuppressWarnings("serial")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Accessors(chain=true)
 public class NetFlowWater {
-    private String time;
+    private Date time;
     private String area;
-    private int count;
+    private long count;
+
+    public void setCount(double count) {
+        this.count = (long) count;
+    }
 }

@@ -30,10 +30,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     @Value("${Open.False.Data}")
     private boolean OPENFALSEDATA;
 
-    //地域表
-    public Map<String, UiAreaDictInfo> listArea() {
-        return myLoad.listUiAreaDicInfo;
-    }
+
 
     //运营商表
     public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
@@ -61,7 +58,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     public List<NtcRejectUrlStatistic> getBlockTop10URLOf1h(String start, String end) {
         List<NtcRejectUrlStatistic> list = new ArrayList<>();
         try {
-            list = blockingTopNDao.getBlockTop10URLOf1h(start, end);
+            list = blockingTopNDao.getBlockTop10URLOf1h(start,start, end);
         } catch (Exception e) {
             logger.error("1小时内全国阻断URLTOP10\t查询异常\tserviceImpl", e);
         }
@@ -69,10 +66,10 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         if (list.isEmpty()) {
             logger.warn("1小时内全国阻断URLTOP10\tNTC_REJECT_URL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = blockingTopNDao.getBlockTop10URLOf1hLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = blockingTopNDao.getBlockTop10URLOf1hLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = blockingTopNDao.getBlockTop10URLOf1h(time, DateUtils.getAfter1h(time));
+                list = blockingTopNDao.getBlockTop10URLOf1h(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("1小时内全国阻断URLTOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -80,9 +77,9 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("1小时内全国阻断URLTOP10------->测试数据");
             int i = (int) (Math.random() * 200);
-            list.add(new NtcRejectUrlStatistic(start, "www.bing.com/fd/ls/lsp.aspx", i + 20));
-            list.add(new NtcRejectUrlStatistic(start, "www.bing.com/fd/ls/lsp.aspx?", i + 18));
-            list.add(new NtcRejectUrlStatistic(start, "www.badidu.com/xx/ee/ee.a2d", i + 15));
+            list.add(new NtcRejectUrlStatistic(start, "astyouth.forum.com.kz/viewtopic.php?id=122", i + 20));
+            list.add(new NtcRejectUrlStatistic(start, "www.bing.com/dict/xls.aspx?Type=Event.ClientInst?", i + 18));
+            list.add(new NtcRejectUrlStatistic(start, "www.cninfo.com.cn/cninfo-new/js/daterangepicker.jQuery.js", i + 15));
             list.add(new NtcRejectUrlStatistic(start, "www.bing.com/ffdsd/ls/lsp.dfd", i + 13));
             list.add(new NtcRejectUrlStatistic(start, "www.bing.com/dfs/ls/lsp.aspx", i + 11));
             list.add(new NtcRejectUrlStatistic(start, "www.baidu.com/er/r/r.rje", i + 10));
@@ -105,17 +102,17 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     public List<NtcRejectWebsiteStatistic> getBlockTop10WebsiteOf1h(String start, String end) {
         List<NtcRejectWebsiteStatistic> list = new ArrayList<>();
         try {
-            list = blockingTopNDao.getBlockTop10WebsiteOf1h(start, end);
+            list = blockingTopNDao.getBlockTop10WebsiteOf1h(start,start, end);
         } catch (Exception e) {
             logger.error("1小时内全国阻断网站TOP10\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("1小时内全国阻断网站TOP10\tNTC_REJECT_WEBSITE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = blockingTopNDao.getBlockTop10WebsiteOf1hLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = blockingTopNDao.getBlockTop10WebsiteOf1hLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = blockingTopNDao.getBlockTop10WebsiteOf1h(time, DateUtils.getAfter1h(time));
+                list = blockingTopNDao.getBlockTop10WebsiteOf1h(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("1小时内全国阻断网站TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -151,19 +148,19 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         Map<String, NtcServiceDict> listNtcService = listNtcService();
         try {
             //查分钟报
-            list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hOnly(start, end);
+            list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hOnly(start,start, end);
         } catch (Exception e) {
-            logger.error("24小时区域阻断协议TOP10\t查询异常\tserviceImpl", e);
+            logger.error("24小时内区域阻断协议TOP10\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
-            logger.warn("24小时区域阻断协议TOP10\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            logger.warn("24小时内区域阻断协议TOP10\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = blockingTopNDao.getAreaBlockTop10ProtocolOf24hLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = blockingTopNDao.getAreaBlockTop10ProtocolOf24hLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfday(time);
-                list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hOnly(time, DateUtils.getAfter24h(time));
+                list = blockingTopNDao.getAreaBlockTop10ProtocolOf24hOnly(start,time, DateUtils.getAfter24h(time));
             } catch (Exception e) {
-                logger.error("24小时区域阻断协议TOP10\t最近数据\t查询异常\tserviceImpl", e);
+                logger.error("24小时内区域阻断协议TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         if (!list.isEmpty()) {
@@ -188,17 +185,17 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("24小时区域阻断协议TOP10------->测试数据");
+            logger.info("24小时内区域阻断协议TOP10------->测试数据");
             int i = (int) (Math.random() * 400);
-            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "ssl_reject", i + 40));
-            list.add(new AreaBlockProtocol(start, "kazTransCom", "file_transfer_digest_reject", i + 31));
-            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "p2p_reject", i + 20));
-            list.add(new AreaBlockProtocol(start, "kazTransCom", "encrypted_tunnel_behavior_reject", i + 18));
-            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "website_dns_monit", i + 17));
-            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "mail_monit", i + 16));
-            list.add(new AreaBlockProtocol(start, "kazTransCom", "ipsec_monit", i + 10));
-            list.add(new AreaBlockProtocol(start, "Kazakhtelecom", "socks_monit", i + 8));
-            list.add(new AreaBlockProtocol(start, "kazTransCom", "bgp_monit", i + 7));
+            list.add(new AreaBlockProtocol(start, "Астана", "IP Address Monitor", i + 40));
+            list.add(new AreaBlockProtocol(start, "Алматы", "Protocol Identify Monitor", i + 31));
+            list.add(new AreaBlockProtocol(start, "Астана", "Protocol Identify Monitor", i + 20));
+            list.add(new AreaBlockProtocol(start, "Астана", "SSL Monitor", i + 18));
+            list.add(new AreaBlockProtocol(start, "Алматы", "FTP Monitor", i + 17));
+            list.add(new AreaBlockProtocol(start, "Астана", "OpenVPN Monitor", i + 16));
+            list.add(new AreaBlockProtocol(start, "Алматы", "GRE Monitor", i + 10));
+            list.add(new AreaBlockProtocol(start, "Алматы", "ASN Block", i + 8));
+            list.add(new AreaBlockProtocol(start, "Алматы", "P2P Block", i + 7));
         }
         return list;
     }
@@ -214,7 +211,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     public List<NtcUrlIpCount> getBlockTop10URLOf5m(String start, String end) {
         List<NtcUrlIpCount> list = new ArrayList<>();
         try {
-            list = blockingTopNDao.getBlockTop10URLOf5m(start, end);
+            list = blockingTopNDao.getBlockTop10URLOf5m(start,start, end);
 
         } catch (Exception e) {
             logger.error("5分钟内全国阻断URLTOP10\t查询异常\tserviceImpl", e);
@@ -222,10 +219,10 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         if (list.isEmpty()) {
             logger.warn("5分钟内全国阻断URLTOP10\tNTC_REJECT_URL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = blockingTopNDao.getBlockTop10URLOf5mLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = blockingTopNDao.getBlockTop10URLOf5mLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = blockingTopNDao.getBlockTop10URLOf5m(time, DateUtils.getAfter5min(time));
+                list = blockingTopNDao.getBlockTop10URLOf5m(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("5分钟内全国阻断URLTOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -240,7 +237,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/life?yuyt9", i + 20));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/life?yuytu?TYUytu", i + 15));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/xg/dfd", i + 15));
-            list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/ww", i + 15));
+            list.add(new NtcUrlIpCount(start, "204.79.197.200", "192.168.17.4:81/yuefei.html", i + 15));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/4ttre", i + 15));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/cnhp/retr", i + 15));
         }
@@ -258,24 +255,24 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     public List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(String start, String end) {
         List<NtcUrlIpCount> list = new ArrayList<>();
         try {
-            list = blockingTopNDao.getBlockTop10WebsiteOf5m(start, end);
+            list = blockingTopNDao.getBlockTop10WebsiteOf5m(start,start, end);
         } catch (Exception e) {
-            logger.error("5分钟内全国阻断website\t查询异常\tserviceImpl", e);
+            logger.error("5分钟内全国阻断网站TOP10\t查询异常\tserviceImpl", e);
         }
         //查询不到时，继续向前一段时间
         if (list == null || list.isEmpty()) {
-            logger.warn("5分钟内全国阻断website\tNTC_REJECT_WEBSITE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            logger.warn("5分钟内全国阻断网站TOP10\tNTC_REJECT_WEBSITE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = blockingTopNDao.getBlockTop10WebsiteOf5mLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = blockingTopNDao.getBlockTop10WebsiteOf5mLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = blockingTopNDao.getBlockTop10WebsiteOf5m(time, DateUtils.getAfter5min(time));
+                list = blockingTopNDao.getBlockTop10WebsiteOf5m(start,time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
-                logger.error("5分钟内全国阻断website\t最近数据\t查询异常\tserviceImpl", e);
+                logger.error("5分钟内全国阻断网站TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("5分钟内全国阻断website------->测试数据");
+            logger.info("5分钟内全国阻断网站TOP10------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/ls/ls", i + 10));
             list.add(new NtcUrlIpCount(start, "204.79.197.200", "www.bing.com/fd/ls/ldfs", i + 9));
@@ -293,7 +290,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     }
 
     /**
-     * 1h内全国阻断标签TOP100
+     * 1小时内全国阻断标签TOP10
      *
      * @param start
      * @param end
@@ -304,19 +301,19 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
         List<NtcTagReport> list = new ArrayList<>();
         Map<String, UiTagDictInfo> listUiTagDicInfo = listUiTagDicInfo();
         try {
-            list = blockingTopNDao.getBlockTop10Tag5mOnly(start, end);
+            list = blockingTopNDao.getBlockTop10Tag5mOnly(start,start, end);
         } catch (Exception e) {
-            logger.error("1h内全国阻断标签TOP100\t查询异常\tserviceImpl", e);
+            logger.error("1小时内全国阻断标签TOP10\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
-            logger.warn("1h内全国阻断标签TOP100\tNTC_TAG_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            logger.warn("1小时内全国阻断标签TOP10\tNTC_TAG_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = blockingTopNDao.getBlockTop10Tag5mOnlyLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = blockingTopNDao.getBlockTop10Tag5mOnlyLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = blockingTopNDao.getBlockTop10Tag5mOnly(time, DateUtils.getAfter1h(time));
+                list = blockingTopNDao.getBlockTop10Tag5mOnly(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
-                logger.error("1h内全国阻断标签TOP100\t最近数据\t查询异常\tserviceImpl", e);
+                logger.error("1小时内全国阻断标签TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         if (!list.isEmpty()) {
@@ -330,7 +327,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             }
         }
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("1h内全国阻断标签TOP100------->测试数据");
+            logger.info("1小时内全国阻断标签TOP10------->测试数据");
             int i = (int) (Math.random() * 200);
             list.add(new NtcTagReport(start, "News", i + 30));
             list.add(new NtcTagReport(start, "kill", i + 30));

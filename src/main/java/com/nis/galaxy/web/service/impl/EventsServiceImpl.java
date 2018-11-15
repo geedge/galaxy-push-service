@@ -53,17 +53,17 @@ public class EventsServiceImpl implements EventsService {
     public List<SystemTotal> getSystemTotalOf1Day(String start, String end) {
         List<SystemTotal> list = new ArrayList<>();
         try {
-            list = eventsDao.getSystemTotalOf1Day(start, end);
+            list = eventsDao.getSystemTotalOf1Day(start,start, end);
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("系统总计\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfday(time);
-                list = eventsDao.getSystemTotalOf1Day(time, DateUtils.getAfter24h(time));
+                list = eventsDao.getSystemTotalOf1Day(start,time, DateUtils.getAfter24h(time));
             } catch (Exception e) {
                 logger.error("系统总计\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -88,17 +88,17 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsAppMonitor> getSpecifiedAPPMonitor(String start, String end) {
         List<EventsAppMonitor> list = new ArrayList<>();
         try {
-            list = eventsDao.getSpecifiedAPPMonitor(start, end);
+            list = eventsDao.getSpecifiedAPPMonitor(start,start, end);
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("特定APP访问监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getSpecifiedAPPMonitor(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getSpecifiedAPPMonitor(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("特定APP访问监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -155,17 +155,17 @@ public class EventsServiceImpl implements EventsService {
         Map<String, NtcServiceDict> listNtcService = listNtcService();
         List<EventsServiceCount> list = new ArrayList<>();
         try {
-            list = eventsDao.getServiceCount(start, end);
+            list = eventsDao.getServiceCount(start,start, end);
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getServiceCountLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getServiceCountLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getServiceCount(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getServiceCount(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("业务类型统计报表\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -198,23 +198,23 @@ public class EventsServiceImpl implements EventsService {
     /**
      * 重点保障事件总览
      *
-     * @param end
+     * @param start
      * @return
      */
     @Override
-    public List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String end) {
+    public List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String start) {
         List<EventsKeyPointSafaguardThing> list = new ArrayList<>();
         try {
-            list = eventsDao.getKeyPointSafaguardThing(end);
+            list = eventsDao.getKeyPointSafaguardThing(start);
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\tserviceImpl", e);
         }
         //测试数据
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("重点保障事件总览------->测试数据");
-            list.add(new EventsKeyPointSafaguardThing(end, "double agent", end, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-            list.add(new EventsKeyPointSafaguardThing(end, "Second task", end, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
-            list.add(new EventsKeyPointSafaguardThing(end, "Subject Tests", end, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(start, "double agent", start, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(start, "Second task", start, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
+            list.add(new EventsKeyPointSafaguardThing(start, "Subject Tests", start, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -315,17 +315,17 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsAudioMonitor> getEventsAudioMonitor(String start, String end) {
         List<EventsAudioMonitor> list = new ArrayList<>();
         try {
-            list = eventsDao.getEventsAudioMonitor(start, end);
+            list = eventsDao.getEventsAudioMonitor(start,start, end);
         } catch (Exception e) {
             logger.error("音频监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("音频监控\tMM_AUDIO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getEventsAudioMonitor(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getEventsAudioMonitor(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("音频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -358,17 +358,17 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsVedioMonitor> getVedioMonitor(String start, String end) {
         List<EventsVedioMonitor> list = new ArrayList<>();
         try {
-            list = eventsDao.getVedioMonitor(start, end);
+            list = eventsDao.getVedioMonitor(start,start, end);
         } catch (Exception e) {
             logger.error("视频监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("视频监控\tMM_VIDEO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getVedioMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getVedioMonitorLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getVedioMonitor(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getVedioMonitor(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("视频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -401,17 +401,17 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsImageMonitor> getImageMonitor(String start, String end) {
         List<EventsImageMonitor> list = new ArrayList<>();
         try {
-            list = eventsDao.getImageMonitor(start, end);
+            list = eventsDao.getImageMonitor(start,start, end);
         } catch (Exception e) {
             logger.error("图片监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("图片监控\tMM_PIC_REPORT" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getImageMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getImageMonitorLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getImageMonitor(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getImageMonitor(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("图片监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -444,17 +444,17 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsVoipMonitor> getVoipMonitor(String start, String end) {
         List<EventsVoipMonitor> list = new ArrayList<>();
         try {
-            list = eventsDao.getVoipMonitor(start, end);
+            list = eventsDao.getVoipMonitor(start,start, end);
         } catch (Exception e) {
             logger.error("VOIP监控\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("VOIP监控\tMM_VOIP_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getVoipMonitorLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getVoipMonitorLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getVoipMonitor(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getVoipMonitor(start,time, DateUtils.getAfter1h(time));
             } catch (Exception e) {
                 logger.error("VOIP监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -504,22 +504,23 @@ public class EventsServiceImpl implements EventsService {
     public List<EvevtsTargetNetwork> getTargetNetwork(String start, String end) {
         List<EvevtsTargetNetwork> list = new ArrayList<>();
         try {
-            list = eventsDao.getTargetNetwork(start, end);
+            list = eventsDao.getTargetNetwork(start,start, end);
         } catch (Exception e) {
             logger.error("目标行为网络监测\t查询异常\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
             logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getTargetNetworkLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getTargetNetworkLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfday(time);
-                list = eventsDao.getTargetNetwork(time, DateUtils.getAfter24h(time));
+                list = eventsDao.getTargetNetwork(start,time, DateUtils.getAfter24h(time));
             } catch (Exception e) {
                 logger.error("目标行为网络监测\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (list.isEmpty() && OPENFALSEDATA) {
+        //&& OPENFALSEDATA
+        if (list.isEmpty() ) {
             logger.info("目标行为网络监测------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EvevtsTargetNetwork("admin", "10.25.6." + (int) (Math.random() * 50), i + 10, start));
@@ -531,7 +532,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     /**
-     * 部署设备数量
+     * 硬件设备统计
      *
      * @param end
      * @return
@@ -548,7 +549,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     /**
-     * 运行状态
+     * 运行状况
      *
      * @param end
      * @return
@@ -557,26 +558,26 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsRunningState> getRunningState(String start, String end) {
         List<EventsRunningState> list = new ArrayList<>();
         try {
-            list = eventsDao.getRunningState(start, end);
+            list = eventsDao.getRunningState(start,start, end);
             list.removeAll(Collections.singleton(null));
         } catch (Exception e) {
             logger.error("运行状态\t查询异常\tserviceImpl", e);
         }
         if (list.isEmpty()) {
-            logger.warn("运行状态\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            logger.warn("运行状况\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
-                String lastTime = eventsDao.getRunningStateLastTime(end);
-                String time = DateUtils.getSubstringTime(lastTime);
+                Date lastTime = eventsDao.getRunningStateLastTime(end);
+                String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getRunningState(time, DateUtils.getAfter1h(time));
+                list = eventsDao.getRunningState(start,time, DateUtils.getAfter1h(time));
                 list.removeAll(Collections.singleton(null));
             } catch (Exception e) {
-                logger.error("运行状态\t最近数据\t查询异常\tserviceImpl", e);
+                logger.error("运行状况\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
         //测试数据
         if (list.isEmpty() && OPENFALSEDATA) {
-            logger.info("运行状态------->测试数据");
+            logger.info("运行状况------->测试数据");
             list.add(new EventsRunningState((int) (Math.random() * 300), (int) (Math.random() * 200), (int) (Math.random() * 300)));
         }
         return list;

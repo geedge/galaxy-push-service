@@ -114,7 +114,7 @@ public class ForBlockingInterface {
     }
 
     /**
-     * 24小时全国范围阻断协议信息 5min
+     * 24小时内全国范围阻断协议信息 5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
     public void get24hAllBlockEachProtocol() {
@@ -129,14 +129,14 @@ public class ForBlockingInterface {
             //获取并封装推送数据
             contentValue = blockingService.get24hAllBlockEachProtocol(start, end);
         } catch (Exception e) {
-            logger.error("24小时全国范围阻断协议信息\t查询异常\trestTemplate", e);
+            logger.error("24小时内全国范围阻断协议信息\t查询异常\trestTemplate", e);
         }
 
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.24hour.global.protocol.block", contentValue);
-        logger.info("开始推送======>>>24小时全国范围阻断协议信息\t请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>24小时内全国范围阻断协议信息\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
-        logger.info("24小时全国范围阻断协议信息\t推送返回结果" + response);
+        logger.info("24小时内全国范围阻断协议信息\t推送返回结果" + response);
     }
 
     /**
@@ -159,9 +159,9 @@ public class ForBlockingInterface {
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.24hour.thermodynamic", contentValue);
-        logger.info("开始推送======>>>24h全国热力图\t请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>24小时内全国热力图\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
-        logger.info("24h全国热力图\t推送返回结果" + response);
+        logger.info("24小时内全国热力图\t推送返回结果" + response);
 
     }
 

@@ -42,7 +42,7 @@ public class ForBlockingTopNInterface {
 
 
     /**
-     * 24小时区域阻断协议TOP10
+     * 24小时内区域阻断协议TOP10
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
     public void getAreaBlockTop10ProtocolOf24h() {
@@ -50,21 +50,20 @@ public class ForBlockingTopNInterface {
             return;
         }
         String now = DateUtils.getDateTime();
-        String start = DateUtils.getRangeOfday(now);
-        String end = DateUtils.getRangeOf5min(now);
+        String end = DateUtils.getRangeOfday(now);
+        String start = DateUtils.getBeforeNminOfTime(end,before60m*24);
         List contentValue = null;
         try {
             //获取并封装数据
             contentValue = blockingTopNService.getAreaBlockTop10ProtocolOf24(start, end);
         } catch (Exception e) {
-            logger.error("24小时区域阻断协议TOP10\t查询异常\trestTemplate", e);
+            logger.error("24小时内区域阻断协议TOP10\t查询异常\trestTemplate", e);
         }
         //请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.24hour.area.protocol.block", contentValue);
-        logger.info("开始推送======>>>24小时区域阻断协议TOP10\t请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>24小时内区域阻断协议TOP10\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
-        logger.info("24小时区域阻断协议TOP10\t推送返回结果" + response);
-
+        logger.info("24小时内区域阻断协议TOP10\t推送返回结果" + response);
     }
 
     /**
@@ -163,18 +162,18 @@ public class ForBlockingTopNInterface {
             contentValue = blockingTopNService.getBlockTop10WebsiteOf5m(start, end);
 
         } catch (Exception e) {
-            logger.error("5分钟内全国阻断website\t查询异常\trestTemplate", e);
+            logger.error("5分钟内全国阻断网站TOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.5minute.website.top_10", contentValue);
-        logger.info("开始推送======>>>5分钟内全国阻断websiteTOP10 请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>5分钟内全国阻断网站TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
-        logger.info("5分钟内全国阻断websiteTOP10\t推送返回结果" + response);
+        logger.info("5分钟内全国阻断网站TOP10\t推送返回结果" + response);
 
     }
 
     /**
-     * 1h内全国阻断标签TOP100  1h
+     * 1小时内全国阻断标签TOP10  1h
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
     public void getBlockTop100Tag1h() {
@@ -189,13 +188,13 @@ public class ForBlockingTopNInterface {
             //获取并封装数据
             contentValue = blockingTopNService.getBlockTop100Tag1h(start, end);
         } catch (Exception e) {
-            logger.error("1h内全国阻断标签TOP100\t查询异常\trestTemplate", e);
+            logger.error("1小时内全国阻断标签TOP10\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.1hour.keyword.top_10", contentValue);
-        logger.info("开始推送======>>>1h内全国阻断标签TOP100 请求头和请求体：" + httpEntity);
+        logger.info("开始推送======>>>1小时内全国阻断标签TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
-        logger.info("1h内全国阻断标签TOP100\t推送返回结果" + response);
+        logger.info("1小时内全国阻断标签TOP10\t推送返回结果" + response);
     }
 
     @Scheduled(fixedRate = 999999999)

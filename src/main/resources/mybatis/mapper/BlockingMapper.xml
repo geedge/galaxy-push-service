@@ -6,8 +6,8 @@
     <!-- 封堵信息总体显示 5min/条、粒度5min-->
     <select id="getAllBlockInformation" resultType="com.nis.galaxy.domain.NtcTotalReport">
         <![CDATA[
-        select #{start} time,reject_num controlNum,monitor_num monitorNum,CONVERT(c2s_byte_len*8/300,int)+CONVERT(s2c_byte_len*8/300,int) networkFlowNum,CONVERT(c2s_byte_len*8/300,int) upstreamNum,CONVERT(s2c_byte_len*8/300,int) downstreamNum,
-          new_uni_conn_num newLinkNum,live_conn_num activeConNum,drop_conn_num dropConNum,loop_conn_num refluxConNum
+        select #{push} time,sum(reject_num) controlNum,sum(monitor_num) monitorNum,sum(c2s_byte_len+s2c_byte_len)*8/300 networkFlowNum,sum(c2s_byte_len)*8/300 upstreamNum,sum(s2c_byte_len)*8/300 downstreamNum,
+          sum(new_uni_conn_num) newLinkNum,sum(live_conn_num) activeConNum,sum(drop_conn_num) dropConNum,sum(loop_conn_num) refluxConNum
           from NTC_TOTAL_REPORT
           WHERE report_time >= #{start}
           AND report_time < #{end}
@@ -17,20 +17,48 @@
     <!--封堵信息分布显示_____映射-->
     <select id="getDisBlockInformationOnly" resultType="com.nis.galaxy.domain.NtcDisReport">
       	<![CDATA[
-      	SELECT #{start} time,entrance_id area,service type,SUM(sum) count
-      	FROM ntc_entrance_report
-          WHERE report_time >= #{start}
-          AND report_time < #{end}
-	    GROUP BY entrance_id,service
-	    HAVING  service BETWEEN #{a} AND #{b}
-		or service BETWEEN #{c} AND #{d}
-		or service BETWEEN #{e} AND #{f};
+      	  select #{push} time, area, sum(controlNum) controlNum , sum(monitorNum) monitorNum ,sum(c.up) upstreamNum ,sum(c.dw) downstreamNum ,sum(c.up)+sum(c.dw) networkFlowNum from (
+	select 1 area,0 as entrance_id FROM ntc_entrance_report  GROUP BY 1
+	UNION all
+	select entrance_id area,entrance_id FROM ntc_device_info GROUP BY entrance_id
+	UNION all
+	select 1 area,3 as entrance_id FROM ntc_entrance_report  GROUP BY 1
+) d LEFT JOIN
+(SELECT entrance_id,sum(sum) controlNum
+from ntc_entrance_report WHERE report_time >= #{start}
+        AND report_time <  #{end}
+				AND (
+				service BETWEEN 16 AND 65
+		    or service BETWEEN 256 AND 266
+		     or service BETWEEN 512 AND 576
+				)
+				GROUP BY entrance_id) a
+				 on d.entrance_id = a.entrance_id
+				 left JOIN
+				 (SELECT entrance_id,sum(sum) monitorNum
+				 from ntc_entrance_report WHERE report_time >= #{start}
+        AND report_time <  #{end}
+				AND (
+        service BETWEEN 128 AND 149
+		    or service BETWEEN 384 AND 394
+		    or service = 592
+				)
+				GROUP BY entrance_id ) b
+				ON d.entrance_id = b.entrance_id
+				left JOIN (
+				select entrance_id , CONVERT(sum(c2s_byte_len)*8/300,int)  up,CONVERT( sum(s2c_byte_len)*8/300,int)  dw from traffic_protocol_statistic
+				WHERE stat_time >= #{start}
+        AND stat_time <   #{end}
+				GROUP BY entrance_id
+				) c
+	 ON d.entrance_id = c.entrance_id
+	 GROUP BY area
         ]]>
     </select>
     <!--DNS欺骗信息显示 5min/条、粒度5min______映射局点表-->
     <select id="getDNSDeceiveInformationOnly" resultType="com.nis.galaxy.domain.NtcEntranceReport">
 		<![CDATA[
-        SELECT #{start} time,entrance_id area,sum(sum) count
+        SELECT  #{push} time,entrance_id area,sum(sum) count
         FROM ntc_entrance_report
           WHERE report_time >= #{start}
           AND report_time < #{end}
@@ -39,20 +67,25 @@
         ]]>
     </select>
 
-    <!--24小时全国范围阻断协议信息 5min/条、粒度5min_______映射业务表-->
+    <!--24小时内全国范围阻断协议信息 5min/条、粒度5min-->
     <select id="get24hAllBlockEachProtocolOnly" resultType="com.nis.galaxy.domain.TimeTypeCount">
         <![CDATA[
-        SELECT  #{start} time ,service type,SUM(sum)  count
+        SELECT  #{push} time,service type,SUM(sum)  count
         FROM ntc_service_report
           WHERE report_time >= #{start}
           AND report_time < #{end}
+            AND (
+          service BETWEEN 16 AND 65
+          or service BETWEEN 256 AND 266
+          or service BETWEEN 512 AND 576
+        )
         GROUP BY service;
         ]]>
     </select>
     <!--24小时内全国热力图 5min/条、粒度1min_____映射-->
     <select id="getAllHotStatistisOnly" resultType="com.nis.galaxy.domain.HotStatistic">
 	   <![CDATA[
-      SELECT #{start} time,entrance_id area, s_ip src_ip, d_ip dst_ip,service type,SUM(sum) count
+      SELECT  #{push} time,entrance_id area, s_ip src_ip, d_ip dst_ip,service type,SUM(sum) count
 	    FROM ntc_service_behav_statistic
           WHERE report_time >= #{start}
           AND report_time < #{end}
@@ -64,104 +97,95 @@
     <select id="getPointMapOf10sOnly" resultType="com.nis.galaxy.domain.PointMap">
       SELECT  report_time time,s_ip src_ip,d_ip dst_ip,service type,sum count
         FROM ntc_service_behav_statistic
-        ORDER BY stat_id desc
+        where report_time > DATE_SUB(NOW(),INTERVAL 8 HOUR)
+        ORDER BY report_time desc
         LIMIT 500;
     </select>
 
     <!--热力图接口 5min/次 粒度5min_____映射 -->
     <select id="getDisBlockMapOnly" resultType="com.nis.galaxy.domain.AreaCount">
         <![CDATA[
-       SELECT #{start} time,service,entrance_id area,sum(sum) count
+       SELECT   #{push} time,entrance_id area,sum(sum) count
        FROM ntc_entrance_report
           WHERE report_time >= #{start}
           AND report_time < #{end}
+          AND  (service between 16 AND 65
+       or service between 256 AND 266
+       or service between 512 AND 576)
         GROUP BY entrance_id
-        HAVING service between #{a} and #{b}
-        or service between #{c} and #{d}
-        or service between #{e} and #{f}
         ]]>
     </select>
 
     <!--全国协议配置信息-->
     <select id="getAllCfgInfoOnly" resultType="com.nis.galaxy.domain.CfgTypeCount">
-      SELECT service_id type, count(0) count
+      <![CDATA[
+        SELECT service_id type, count(0) count
         FROM ui_cfg_num_statistics
         WHERE cfg_state = 1
+        and statistic_time < #{time}
       GROUP BY service_id
       ORDER BY count desc;
+       ]]>
     </select>
 
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：封堵信息整体显示-->
-    <select id="getAllBlockInformationLastTime" resultType="String">
+    <select id="getAllBlockInformationLastTime" resultType="java.util.Date">
         <![CDATA[
-        select report_time
+        select max(report_time)
           FROM ntc_total_report
           WHERE report_time < #{end}
-          ORDER BY report_time desc
-          LIMIT 1;
         ]]>
     </select>
     <!--封堵信息分布显示-->
-    <select id="getDisBlockInformationLastTime" resultType="String">
+    <select id="getDisBlockInformationLastTime" resultType="java.util.Date">
         <![CDATA[
-         SELECT report_time
+         SELECT max(report_time)
          FROM ntc_entrance_report
          WHERE report_time < #{end}
-         AND (
-              service BETWEEN #{a} AND #{b}
-              or service BETWEEN #{c} AND #{d}
-              or service BETWEEN #{e} AND #{f}
-         )
-        ORDER BY report_time desc
-        LIMIT 1;
+         AND (service between 16 AND 65
+       or service between 256 AND 266
+       or service between 512 AND 576)
          ]]>
     </select>
     <!--DNS欺骗信息显示-->
-    <select id="getDNSDeceiveInformationLastTime" resultType="String">
+    <select id="getDNSDeceiveInformationLastTime" resultType="java.util.Date">
         <![CDATA[
-        select report_time
+        select max(report_time)
           FROM ntc_entrance_report
           WHERE report_time < #{end}
           AND service = 18
-          ORDER BY report_time desc
-          LIMIT 1;
         ]]>
     </select>
     <!--24小时全国范围阻断协议信息-->
-    <select id="get24hAllBlockEachProtocolOLastTime" resultType="String">
+    <select id="get24hAllBlockEachProtocolOLastTime" resultType="java.util.Date">
         <![CDATA[
-        select report_time
+        select max(report_time)
           FROM ntc_service_report
           WHERE report_time < #{end}
-          ORDER BY report_time desc
-          LIMIT 1;
+           AND (service between 16 AND 65
+       or service between 256 AND 266
+       or service between 512 AND 576)
         ]]>
     </select>
     <!--24小时内全国热力图-->
-    <select id="getAllHotStatistisLastTime" resultType="String">
+    <select id="getAllHotStatistisLastTime" resultType="java.util.Date">
         <![CDATA[
-        select report_time
+        select max(report_time)
           FROM ntc_service_behav_statistic
           WHERE report_time < #{end}
-          ORDER BY report_time desc
-          LIMIT 1;
         ]]>
     </select>
     <!--热力图接口-->
-    <select id="getDisBlockMapLastTime" resultType="String">
+    <select id="getDisBlockMapLastTime" resultType="java.util.Date">
          <![CDATA[
-         SELECT report_time
+         SELECT max(report_time)
          FROM ntc_entrance_report
          WHERE report_time < #{end}
-         AND (
-              service BETWEEN #{a} AND #{b}
-              or service BETWEEN #{c} AND #{d}
-              or service BETWEEN #{e} AND #{f}
-         )
-        ORDER BY report_time desc
-        LIMIT 1;
+         AND (service between 16 AND 65
+       or service between 256 AND 266
+       or service between 512 AND 576)
          ]]>
     </select>
 </mapper>
