@@ -30,6 +30,8 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     private int languageChose;
     @Value("${Open.False.Data}")
     private boolean OPENFALSEDATA;
+    @Value("${Open.Recent.Data}")
+    private boolean OpenRecentData;
 
 
 
@@ -54,7 +56,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("5分钟内活跃IP流量TOP10\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
@@ -109,7 +111,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         } catch (Exception e) {
             logger.error("互联网流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty()&& OpenRecentData) {
             logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);

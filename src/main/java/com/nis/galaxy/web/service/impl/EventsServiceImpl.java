@@ -36,6 +36,8 @@ public class EventsServiceImpl implements EventsService {
     private int DeviceAsemNum;
     @Value("${Device.Adc.Num}")
     private int DeviceAdcNum;
+    @Value("${Open.Recent.Data}")
+    private boolean OpenRecentData;
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
@@ -57,7 +59,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("系统总计\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
@@ -92,7 +94,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("特定APP访问监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
@@ -159,7 +161,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getServiceCountLastTime(end);
@@ -319,7 +321,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("音频监控\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("音频监控\tMM_AUDIO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
@@ -362,7 +364,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("视频监控\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("视频监控\tMM_VIDEO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getVedioMonitorLastTime(end);
@@ -405,7 +407,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("图片监控\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("图片监控\tMM_PIC_REPORT" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getImageMonitorLastTime(end);
@@ -448,7 +450,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("VOIP监控\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("VOIP监控\tMM_VOIP_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getVoipMonitorLastTime(end);
@@ -508,7 +510,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("目标行为网络监测\t查询异常\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getTargetNetworkLastTime(end);
@@ -563,7 +565,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("运行状态\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()) {
+        if (list.isEmpty() && OpenRecentData) {
             logger.warn("运行状况\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getRunningStateLastTime(end);
