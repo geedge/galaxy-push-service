@@ -6,6 +6,7 @@ import com.nis.galaxy.domain.dict.NtcServiceDict;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.EventsDao;
 import com.nis.galaxy.web.service.EventsService;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<SystemTotal> getSystemTotalOf1Day(String start, String end) {
         List<SystemTotal> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getSystemTotalOf1Day(start,start, end);
         } catch (Exception e) {
@@ -70,7 +72,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("系统总计\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //测试数据
+        logger.info("系统总计耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("系统总计------->测试数据");
             int i = (int) (Math.random() * 20);
@@ -89,6 +91,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsAppMonitor> getSpecifiedAPPMonitor(String start, String end) {
         List<EventsAppMonitor> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getSpecifiedAPPMonitor(start,start, end);
         } catch (Exception e) {
@@ -105,7 +108,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("特定APP访问监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //测试数据
+        logger.info("特定APP访问监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("特定APP访问监控------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -127,12 +130,13 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsLetterCount> getLetterCount() {
         List<EventsLetterCount> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getLetterCount();
         } catch (Exception e) {
             logger.error("来函统计报表\t查询异常\tserviceImpl", e);
         }
-        //测试数据
+        logger.info("来函统计报表耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("来函统计报表------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -156,6 +160,7 @@ public class EventsServiceImpl implements EventsService {
     public List<EventsServiceCount> getServiceCount(String start, String end) {
         Map<String, NtcServiceDict> listNtcService = listNtcService();
         List<EventsServiceCount> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getServiceCount(start,start, end);
         } catch (Exception e) {
@@ -187,12 +192,11 @@ public class EventsServiceImpl implements EventsService {
                 }
             }
         }
+        logger.info("业务类型统计报表耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("业务类型统计报表------->测试数据");
-            list.add(new EventsServiceCount(start, "video_sample_reject", (int) (Math.random() * 100)));
-            list.add(new EventsServiceCount(start, "file_transfer_digest_reject", (int) (Math.random() * 100)));
-            list.add(new EventsServiceCount(start, "pptp_monit", (int) (Math.random() * 100)));
-            list.add(new EventsServiceCount(start, "ctrl_http_monit", (int) (Math.random() * 100)));
+            list.add(new EventsServiceCount(start, "Website Keyword Monitor", (int) (Math.random() * 100)));
+            list.add(new EventsServiceCount(start, "HTTP(s) Monitor", (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -206,12 +210,13 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsKeyPointSafaguardThing> getKeyPointSafaguardThing(String start) {
         List<EventsKeyPointSafaguardThing> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getKeyPointSafaguardThing(start);
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\tserviceImpl", e);
         }
-        //测试数据
+        logger.info("重点保障事件总览耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("重点保障事件总览------->测试数据");
             list.add(new EventsKeyPointSafaguardThing(start, "double agent", start, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
@@ -229,12 +234,13 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsSpecificWebsites> getSpecificWebsites(String end) {
         List<EventsSpecificWebsites> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getSpecificWebsites(end);
         } catch (Exception e) {
             logger.error("特定网站监控\t查询异常\tserviceImpl", e);
         }
-        //测试数据
+        logger.info("特定网站监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("特定网站监控------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -261,11 +267,13 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsMonitor> getEventsMonitor(String end) {
         List<EventsMonitor> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getEventsMonitor();
         } catch (Exception e) {
             logger.error("事件监测\t查询异常\tserviceImpl", e);
         }
+        logger.info("事件监测耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("事件监测------->测试数据");
             list.add(new EventsMonitor("double agent", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
@@ -288,11 +296,13 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsBlock> getEventsBlock(String end) {
         List<EventsBlock> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getEventsBlock();
         } catch (Exception e) {
             logger.error("事件封堵\t查询异常\tserviceImpl", e);
         }
+        logger.info("事件封堵耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("事件封堵------->测试数据");
             list.add(new EventsBlock("spy", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
@@ -316,6 +326,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsAudioMonitor> getEventsAudioMonitor(String start, String end) {
         List<EventsAudioMonitor> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getEventsAudioMonitor(start,start, end);
         } catch (Exception e) {
@@ -332,6 +343,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("音频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        logger.info("音频监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("音频监控------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -359,6 +371,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsVedioMonitor> getVedioMonitor(String start, String end) {
         List<EventsVedioMonitor> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getVedioMonitor(start,start, end);
         } catch (Exception e) {
@@ -375,6 +388,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("视频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        logger.info("视频监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("视频监控------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -402,6 +416,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsImageMonitor> getImageMonitor(String start, String end) {
         List<EventsImageMonitor> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getImageMonitor(start,start, end);
         } catch (Exception e) {
@@ -418,6 +433,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("图片监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        logger.info("视频监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("图片监控------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -505,6 +521,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EvevtsTargetNetwork> getTargetNetwork(String start, String end) {
         List<EvevtsTargetNetwork> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getTargetNetwork(start,start, end);
         } catch (Exception e) {
@@ -521,6 +538,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("目标行为网络监测\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        logger.info("目标行为网络监测耗时："+(System.currentTimeMillis()-timeMillisStart));
         //&& OPENFALSEDATA
         if (list.isEmpty() ) {
             logger.info("目标行为网络监测------->测试数据");
@@ -559,6 +577,7 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsRunningState> getRunningState(String start, String end) {
         List<EventsRunningState> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = eventsDao.getRunningState(start,start, end);
             list.removeAll(Collections.singleton(null));
@@ -577,7 +596,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("运行状况\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //测试数据
+        logger.info("运行状况耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("运行状况------->测试数据");
             list.add(new EventsRunningState((int) (Math.random() * 300), (int) (Math.random() * 200), (int) (Math.random() * 300)));

@@ -7,6 +7,7 @@ import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.dao.NetflowDao;
 import com.nis.galaxy.web.service.NetflowService;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,7 @@ public class NetflowServiceImpl implements NetflowService {
     public List<TimeTypeCount> getNetflowStatistic5m(String start, String end) {
         List<TimeTypeCount> list = new ArrayList<>();
         Map<String, String> listProtocolDict = listProtocolDict();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getNetflowStatistic5mOnly(start, start, end);
         } catch (Exception e) {
@@ -96,7 +98,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
-        //测试数据
+        logger.info("5分钟内网络流量统计耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("5分钟内网络流量统计------->测试数据");
             int i = (int) (Math.random() * 1000);
@@ -123,6 +125,7 @@ public class NetflowServiceImpl implements NetflowService {
     public List<NetflowProtocol> getProtocolStatisticOf1h(String start, String end) {
         List<NetflowProtocol> list = new ArrayList<>();
         Map<String, String> listProtocolDict = listProtocolDict();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getProtocolStatisticOf1hOnly(start, start, end);
         } catch (Exception e) {
@@ -152,7 +155,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
-        //测试数据
+        logger.info("1小时内网络协议统计耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("1小时内网络协议统计------->测试数据");
             int i = (int) (Math.random() * 5000);
@@ -180,6 +183,7 @@ public class NetflowServiceImpl implements NetflowService {
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
         List<IpActiveInfo> list = new ArrayList<>();
         Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, start, end);
         } catch (Exception e) {
@@ -205,15 +209,16 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
+        logger.info("5分钟内活跃IP信息耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("5分钟内活跃IP信息------->测试数据");
             long c = (long) (Math.random() * 5000000);
             long b = (long) (Math.random() * 5000);
             long a = (long) (Math.random() * 5000);
-            list.add(new IpActiveInfo(start, "10.11.36.44", "Kazakhtelecom", a + 1, b + 10, c + 435));
-            list.add(new IpActiveInfo(start, "183.138.59.73", "kazTransCom", a + 32, b + 3, c + 67));
-            list.add(new IpActiveInfo(start, "10.11.36.126", "Kazakhtelecom", a + 3, b + 34, c + 56));
-            list.add(new IpActiveInfo(start, "119.108.229.153", "kazTransCom", a + 45, b + 5, c + 45));
+            list.add(new IpActiveInfo(start, "10.11.36.44", "Астана", a + 1, b + 10, c + 435));
+            list.add(new IpActiveInfo(start, "183.138.59.73", "Астана", a + 32, b + 3, c + 67));
+            list.add(new IpActiveInfo(start, "10.11.36.126", "Астана", a + 3, b + 34, c + 56));
+            list.add(new IpActiveInfo(start, "119.108.229.153", "Астана", a + 45, b + 5, c + 45));
         }
         return list;
     }
@@ -229,6 +234,7 @@ public class NetflowServiceImpl implements NetflowService {
     public List<AreaBPSTime> getAreaNetflowOf5min(String start, String end, int areaNetqueryExpTimes) {
         List<AreaBPSTime> list = new ArrayList<>();
         Map<String, UiCarrierDictInfo> uiCarrierDictInfo = listUiCarrierDictInfo();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getAreaNetflowOf5min(start, start, end);
             //根据查询失败次数，最大向前查询3次
@@ -265,6 +271,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
+        logger.info("地域流量耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("地域流量------->测试数据");
             if (languageChose == 3) {
@@ -286,6 +293,7 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<PortBPSTime> getPortNetflowOf5min(String start, String end, int portNetqueryExpTimes) {
         List<PortBPSTime> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getPortNetflowOf5min(start, start, end);
             //根据查询失败次数，最大向前查询3次
@@ -313,7 +321,7 @@ public class NetflowServiceImpl implements NetflowService {
                 logger.error("端口流量\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        //测试数据
+        logger.info("端口流量耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             list = new ArrayList<>();
             logger.info("端口流量------->测试数据");

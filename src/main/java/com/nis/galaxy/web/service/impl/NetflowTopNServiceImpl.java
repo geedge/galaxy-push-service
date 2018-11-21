@@ -51,6 +51,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end) {
         List<IpActiveInt> list = new ArrayList<>();
         Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start,start, end);
         } catch (Exception e) {
@@ -76,19 +77,20 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 }
             }
         }
+        logger.info("5分钟内活跃IP流量TOP10耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             int i = (int) (Math.random() * 200);
             logger.info("5分钟内活跃IP流量TOP10------->测试数据");
-            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.108.229.153", i + 20));
-            list.add(new IpActiveInt(start, "kazTransCom", "121.236.4.78", i + 16));
-            list.add(new IpActiveInt(start, "Kazakhtelecom", "192.158.229.15", i + 15));
-            list.add(new IpActiveInt(start, "kazTransCom", "192.168.99.153", i + 14));
-            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.188.29.125", i + 12));
-            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.168.229.45", i + 6));
-            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.168.229.11", i + 5));
-            list.add(new IpActiveInt(start, "kazTransCom", "119.168.229.1", i + 3));
-            list.add(new IpActiveInt(start, "Kazakhtelecom", "119.168.229.6", i + 2));
-            list.add(new IpActiveInt(start, "kazTransCom", "119.168.229.8", i));
+            list.add(new IpActiveInt(start, "Астана", "119.108.229.153", i + 20));
+            list.add(new IpActiveInt(start, "Астана", "121.236.4.78", i + 16));
+            list.add(new IpActiveInt(start, "Алматы", "192.158.229.15", i + 15));
+            list.add(new IpActiveInt(start, "Астана", "192.168.99.153", i + 14));
+            list.add(new IpActiveInt(start, "Алматы", "119.188.29.125", i + 12));
+            list.add(new IpActiveInt(start, "Астана", "119.168.229.45", i + 6));
+            list.add(new IpActiveInt(start, "Алматы", "119.168.229.11", i + 5));
+            list.add(new IpActiveInt(start, "Алматы", "119.168.229.1", i + 3));
+            list.add(new IpActiveInt(start, "Алматы", "119.168.229.6", i + 2));
+            list.add(new IpActiveInt(start, "Астана", "119.168.229.8", i));
         }
         return list;
     }
@@ -106,6 +108,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         List<NetFlowWater> list = new ArrayList<>();
         List<NetFlowWaterPush> resule = new ArrayList<>();
         List<Entrance> entrance = netflowTopNDao.getIpEntranceRe();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowTopNDao.getNetFlowWaterTop10(start, end);
         } catch (Exception e) {
@@ -133,7 +136,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         }
         int size = list.size();
         if (size == 1) {
-            long avg = 0, subtractSum = 0;
+            long avg = 0;
             String area = list.get(0).getArea();
             long count = list.get(0).getCount();
             if (count >= 0) {
@@ -141,12 +144,14 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             }
             resule.add(new NetFlowWaterPush(start, area, avg));
         } else if (size > 1) {
-            for (Entrance entrance1 : entrance) {
+            //根据局点遍历
+            for (Entrance entranceOne : entrance) {
                 List<NetFlowWater> temp = new ArrayList<>();
-                String entrance2 = entrance1.getEntrance();
+                String entranceNanme = entranceOne.getEntrance();
+                //遍历list结果集
                 for (int i = 0; i < size; i++) {
                     String area = list.get(i).getArea();
-                    if (entrance2.equals(area)) {
+                    if (entranceNanme.equals(area)) {
                         temp.add(list.get(i));
                     }
                 }
@@ -185,6 +190,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             long avg = 0;
             avg = 0;
         }
+        //映射地域
         for (NetFlowWaterPush netFlowWaterPush : resule) {
             String area = netFlowWaterPush.getArea();
             UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
@@ -193,6 +199,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             }
             netFlowWaterPush.setArea(uiCarrierDictInfo.getItemValue());
         }
+        logger.info("互联网流量TOP10耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (resule.isEmpty() && OPENFALSEDATA) {
             logger.info("互联网流量TOP10------->测试数据");
             if (languageChose == 3) {

@@ -40,9 +40,9 @@ public class ForMonitorInterface {
     private String SERVICE_PATH_BLOCKING;
     @Value("${DICT.WAIT}")
     private int DICTWAIT;
-
     @Value("${scheduled.monitor.enable}")
     private String scheduledMonitorEnable;
+    private int areaNetWaterMonitorExpTimes = 0;
 
 
     /**
@@ -79,9 +79,12 @@ public class ForMonitorInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            contentValue = monitorService.getNetWaterMonitor(start,end);
+            contentValue = monitorService.getNetWaterMonitor(start,end,areaNetWaterMonitorExpTimes);
         } catch (Exception e) {
-            logger.info("网络流量监控\t查询异常\trestTemplate", e);
+            logger.info("网络流量监控\t查询异常\trestTemplate"+ ++areaNetWaterMonitorExpTimes, e);
+        }
+        if (areaNetWaterMonitorExpTimes > 0 && contentValue != null) {
+            areaNetWaterMonitorExpTimes = 0;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"network.waterflow", contentValue);

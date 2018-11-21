@@ -11,6 +11,14 @@ import java.util.List;
 public interface MonitorService {
 
     List<NmsServerBean> getMonitorOf1m();
-    List<NetWaterMonitor> getNetWaterMonitor(String start, String end);
+
+    /**
+     * 网络流量监控
+     * @param start
+     * @param end
+     * @param areaNetWaterMonitorExpTimes
+     * @return
+     */
+    List<NetWaterMonitor> getNetWaterMonitor(String start, String end,int areaNetWaterMonitorExpTimes);
 
 }

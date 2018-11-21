@@ -40,6 +40,7 @@ public class ForBlockingInterface {
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_BLOCKING}")
     private String SERVICE_PATH_BLOCKING;
+    private int AllBlockEachProtocolExpTimes = 0;
 
     /**
      * 封堵信息整体显示 5min/次
@@ -126,10 +127,12 @@ public class ForBlockingInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            //获取并封装推送数据
-            contentValue = blockingService.get24hAllBlockEachProtocol(start, end);
+            contentValue = blockingService.get24hAllBlockEachProtocol(start, end,AllBlockEachProtocolExpTimes);
         } catch (Exception e) {
-            logger.error("24小时内全国范围阻断协议信息\t查询异常\trestTemplate", e);
+            logger.error("24小时内全国范围阻断协议信息\t查询异常\trestTemplate"+ ++AllBlockEachProtocolExpTimes, e);
+        }
+        if (AllBlockEachProtocolExpTimes > 0 && contentValue != null) {
+            AllBlockEachProtocolExpTimes = 0;
         }
 
         // 请求头和请求体

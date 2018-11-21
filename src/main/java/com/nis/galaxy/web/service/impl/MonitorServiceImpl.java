@@ -43,6 +43,7 @@ public class MonitorServiceImpl implements MonitorService {
     public List<NmsServerBean> getMonitorOf1m() {
         List<NmsServerBean> list = new ArrayList<>();
         NmsServiceBeanTmp nmsServerBeanTmp = new NmsServiceBeanTmp();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             //查询
             nmsServerBeanTmp = monitorDao.getMonitorOf1m01();
@@ -64,6 +65,7 @@ public class MonitorServiceImpl implements MonitorService {
             list.add(nmsServerBean);
             list.remove(null);
         }
+        logger.info("系统监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("系统监控------->测试数据");
             nmsServerBeanTmp = new NmsServiceBeanTmp(DateUtils.getDateTime(), "Астана", "" + (int) (Math.random() * 5000), (int) (Math.random() * 5000) + "", "2", 22);
@@ -90,13 +92,25 @@ public class MonitorServiceImpl implements MonitorService {
      * @return
      */
     @Override
-    public List<NetWaterMonitor> getNetWaterMonitor(String start, String end) {
+    public List<NetWaterMonitor> getNetWaterMonitor(String start, String end,int areaNetWaterMonitorExpTimes) {
         List<NetWaterMonitor> list = new ArrayList<>();
+        long timeMillisStart = System.currentTimeMillis();
         try {
             String before = DateUtils.getBeforeNminOfTime(start, -5);
             list = monitorDao.getNetWaterMonitor(start,start, end, before);
+            //上阶段异常数据的获取
+            if (areaNetWaterMonitorExpTimes > 0) {
+                if (areaNetWaterMonitorExpTimes >= 3) {
+                    areaNetWaterMonitorExpTimes = 3;
+                }
+                for (int i = 1; i <= areaNetWaterMonitorExpTimes; i++) {
+                    String emptStart = DateUtils.getBeforeNminOfTime(start, -5 * i);
+                    list = monitorDao.getNetWaterMonitor(emptStart,emptStart, DateUtils.getAfter5min(emptStart), DateUtils.getBeforeNminOfTime(emptStart,-5));
+                }
+            }
         } catch (Exception e) {
             logger.error("网络流量监控\t查询异常\tserviceImpl", e);
+            throw new RuntimeException();
         }
         if (list.isEmpty() && OpenRecentDataTendency) {
             logger.warn("网络流量监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
@@ -119,7 +133,7 @@ public class MonitorServiceImpl implements MonitorService {
                 }
             }
         }
-        //测试数据
+        logger.info("网络流量监控耗时："+(System.currentTimeMillis()-timeMillisStart));
         if (list.isEmpty() && OPENFALSEDATA) {
             logger.info("网络流量监控------->测试数据");
             if (languageChose == 3) {
