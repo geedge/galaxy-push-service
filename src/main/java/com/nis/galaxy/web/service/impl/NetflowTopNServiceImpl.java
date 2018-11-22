@@ -5,9 +5,9 @@ import com.nis.galaxy.domain.Entrance;
 import com.nis.galaxy.domain.IpActiveInt;
 import com.nis.galaxy.domain.NetFlowWater;
 import com.nis.galaxy.domain.NetFlowWaterPush;
-import com.nis.galaxy.domain.dict.UiAreaDictInfo;
 import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
 import com.nis.galaxy.util.DateUtils;
+import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.NetflowTopNDao;
 import com.nis.galaxy.web.service.NetflowTopNService;
 import org.slf4j.Logger;
@@ -34,7 +34,6 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     private boolean OpenRecentData;
 
 
-
     //运营商表
     public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
         return myLoad.listUiCarrierDictInfo;
@@ -53,22 +52,22 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
         long timeMillisStart = System.currentTimeMillis();
         try {
-            list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start,start, end);
+            list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, start, end);
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty() && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && OpenRecentData) {
             logger.warn("5分钟内活跃IP流量TOP10\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
                 String time = DateUtils.formatDateTime(lastTime);
                 time = DateUtils.getRangeOf5min(time);
-                list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start,time, DateUtils.getAfter5min(time));
+                list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, time, DateUtils.getAfter5min(time));
             } catch (Exception e) {
                 logger.error("5分钟内活跃IP流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (!list.isEmpty()) {
+        if (!ListUtils.isEmptyList(list)) {
             for (IpActiveInt ipActiveInt : list) {
                 String area = ipActiveInt.getArea();
                 UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
@@ -77,8 +76,8 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 }
             }
         }
-        logger.info("5分钟内活跃IP流量TOP10耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (list.isEmpty() && OPENFALSEDATA) {
+        logger.info("5分钟内活跃IP流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));
+        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
             int i = (int) (Math.random() * 200);
             logger.info("5分钟内活跃IP流量TOP10------->测试数据");
             list.add(new IpActiveInt(start, "Астана", "119.108.229.153", i + 20));
@@ -114,7 +113,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         } catch (Exception e) {
             logger.error("互联网流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (list.isEmpty()&& OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && OpenRecentData) {
             logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);
@@ -134,73 +133,75 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 logger.error("互联网流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        int size = list.size();
-        if (size == 1) {
-            long avg = 0;
-            String area = list.get(0).getArea();
-            long count = list.get(0).getCount();
-            if (count >= 0) {
-                avg = count;
-            }
-            resule.add(new NetFlowWaterPush(start, area, avg));
-        } else if (size > 1) {
-            //根据局点遍历
-            for (Entrance entranceOne : entrance) {
-                List<NetFlowWater> temp = new ArrayList<>();
-                String entranceNanme = entranceOne.getEntrance();
-                //遍历list结果集
-                for (int i = 0; i < size; i++) {
-                    String area = list.get(i).getArea();
-                    if (entranceNanme.equals(area)) {
-                        temp.add(list.get(i));
-                    }
-                }
-                long endCount = 0;
-                long startCount = 0;
-                long count = 0;
+        if (!ListUtils.isEmptyList(list)) {
+            int size = list.size();
+            if (size == 1) {
                 long avg = 0;
-                Date timeEnd;
-                Date timeStart;
-                int tempSize = temp.size();
-                for (int i = tempSize - 1; i > 0; i--) {
-                    endCount = temp.get(i).getCount();
-                    startCount = temp.get(i - 1).getCount();
-                    timeEnd = temp.get(i).getTime();
-                    timeStart = temp.get(i - 1).getTime();
-                    long timeSecond = (timeEnd.getTime() - timeStart.getTime()) / 1000;
-                    count = endCount - startCount;
-                    if (count >= 0) {
-                        avg = avg + count / timeSecond;
-                    } else {
-                        if (endCount > 0) {
-                            avg = avg + endCount / timeSecond;
+                String area = list.get(0).getArea();
+                long count = list.get(0).getCount();
+                if (count >= 0) {
+                    avg = count;
+                }
+                resule.add(new NetFlowWaterPush(start, area, avg));
+            } else if (size > 1) {
+                //根据局点遍历
+                for (Entrance entranceOne : entrance) {
+                    List<NetFlowWater> temp = new ArrayList<>();
+                    String entranceNanme = entranceOne.getEntrance();
+                    //遍历list结果集
+                    for (int i = 0; i < size; i++) {
+                        String area = list.get(i).getArea();
+                        if (entranceNanme.equals(area)) {
+                            temp.add(list.get(i));
                         }
                     }
+                    long endCount = 0;
+                    long startCount = 0;
+                    long count = 0;
+                    long avg = 0;
+                    Date timeEnd;
+                    Date timeStart;
+                    int tempSize = temp.size();
+                    for (int i = tempSize - 1; i > 0; i--) {
+                        endCount = temp.get(i).getCount();
+                        startCount = temp.get(i - 1).getCount();
+                        timeEnd = temp.get(i).getTime();
+                        timeStart = temp.get(i - 1).getTime();
+                        long timeSecond = (timeEnd.getTime() - timeStart.getTime()) / 1000;
+                        count = endCount - startCount;
+                        if (count >= 0) {
+                            avg = avg + count / timeSecond;
+                        } else {
+                            if (endCount > 0) {
+                                avg = avg + endCount / timeSecond;
+                            }
+                        }
+                    }
+                    if (tempSize > 1) {
+                        avg = avg / (size - 1);
+                    } else if (tempSize == 1) {
+                        avg = temp.get(0).getCount();
+                    } else {
+                        continue;
+                    }
+                    resule.add(new NetFlowWaterPush(start, temp.get(0).getArea(), avg));
                 }
-                if (tempSize > 1) {
-                    avg = avg / (size - 1);
-                } else if (tempSize == 1) {
-                    avg = temp.get(0).getCount();
-                }else {
+            } else {
+                long avg = 0;
+                avg = 0;
+            }
+            //映射地域
+            for (NetFlowWaterPush netFlowWaterPush : resule) {
+                String area = netFlowWaterPush.getArea();
+                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
+                if (uiCarrierDictInfo == null) {
                     continue;
                 }
-                resule.add(new NetFlowWaterPush(start, temp.get(0).getArea(), avg));
+                netFlowWaterPush.setArea(uiCarrierDictInfo.getItemValue());
             }
-        } else {
-            long avg = 0;
-            avg = 0;
         }
-        //映射地域
-        for (NetFlowWaterPush netFlowWaterPush : resule) {
-            String area = netFlowWaterPush.getArea();
-            UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-            if (uiCarrierDictInfo == null) {
-                continue;
-            }
-            netFlowWaterPush.setArea(uiCarrierDictInfo.getItemValue());
-        }
-        logger.info("互联网流量TOP10耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (resule.isEmpty() && OPENFALSEDATA) {
+        logger.info("互联网流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));
+        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
             logger.info("互联网流量TOP10------->测试数据");
             if (languageChose == 3) {
                 resule.add(new NetFlowWaterPush(start, "Астана", (long) (Math.random() * 10000)));

@@ -14,7 +14,7 @@ public interface BlockingDao {
 
     List<NtcEntranceReport> getDNSDeceiveInformationOnly(@Param("push") String push,@Param("start") String start, @Param("end") String end);
 
-    List<CfgTypeCount> getAllCfgInfoOnly(@Param("time") String time);
+    List<CfgTypeCount> getAllCfgInfoOnly();
 
     List<TimeTypeCount> get24hAllBlockEachProtocolOnly(@Param("push") String push,@Param("start") String start, @Param("end") String end);
 

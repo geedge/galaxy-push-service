@@ -97,7 +97,7 @@ from ntc_entrance_report WHERE report_time >= #{start}
     <select id="getPointMapOf10sOnly" resultType="com.nis.galaxy.domain.PointMap">
       SELECT  report_time time,s_ip src_ip,d_ip dst_ip,service type,sum count
         FROM ntc_service_behav_statistic
-        where report_time > DATE_SUB(NOW(),INTERVAL 8 HOUR)
+        where report_time > DATE_SUB(NOW(),INTERVAL 24 HOUR)
         ORDER BY report_time desc
         LIMIT 500;
     </select>
@@ -122,7 +122,6 @@ from ntc_entrance_report WHERE report_time >= #{start}
         SELECT service_id type, count(0) count
         FROM ui_cfg_num_statistics
         WHERE cfg_state = 1
-        and statistic_time < #{time}
       GROUP BY service_id
       ORDER BY count desc;
        ]]>

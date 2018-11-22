@@ -1,14 +1,12 @@
 package com.nis.galaxy.web.dao;
 
-import com.nis.galaxy.domain.AbnormalBean;
 import com.nis.galaxy.domain.NetWaterMonitor;
-import com.nis.galaxy.domain.NmsServiceBeanTmp;
+import com.nis.galaxy.domain.NmsServerBean;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author GouGe
@@ -16,13 +14,10 @@ import java.util.Map;
  */
 @Mapper
 public interface MonitorDao {
-    NmsServiceBeanTmp getMonitorOf1m01();
-
-    List<AbnormalBean> getMonitorOf1m02(long id);
-
 
     List<NetWaterMonitor> getNetWaterMonitor(@Param("push") String push,@Param("start") String start, @Param("end") String end, @Param("before") String before);
 
     Date getNetWaterMonitorLastTime(@Param("end") String end);
 
+    List<NmsServerBean> getSystemMonitor();
 }

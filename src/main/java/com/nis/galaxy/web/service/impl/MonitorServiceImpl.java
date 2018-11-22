@@ -4,6 +4,7 @@ import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
 import com.nis.galaxy.util.DateUtils;
+import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.MonitorDao;
 import com.nis.galaxy.web.service.MonitorService;
 import org.slf4j.Logger;
@@ -38,47 +39,36 @@ public class MonitorServiceImpl implements MonitorService {
         return myLoad.listUiCarrierDictInfo;
     }
 
-
+    /**
+     * 系统监控
+     * @return
+     */
     @Override
     public List<NmsServerBean> getMonitorOf1m() {
         List<NmsServerBean> list = new ArrayList<>();
-        NmsServiceBeanTmp nmsServerBeanTmp = new NmsServiceBeanTmp();
         long timeMillisStart = System.currentTimeMillis();
         try {
-            //查询
-            nmsServerBeanTmp = monitorDao.getMonitorOf1m01();
+            list = monitorDao.getSystemMonitor();
         } catch (Exception e) {
             logger.error("系统监控\t查询异常\tserviceImpl", e);
         }
-        List<AbnormalBean> abnormalBean = new ArrayList<>();
-        if (nmsServerBeanTmp != null) {
-            long id = nmsServerBeanTmp.getId();
-            abnormalBean = monitorDao.getMonitorOf1m02(id);
-            //结果的封装
-            NmsServerBean nmsServerBean = new NmsServerBean();
-            nmsServerBean.setTime(nmsServerBeanTmp.getTime());
-            nmsServerBean.setArea(nmsServerBeanTmp.getArea());
-            nmsServerBean.setTotal(Integer.parseInt(nmsServerBeanTmp.getTotal()));
-            nmsServerBean.setNormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
-            nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getAbnormal()));
-            nmsServerBean.setAbnormalmachines(abnormalBean);
-            list.add(nmsServerBean);
-            list.remove(null);
-        }
         logger.info("系统监控耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (list.isEmpty() && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
             logger.info("系统监控------->测试数据");
-            nmsServerBeanTmp = new NmsServiceBeanTmp(DateUtils.getDateTime(), "Астана", "" + (int) (Math.random() * 5000), (int) (Math.random() * 5000) + "", "2", 22);
-            abnormalBean.add(new AbnormalBean("competer1", "120.213." + (int) (Math.random() * 50)));
-            abnormalBean.add(new AbnormalBean("competer2", "120.213." + (int) (Math.random() * 20)));
-            //结果的封装
+            list = new ArrayList<>();
             NmsServerBean nmsServerBean = new NmsServerBean();
-            nmsServerBean.setTime(nmsServerBeanTmp.getTime());
-            nmsServerBean.setArea(nmsServerBeanTmp.getArea());
-            nmsServerBean.setTotal(Integer.parseInt(nmsServerBeanTmp.getTotal()));
-            nmsServerBean.setNormal(Integer.parseInt(nmsServerBeanTmp.getNormal()));
-            nmsServerBean.setAbnormal(Integer.parseInt(nmsServerBeanTmp.getAbnormal()));
-            nmsServerBean.setAbnormalmachines(abnormalBean);
+            nmsServerBean.setAbnormal(2);
+            nmsServerBean.setArea("Астана");
+            nmsServerBean.setNormal(8);
+            nmsServerBean.setSystem("ntc");
+            nmsServerBean.setTime(DateUtils.getDateTime());
+            nmsServerBean.setTotal(10);
+            AbnormalBean abnormalBean1 = new AbnormalBean("serverMachine01","10.3.48.6");
+            AbnormalBean abnormalBean2 = new AbnormalBean("serverMachine02","10.3.48.8");
+            ArrayList<AbnormalBean> abnormalBeans = new ArrayList<>();
+            abnormalBeans.add(abnormalBean1);
+            abnormalBeans.add(abnormalBean2);
+            nmsServerBean.setAbnormalmachines(abnormalBeans);
             list.add(nmsServerBean);
         }
         return list;
@@ -112,7 +102,7 @@ public class MonitorServiceImpl implements MonitorService {
             logger.error("网络流量监控\t查询异常\tserviceImpl", e);
             throw new RuntimeException();
         }
-        if (list.isEmpty() && OpenRecentDataTendency) {
+        if (ListUtils.isEmptyList(list) && OpenRecentDataTendency) {
             logger.warn("网络流量监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = monitorDao.getNetWaterMonitorLastTime(end);
@@ -123,7 +113,7 @@ public class MonitorServiceImpl implements MonitorService {
                 logger.error("网络流量监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (!list.isEmpty()) {
+        if (!ListUtils.isEmptyList(list)) {
             Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
             for (NetWaterMonitor netWaterMonitor : list) {
                 String area = netWaterMonitor.getArea();
@@ -134,7 +124,7 @@ public class MonitorServiceImpl implements MonitorService {
             }
         }
         logger.info("网络流量监控耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (list.isEmpty() && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
             logger.info("网络流量监控------->测试数据");
             if (languageChose == 3) {
                 list.add(new NetWaterMonitor(start, "Астана", "INOCTETS", (long) (Math.random() * 20000)));
