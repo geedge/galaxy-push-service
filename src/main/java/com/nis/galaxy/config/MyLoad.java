@@ -5,6 +5,7 @@ import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,8 @@ public class MyLoad {
 
 
     private int a = 1;
-
+    @Value("${dict.moment.switch}")
+    private boolean dictMomentSwitch;
     @Autowired
     DictService dictService;
     /**
@@ -74,9 +76,7 @@ public class MyLoad {
 
     @Scheduled(cron = "${dict.scheduled.cron.plan}")
     public void runMyLoad() {
-        logger.info("执行初始化字典表：地域表\t运营商表\t业务表\t协议表\t标签表");
-
-
+        logger.info("执行初始化字典表：地域表\t运营商表\t业务表\t协议表");
         List<UiAreaDictInfo> uiAreaDictInfo = new ArrayList<>();
         try {
             uiAreaDictInfo = dictService.getUiAreaDictInfo();
@@ -97,10 +97,12 @@ public class MyLoad {
         for (UiCarrierDictInfo carrierDictInfo : uiCarrierDictInfo) {
             listUiCarrierDictInfo.put(carrierDictInfo.getCarrierId(), carrierDictInfo);
         }
-        listUiCarrierDictInfo.put("0",new UiCarrierDictInfo("0","Астана"));
-        listUiCarrierDictInfo.put("1",new UiCarrierDictInfo("1","Астана"));
-        listUiCarrierDictInfo.put("2",new UiCarrierDictInfo("2","Алматы"));
-        listUiCarrierDictInfo.put("3",new UiCarrierDictInfo("3","Астана"));
+        if(dictMomentSwitch){
+            listUiCarrierDictInfo.put("0", new UiCarrierDictInfo("0", "Астана"));
+            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "Астана"));
+            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("2", "Алматы"));
+            listUiCarrierDictInfo.put("3", new UiCarrierDictInfo("3", "Астана"));
+        }
         logger.info("运营商表的预加载结果\t" + listUiCarrierDictInfo);
 
         List<NtcServiceDict> ntcServiceDict = new ArrayList<>();
@@ -128,7 +130,12 @@ public class MyLoad {
             }
         }
         logger.info("协议表的预加载结果为\t" + listProtocolDict);
+        logger.info("地域表\t运营商表\t业务表\t协议表初始化操作执行完成");
+    }
 
+    @Scheduled(cron = "${dict.tag.cron.plan}")
+    public void runTagDict() {
+        logger.info("执行初始化字典表：标签表");
         List<UiTagDictInfo> uiTagDicInfo = new ArrayList<>();
         try {
             uiTagDicInfo = dictService.getUiTagDicInfo();
@@ -141,14 +148,14 @@ public class MyLoad {
             }
         }
         logger.info("标签表的预加载结果为\t" + listUiTagDicInfo);
-        logger.info("初始化字典表操作执行完成");
+        logger.info("标签表初始化操作执行完成");
     }
-
     @Scheduled(fixedRate = 999999999)
     public void run() {
         if (a++ > 1) {
             return;
         }
         runMyLoad();
+        runTagDict();
     }
 }
