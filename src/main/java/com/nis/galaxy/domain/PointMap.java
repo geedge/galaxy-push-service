@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 /**
  * @author GouGe
  * @data 2018/8/28 19:45
@@ -23,11 +25,7 @@ public class PointMap {
     private String type; //    类型
     private long count;
 
-    public void setTime(String time) {
-        if (time != null && time.indexOf(".") > -1) {
-            this.time = time.substring(0, time.indexOf("."));
-        }else {
-            this.time=time;
-        };
+    public void setTime(Date time) {
+        this.time=DateUtils.formatDateTime(time);
     }
 }

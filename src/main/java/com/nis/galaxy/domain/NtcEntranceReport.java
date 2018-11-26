@@ -18,6 +18,6 @@ public class NtcEntranceReport {
 
     public String getTime() {
         time = DateUtils.getRangeOf5min(DateUtils.getDateTime());
-        return DateUtils.getBeforeNminOfTime(time, -5);
+        return time = DateUtils.getBeforeNminOfTime(time, -5);
     }
 }

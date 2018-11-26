@@ -3,8 +3,11 @@ package com.nis.galaxy.web.service;
 import com.nis.galaxy.domain.*;
 import java.util.List;
 public interface BlockingService {
-
-    List getAllBlockInformation(String start, String end);
+    /**
+     * 封堵信息整体显示
+     * @return
+     */
+    List getAllBlockInformation();
 
     List<NtcEntranceReport> getDNSDeceiveInformation(String start, String end);
 

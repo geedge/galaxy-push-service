@@ -54,7 +54,9 @@ public class BlockingServiceImp implements BlockingService {
      * @return
      */
     @Override
-    public List getAllBlockInformation(String start, String end) {
+    public List getAllBlockInformation() {
+        String end = DateUtils.getRangeOf5min(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, -5);
         List<NtcTotalReport> list = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
         try {
@@ -346,9 +348,9 @@ public class BlockingServiceImp implements BlockingService {
         if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
             logger.info("实时打点图------->测试数据");
             String time = DateUtils.getDateTime();
-            list.add(new PointMap(time, "103.227.81.43", "10.11.36.42", "HTTP Monitor", (int) (Math.random())));
-            list.add(new PointMap(time, "103.227.81.33", "10.11.36.4", "IP Address Monitor", (int) (Math.random())));
-            list.add(new PointMap(time, "103.227.81.15", "10.11.36.23", "HTTP Monitor", (int) (Math.random())));
+            list.add(new PointMap(time, "103.227.81.43", "10.11.36.42", "HTTP Monitor", (int) (Math.random()*100)));
+            list.add(new PointMap(time, "103.227.81.33", "10.11.36.4", "IP Address Monitor", (int) (Math.random()*100)));
+            list.add(new PointMap(time, "103.227.81.15", "10.11.36.23", "HTTP Monitor", (int) (Math.random()*100)));
         }
         return list;
     }

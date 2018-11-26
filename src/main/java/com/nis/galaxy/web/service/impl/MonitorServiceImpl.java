@@ -61,7 +61,7 @@ public class MonitorServiceImpl implements MonitorService {
             nmsServerBean.setArea("Астана");
             nmsServerBean.setNormal(8);
             nmsServerBean.setSystem("ntc");
-            nmsServerBean.setTime(DateUtils.getDateTime());
+            nmsServerBean.setTime(new Date());
             nmsServerBean.setTotal(10);
             AbnormalBean abnormalBean1 = new AbnormalBean("serverMachine01","10.3.48.6");
             AbnormalBean abnormalBean2 = new AbnormalBean("serverMachine02","10.3.48.8");

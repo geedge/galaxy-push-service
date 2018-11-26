@@ -50,12 +50,9 @@ public class ForBlockingInterface {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
         }
-        String now = DateUtils.getDateTime();
-        String end = DateUtils.getRangeOf5min(now);
-        String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            contentValue = blockingService.getAllBlockInformation(start, end);
+            contentValue = blockingService.getAllBlockInformation();
         } catch (Exception e) {
             logger.error("封堵信息整体显示\t查询异常\trestTemplate",e);
         }
