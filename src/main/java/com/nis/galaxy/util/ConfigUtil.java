@@ -75,7 +75,15 @@ public class ConfigUtil {
     }
 
     @Value("${t_loop}")
-    public void setTime(int time) {
-        ConfigUtil.time = time;
+    public void setTime(String time) {
+        if (time == null || "".equals(time)) {
+            ConfigUtil.time = 120000;
+            return;
+        }
+        try {
+            ConfigUtil.time = Integer.parseInt(time.trim());
+        } catch (Exception e) {
+            ConfigUtil.time = 120000;
+        }
     }
 }
