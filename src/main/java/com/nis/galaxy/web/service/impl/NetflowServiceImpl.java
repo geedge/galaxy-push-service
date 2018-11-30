@@ -3,6 +3,7 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.NetflowDao;
@@ -25,19 +26,11 @@ public class NetflowServiceImpl implements NetflowService {
     NetflowDao netflowDao;
     @Autowired
     MyLoad myLoad;
-    @Value("${Language.Chose}")
-    private int languageChose;
+
     @Value("${server.port}")
     private int serverPort;
-    @Value("${Open.False.Data}")
-    private boolean OPENFALSEDATA;
-    @Value("${Open.Recent.Data}")
-    private boolean OpenRecentData;
-    @Value("${Open.Recent.Data.Tendency}")
-    private boolean OpenRecentDataTendency;
 
     static String ip = "";
-    static String ipPort = "";
 
     static {
         try {
@@ -75,7 +68,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("5分钟内网络流量统计\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("5分钟内网络流量统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getNetflowStatistic5mLastTime(end);
@@ -98,7 +91,7 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         logger.info("5分钟内网络流量统计耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("5分钟内网络流量统计------->测试数据");
             int i = (int) (Math.random() * 1000);
             list.add(new TimeTypeCount(start, "HTTP", 3600 + i));
@@ -130,7 +123,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("1小时内网络协议统计\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("1小时内网络协议统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getProtocolStatisticOf1hLastTime(end);
@@ -155,7 +148,7 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         logger.info("1小时内网络协议统计耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("1小时内网络协议统计------->测试数据");
             int i = (int) (Math.random() * 5000);
             list.add(new NetflowProtocol(start, "GRE", 2100 + i, 25000 + i, 4000 + i));
@@ -188,7 +181,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("5分钟内活跃IP信息\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("5分钟内活跃IP信息\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getIpActiveInfoOf5minLastTime(end);
@@ -209,7 +202,7 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         logger.info("5分钟内活跃IP信息耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("5分钟内活跃IP信息------->测试数据");
             long c = (long) (Math.random() * 5000000);
             long b = (long) (Math.random() * 5000);
@@ -250,7 +243,7 @@ public class NetflowServiceImpl implements NetflowService {
             logger.error("地域流量\t查询异常\tserviceImpl", e);
             throw new RuntimeException();
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentDataTendency) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.tendencyData) {
             logger.warn("地域流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getAreaNetflowOf5minLastTime(end);
@@ -271,9 +264,9 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         logger.info("地域流量耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("地域流量------->测试数据");
-            if (languageChose == 3) {
+            if (ConfigUtil.languageChose == 3) {
                 list.add(new AreaBPSTime("Астана", (int) (Math.random() * 10000), DateUtils.getDateTime()));
             } else {
                 list.add(new AreaBPSTime("Astana", (int) (Math.random() * 10000), DateUtils.getDateTime()));
@@ -309,7 +302,7 @@ public class NetflowServiceImpl implements NetflowService {
             logger.error("端口流量\t查询异常\tserviceImpl", e);
             throw new RuntimeException();
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentDataTendency) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.tendencyData) {
             logger.warn("端口流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getPortNetflowOf5minLastTime(end);
@@ -321,7 +314,7 @@ public class NetflowServiceImpl implements NetflowService {
             }
         }
         logger.info("端口流量耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             list = new ArrayList<>();
             logger.info("端口流量------->测试数据");
             list.add(new PortBPSTime("xgei_6/1/12", (int) (Math.random() * 150), start));
@@ -346,7 +339,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("文本\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("文本------->测试数据");
             String rangeOfday = DateUtils.getRangeOfday(DateUtils.getDateTime());
             list.add(new NetflowMonitor("WEBSITE", "http://192.168.10.2/group1/M00/00/05/CgAG-VuuHZmADRhnAAADPT3-BI0965.jpg", rangeOfday));
@@ -379,7 +372,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("音视频\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("音视频------->测试数据");
             String rangeOfday = DateUtils.getRangeOfday(DateUtils.getDateTime());
             list.add(new NetflowMonitor("VIDEO", "http://192.168.10.2/group2/M00/00/06/AUDIO-UIYjkjrg-MP4.jpg", rangeOfday));
@@ -404,7 +397,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("APP\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("APP------->测试数据");
             String rangeOfday = DateUtils.getRangeOfday(DateUtils.getDateTime());
             list.add(new NetflowMonitor("Telegram", "http://192.168.10.2/group3/M00/00/06/APP-TYILOkjUO3-Telegram.jpg", rangeOfday));
@@ -431,7 +424,7 @@ public class NetflowServiceImpl implements NetflowService {
         } catch (Exception e) {
             logger.error("加密管控\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("加密管控------->测试数据");
             String rangeOfday = DateUtils.getRangeOfday(DateUtils.getDateTime());
             list.add(new NetflowMonitor("PROXY INTERCEPT", "http://192.168.10.2/group4/M00/00/06/PASS-YIHK-MMPE.jpg", rangeOfday));

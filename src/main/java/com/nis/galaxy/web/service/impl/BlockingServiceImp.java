@@ -4,6 +4,7 @@ import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.NtcServiceDict;
 import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.BlockingDao;
@@ -23,16 +24,6 @@ public class BlockingServiceImp implements BlockingService {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    @Value("${Language.Chose}")
-    private int languageChose;
-    @Value("${Open.False.Data}")
-    private boolean OPENFALSEDATA;
-    @Value("${Open.Recent.Data.Actual}")
-    private boolean OpenRecentDataActual;
-    @Value("${Open.Recent.Data.Tendency}")
-    private boolean OpenRecentDataTendency;
-    @Value("${Open.Recent.Data}")
-    private boolean OpenRecentData;
     @Autowired
     BlockingDao blockingDao;
     @Autowired
@@ -64,21 +55,30 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("封堵信息整体显示\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentDataActual) {
-            logger.warn("封堵信息整体显示\tNTC_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
-            try {
-                long timeMillis = System.currentTimeMillis();
-                Date lastTime = blockingDao.getAllBlockInformationLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = blockingDao.getAllBlockInformation(start, time, DateUtils.getAfter5min(time));
-                logger.trace("封堵信息整体显示\t最近数据查询耗时\t" + String.valueOf(System.currentTimeMillis() - timeMillis));
-            } catch (Exception e) {
-                logger.error("封堵信息整体显示\t最近数据\t查询异常\tserviceImpl", e);
+        if (ConfigUtil.actualData) {
+            if (list != null && list.size() == 1) {
+                NtcTotalReport temp = list.get(0);
+                long num = temp.getNetworkFlowNum() + temp.getMonitorNum() + temp.getRefluxConNum();
+                if (num == 0) {
+                    list = new ArrayList<>();
+                }
+            }
+            if (ListUtils.isEmptyList(list)) {
+                logger.warn("封堵信息整体显示\tNTC_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+                try {
+                    long timeMillis = System.currentTimeMillis();
+                    Date lastTime = blockingDao.getAllBlockInformationLastTime(end);
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = blockingDao.getAllBlockInformation(start, time, DateUtils.getAfter5min(time));
+                    logger.trace("封堵信息整体显示\t最近数据查询耗时\t" + String.valueOf(System.currentTimeMillis() - timeMillis));
+                } catch (Exception e) {
+                    logger.error("封堵信息整体显示\t最近数据\t查询异常\tserviceImpl", e);
+                }
             }
         }
         logger.info("封堵信息整体显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("封堵信息整体显示------->测试数据");
             int testInt = (int) (Math.random() * 100);
             long testLong = (long) (Math.random() * 1000);
@@ -105,7 +105,7 @@ public class BlockingServiceImp implements BlockingService {
             logger.error("DNS欺骗信息显示\t查询异常\tserviceImpl", e);
         }
 
-        if (ListUtils.isEmptyList(list) && OpenRecentDataActual) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.actualData) {
             logger.warn("DNS欺骗信息显示\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getDNSDeceiveInformationLastTime(end);
@@ -127,7 +127,7 @@ public class BlockingServiceImp implements BlockingService {
                 ntcEntranceReport.setArea(uiCarrierDictInfo.getItemValue());
             }
         }
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("DNS欺骗信息显示------->测试数据");
             list.add(new NtcEntranceReport(start, "Астана", (int) (Math.random() * 100)));
             list.add(new NtcEntranceReport(start, "Алматы", (int) (Math.random() * 100)));
@@ -163,7 +163,7 @@ public class BlockingServiceImp implements BlockingService {
             throw new RuntimeException();
         }
         //若查询结果为空，查询上时间段的数据
-        if (ListUtils.isEmptyList(list) && OpenRecentDataTendency) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.tendencyData) {
             logger.warn("24小时内全国范围阻断协议信息\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.get24hAllBlockEachProtocolOLastTime(end);
@@ -184,10 +184,10 @@ public class BlockingServiceImp implements BlockingService {
                     if (ntcServiceDict == null) {
                         continue;
                     }
-                    if (languageChose == 2) {
+                    if (ConfigUtil.languageChose == 2) {
                         //获取英文字段
                         timeTypeCount.setType(ntcServiceDict.getServiceNameEn());
-                    } else if (languageChose == 1) {
+                    } else if (ConfigUtil.languageChose == 1) {
                         //中文
                         timeTypeCount.setType(ntcServiceDict.getServiceNameZh());
                     } else {
@@ -198,7 +198,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         logger.info("24小时全国范围阻断协议信息耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("24小时全国范围阻断协议信息------->测试数据");
             list.add(new TimeTypeCount(start, "Protocol Identify Block", (int) (Math.random() * 100)));
             list.add(new TimeTypeCount(start, "HTTP(s) Redirect", (int) (Math.random() * 100)));
@@ -224,7 +224,7 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("封堵信息分布显示\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentDataActual) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.actualData) {
             logger.warn("封堵信息分布显示\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getDisBlockInformationLastTime(end);
@@ -245,7 +245,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         logger.info("封堵信息分布显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("封堵信息分布显示------->测试数据");
             list.add(new NtcDisReport(start, "Астана", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
             list.add(new NtcDisReport(start, "Алматы", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
@@ -269,7 +269,7 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("24小时内全国热力图\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("24小时内全国热力图\tNTC_SERVICE_BEHAV_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getAllHotStatistisLastTime(end);
@@ -292,9 +292,9 @@ public class BlockingServiceImp implements BlockingService {
                 if (ntcServiceDict1 == null) {
                     continue;
                 }
-                if (languageChose == 2) {
+                if (ConfigUtil.languageChose == 2) {
                     hotStatistic.setType(ntcServiceDict1.getServiceNameEn());
-                } else if (languageChose == 3) {
+                } else if (ConfigUtil.languageChose == 3) {
                     hotStatistic.setType(ntcServiceDict1.getServiceNameRu());
                 } else {
                     hotStatistic.setType(ntcServiceDict1.getServiceNameZh());
@@ -302,7 +302,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         logger.info("封堵信息分布显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("24小时内全国热力图------->测试数据");
             list.add(new HotStatistic(start, "Астана", "103.227.81.43", "10.11.36.42", "IP Address Monitor", (int) (Math.random() * 100)));
             list.add(new HotStatistic(start, "Астана", "103.227.81.1", "10.11.36.12", "HTTP Monitor", (int) (Math.random() * 100)));
@@ -334,9 +334,9 @@ public class BlockingServiceImp implements BlockingService {
                     if (ntcServiceDict == null) {
                         continue;
                     }
-                    if (languageChose == 2) {
+                    if (ConfigUtil.languageChose == 2) {
                         pointMap.setType(ntcServiceDict.getServiceNameEn());
-                    } else if (languageChose == 1) {
+                    } else if (ConfigUtil.languageChose == 1) {
                         pointMap.setType(ntcServiceDict.getServiceNameZh());
                     } else {
                         pointMap.setType(ntcServiceDict.getServiceNameRu());
@@ -345,12 +345,12 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         logger.info("实时打点图耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("实时打点图------->测试数据");
             String time = DateUtils.getDateTime();
-            list.add(new PointMap(time, "103.227.81.43", "10.11.36.42", "HTTP Monitor", (int) (Math.random()*100)));
-            list.add(new PointMap(time, "103.227.81.33", "10.11.36.4", "IP Address Monitor", (int) (Math.random()*100)));
-            list.add(new PointMap(time, "103.227.81.15", "10.11.36.23", "HTTP Monitor", (int) (Math.random()*100)));
+            list.add(new PointMap(time, "103.227.81.43", "10.11.36.42", "HTTP Monitor", (int) (Math.random() * 100)));
+            list.add(new PointMap(time, "103.227.81.33", "10.11.36.4", "IP Address Monitor", (int) (Math.random() * 100)));
+            list.add(new PointMap(time, "103.227.81.15", "10.11.36.23", "HTTP Monitor", (int) (Math.random() * 100)));
         }
         return list;
     }
@@ -373,7 +373,7 @@ public class BlockingServiceImp implements BlockingService {
             logger.error("热力图接口\t查询异常\tserviceImpl", e);
         }
         //如果此次没有查询到数据查上一个5min的数据
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("热力图接口\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getDisBlockMapLastTime(end);
@@ -395,7 +395,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         logger.info("热力图接口耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("热力图接口------->测试数据");
             list.add(new AreaCount(start, "Астана", (int) (Math.random() * 1000)));
             list.add(new AreaCount(start, "Алматы", (int) (Math.random() * 1000)));
@@ -418,15 +418,15 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("全国协议配置信息\t查询异常\tserviceImpl", e);
         }
-        if (!ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (!ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             for (CfgTypeCount cfgTypeCount : list) {
                 NtcServiceDict ntcServiceDict = listNtcService.get(cfgTypeCount.getType());
                 if (ntcServiceDict == null) {
                     continue;
                 }
-                if (languageChose == 2) {
+                if (ConfigUtil.languageChose == 2) {
                     cfgTypeCount.setType(ntcServiceDict.getServiceNameEn());
-                } else if (languageChose == 1) {
+                } else if (ConfigUtil.languageChose == 1) {
                     cfgTypeCount.setType(ntcServiceDict.getServiceNameZh());
                 } else {
                     cfgTypeCount.setType(ntcServiceDict.getServiceNameRu());
@@ -434,7 +434,7 @@ public class BlockingServiceImp implements BlockingService {
             }
         }
         logger.info("全国协议配置信息耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("全国协议配置信息------->测试数据");
             String time = DateUtils.getRangeOfday(DateUtils.getDateTime());
             list.add(new CfgTypeCount(time, "APP Monitor", (int) (Math.random() * 20)));

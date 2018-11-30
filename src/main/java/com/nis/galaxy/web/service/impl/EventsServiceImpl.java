@@ -3,6 +3,7 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.NtcServiceDict;
+import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.EventsDao;
@@ -23,10 +24,7 @@ public class EventsServiceImpl implements EventsService {
     EventsDao eventsDao;
     @Autowired
     MyLoad myLoad;
-    @Value("${Language.Chose}")
-    private int languageChose;
-    @Value("${Open.False.Data}")
-    private boolean OPENFALSEDATA;
+
     @Value("${Device.Server.Num}")
     private int DeviceServerNum;
     @Value("${Device.CoreSwtich.Num}")
@@ -37,8 +35,6 @@ public class EventsServiceImpl implements EventsService {
     private int DeviceAsemNum;
     @Value("${Device.Adc.Num}")
     private int DeviceAdcNum;
-    @Value("${Open.Recent.Data}")
-    private boolean OpenRecentData;
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
@@ -61,7 +57,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("系统总计\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
@@ -73,7 +69,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("系统总计耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("系统总计------->测试数据");
             int i = (int) (Math.random() * 20);
             list.add(new SystemTotal(i + 182, i + 2836, i + 3026, i + 442688, i + 4565, i + 463));
@@ -97,7 +93,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("特定APP访问监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
@@ -109,7 +105,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("特定APP访问监控耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("特定APP访问监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsAppMonitor(start, "Youtube", i + 66));
@@ -137,7 +133,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("来函统计报表\t查询异常\tserviceImpl", e);
         }
         logger.info("来函统计报表耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("来函统计报表------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsLetterCount("2018-04-05", "Request Title", 12 + i));
@@ -166,7 +162,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getServiceCountLastTime(end);
@@ -182,18 +178,18 @@ public class EventsServiceImpl implements EventsService {
                 String type = eventsServiceCount.getType();
                 NtcServiceDict ntcServiceDict = listNtcService.get(type);
                 if (ntcServiceDict != null) {
-                    if (languageChose == 2) {
+                    if (ConfigUtil.languageChose == 2) {
                         eventsServiceCount.setType(ntcServiceDict.getServiceNameEn());
-                    } else if (languageChose == 1) {
+                    } else if (ConfigUtil.languageChose == 1) {
                         eventsServiceCount.setType(ntcServiceDict.getServiceNameZh());
-                    } else if (languageChose == 3) {
+                    } else if (ConfigUtil.languageChose == 3) {
                         eventsServiceCount.setType(ntcServiceDict.getServiceNameRu());
                     }
                 }
             }
         }
         logger.info("业务类型统计报表耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("业务类型统计报表------->测试数据");
             list.add(new EventsServiceCount(start, "Website Keyword Monitor", (int) (Math.random() * 100)));
             list.add(new EventsServiceCount(start, "HTTP(s) Monitor", (int) (Math.random() * 100)));
@@ -217,7 +213,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("重点保障事件总览\t查询异常\tserviceImpl", e);
         }
         logger.info("重点保障事件总览耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("重点保障事件总览------->测试数据");
             list.add(new EventsKeyPointSafaguardThing(start, "double agent", start, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
             list.add(new EventsKeyPointSafaguardThing(start, "Second task", start, (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100)));
@@ -241,7 +237,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("特定网站监控\t查询异常\tserviceImpl", e);
         }
         logger.info("特定网站监控耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("特定网站监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsSpecificWebsites(end, "Facebook", i + 100));
@@ -274,7 +270,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("事件监测\t查询异常\tserviceImpl", e);
         }
         logger.info("事件监测耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("事件监测------->测试数据");
             list.add(new EventsMonitor("double agent", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
             list.add(new EventsMonitor("nuclear program", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
@@ -303,7 +299,7 @@ public class EventsServiceImpl implements EventsService {
             logger.error("事件封堵\t查询异常\tserviceImpl", e);
         }
         logger.info("事件封堵耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("事件封堵------->测试数据");
             list.add(new EventsBlock("spy", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
             list.add(new EventsBlock("test", (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), (int) (Math.random() * 100), end));
@@ -332,7 +328,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("音频监控\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("音频监控\tMM_AUDIO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
@@ -344,7 +340,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("音频监控耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("音频监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsAudioMonitor("" + (int) (Math.random() * 50), i + 160, "http://baidu/video/er/h66"));
@@ -377,7 +373,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("视频监控\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("视频监控\tMM_VIDEO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getVedioMonitorLastTime(end);
@@ -389,7 +385,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("视频监控耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("视频监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsVedioMonitor("" + (int) (Math.random() * 50), i + 320, "http://baidu/video/eefv/h66"));
@@ -422,7 +418,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("图片监控\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("图片监控\tMM_PIC_REPORT" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getImageMonitorLastTime(end);
@@ -434,7 +430,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("视频监控耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("图片监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsImageMonitor("" + (int) (Math.random() * 50), i + 320, "http://baidu/dfedf/h66"));
@@ -466,7 +462,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("VOIP监控\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("VOIP监控\tMM_VOIP_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getVoipMonitorLastTime(end);
@@ -477,7 +473,7 @@ public class EventsServiceImpl implements EventsService {
                 logger.error("VOIP监控\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("VOIP监控------->测试数据");
             int i = (int) (Math.random() * 100);
             list.add(new EventsVoipMonitor("" + (int) (Math.random() * 10000) + 1982345254, i + 560, "http://baidu/iphi/picture/grennd/efd=3"));
@@ -527,7 +523,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("目标行为网络监测\t查询异常\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getTargetNetworkLastTime(end);
@@ -539,7 +535,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("目标行为网络监测耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        //&& OPENFALSEDATA
+        //&& ConfigUtil.testData
         if (ListUtils.isEmptyList(list)) {
             logger.info("目标行为网络监测------->测试数据");
             int i = (int) (Math.random() * 100);
@@ -584,7 +580,7 @@ public class EventsServiceImpl implements EventsService {
         } catch (Exception e) {
             logger.error("运行状态\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("运行状况\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getRunningStateLastTime(end);
@@ -597,7 +593,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         logger.info("运行状况耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("运行状况------->测试数据");
             list.add(new EventsRunningState((int) (Math.random() * 300), (int) (Math.random() * 200), (int) (Math.random() * 300)));
         }

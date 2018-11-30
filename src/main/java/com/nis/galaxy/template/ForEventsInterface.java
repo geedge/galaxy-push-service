@@ -5,12 +5,14 @@ import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.config.PushParams;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.service.EventsService;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Component
+@Async
 public class ForEventsInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -47,6 +50,7 @@ public class ForEventsInterface {
      * 系统总计 1天/条
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "system.total", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getSystemTotalOf1Day() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -71,6 +75,7 @@ public class ForEventsInterface {
      * 特定APP访问监控 1小时条
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "specific.app", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getSpecifiedAPPMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -94,6 +99,7 @@ public class ForEventsInterface {
      * 来函统计报表 一天上送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "letter.count", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getLetterCount() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -115,6 +121,7 @@ public class ForEventsInterface {
      * 业务类型统计报表 一天上送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "trans.type", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getServiceCount() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -138,6 +145,7 @@ public class ForEventsInterface {
      * 重点保障事件总览 一天上送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "events.key.protection", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getKeyPointSafaguardThing() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -160,6 +168,7 @@ public class ForEventsInterface {
      * 特定网站监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "specific.websites", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getSpecificWebsites() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -182,6 +191,7 @@ public class ForEventsInterface {
      * 事件监测 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "events.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getEventsMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -204,6 +214,7 @@ public class ForEventsInterface {
      * 事件封堵 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "events.block", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getEventsBlock() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -226,6 +237,7 @@ public class ForEventsInterface {
      * 音频监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "audio.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getEventsAudioMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -250,6 +262,7 @@ public class ForEventsInterface {
      * 视频监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "vedio.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getVedioMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -273,6 +286,7 @@ public class ForEventsInterface {
      * 图片监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "image.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getImageMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -296,6 +310,7 @@ public class ForEventsInterface {
      * VOIP监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "voip.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getVoipMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -320,6 +335,7 @@ public class ForEventsInterface {
      * 网络行为预警  DDOS告警 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "ddos.alarm", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getDdosAlarm() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -343,6 +359,7 @@ public class ForEventsInterface {
      * 目标行为网络监测 24小时送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "target.network", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getTargetNetwork() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -367,6 +384,7 @@ public class ForEventsInterface {
      * 硬件设备统计 24小时送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "device.num", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getDeviceNum() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -390,6 +408,7 @@ public class ForEventsInterface {
      * 运行状况 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "running.state", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getRunningState() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -413,6 +432,7 @@ public class ForEventsInterface {
 
 
     @Scheduled(fixedRate = 999999999)
+    @SchedulerLock(name = "FirstPushEvents", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void run() throws InterruptedException {
         if (a++ > 1) {
             return;

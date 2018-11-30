@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
  * @author GouGe
  * @data 2018/9/5 11:48
  */
-@Configuration
+//配置定时任务锁时：配置线程池导致shedlock无法起作用
+//@Configuration
 public class AsyncConfig implements SchedulingConfigurer {
 
     @Value("${SCHEDULED.THREAD.POOL}")

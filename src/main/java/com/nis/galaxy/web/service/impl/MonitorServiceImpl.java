@@ -3,6 +3,7 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.MonitorDao;
@@ -23,16 +24,11 @@ import java.util.*;
 public class MonitorServiceImpl implements MonitorService {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${Language.Chose}")
-    private int languageChose;
+
     @Autowired
     MonitorDao monitorDao;
-    @Value("${Open.False.Data}")
-    private boolean OPENFALSEDATA;
     @Autowired
     MyLoad myLoad;
-    @Value("${Open.Recent.Data.Tendency}")
-    private boolean OpenRecentDataTendency;
 
     //运营商表
     public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
@@ -53,7 +49,7 @@ public class MonitorServiceImpl implements MonitorService {
             logger.error("系统监控\t查询异常\tserviceImpl", e);
         }
         logger.info("系统监控耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("系统监控------->测试数据");
             list = new ArrayList<>();
             NmsServerBean nmsServerBean = new NmsServerBean();
@@ -102,7 +98,7 @@ public class MonitorServiceImpl implements MonitorService {
             logger.error("网络流量监控\t查询异常\tserviceImpl", e);
             throw new RuntimeException();
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentDataTendency) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.tendencyData) {
             logger.warn("网络流量监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = monitorDao.getNetWaterMonitorLastTime(end);
@@ -124,9 +120,9 @@ public class MonitorServiceImpl implements MonitorService {
             }
         }
         logger.info("网络流量监控耗时："+(System.currentTimeMillis()-timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("网络流量监控------->测试数据");
-            if (languageChose == 3) {
+            if (ConfigUtil.languageChose == 3) {
                 list.add(new NetWaterMonitor(start, "Астана", "INOCTETS", (long) (Math.random() * 20000)));
                 list.add(new NetWaterMonitor(start, "Астана", "OUTOCTETS", (long) (Math.random() * 20000)));
             } else {

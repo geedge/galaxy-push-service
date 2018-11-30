@@ -3,7 +3,7 @@ Properties:
   - name: log.level.galaxy
     value: info
   - name: log.path
-    value: F:/log/1120/idea
+    value: /home/ceiec/galaxy-push-service/logs
   - name: project.name
     value: galaxy-push-service
 Appenders:

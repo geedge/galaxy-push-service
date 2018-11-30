@@ -4,12 +4,14 @@ import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.config.PushParams;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.service.MonitorService;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +23,7 @@ import java.util.List;
  * @data 2018/9/8 15:59
  */
 @Component
+@Async
 public class ForMonitorInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
@@ -49,6 +52,7 @@ public class ForMonitorInterface {
      * 系统监控
      */
     @Scheduled(cron = "${1m.scheduled.cron.plan}")
+    @SchedulerLock(name = "system_monitoring.global.gis", lockAtLeastForString = "PT20S",lockAtMostForString = "PT40S")
     public void getIpActiveInfoOf5min() {
         if (!Boolean.parseBoolean(scheduledMonitorEnable)) {
             return;
@@ -60,7 +64,7 @@ public class ForMonitorInterface {
             logger.info("系统监控\t查询异常\trestTemplate", e);
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"system_monitoring.global.gis", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "system_monitoring.global.gis", contentValue);
         logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_MONITOR, httpEntity, String.class);
         logger.info("系统监控\t推送返回结果" + response);
@@ -70,6 +74,7 @@ public class ForMonitorInterface {
      * 网络流量监控_5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "network.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetWaterMonitor() {
         if (!Boolean.parseBoolean(scheduledMonitorEnable)) {
             return;
@@ -79,21 +84,23 @@ public class ForMonitorInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            contentValue = monitorService.getNetWaterMonitor(start,end,areaNetWaterMonitorExpTimes);
+            contentValue = monitorService.getNetWaterMonitor(start, end, areaNetWaterMonitorExpTimes);
         } catch (Exception e) {
-            logger.info("网络流量监控\t查询异常\trestTemplate"+ ++areaNetWaterMonitorExpTimes, e);
+            logger.info("网络流量监控\t查询异常\trestTemplate" + ++areaNetWaterMonitorExpTimes, e);
         }
         if (areaNetWaterMonitorExpTimes > 0 && contentValue != null) {
             areaNetWaterMonitorExpTimes = 0;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"network.waterflow", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "network.waterflow", contentValue);
         logger.info("开始推送======>>>网络流量监控\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
         logger.info("网络流量监控\t推送返回结果" + response);
     }
+
     @Scheduled(fixedRate = 999999999)
-    public void run()  throws InterruptedException{
+    @SchedulerLock(name = "FirstPushMonitor", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    public void run() throws InterruptedException {
         if (a++ > 1) {
             return;
         }

@@ -6,6 +6,7 @@ import com.nis.galaxy.domain.IpActiveInt;
 import com.nis.galaxy.domain.NetFlowWater;
 import com.nis.galaxy.domain.NetFlowWaterPush;
 import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.NetflowTopNDao;
@@ -26,12 +27,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     NetflowTopNDao netflowTopNDao;
     @Autowired
     MyLoad myLoad;
-    @Value("${Language.Chose}")
-    private int languageChose;
-    @Value("${Open.False.Data}")
-    private boolean OPENFALSEDATA;
-    @Value("${Open.Recent.Data}")
-    private boolean OpenRecentData;
+
 
 
     //运营商表
@@ -56,7 +52,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("5分钟内活跃IP流量TOP10\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
@@ -77,7 +73,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             }
         }
         logger.info("5分钟内活跃IP流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             int i = (int) (Math.random() * 200);
             logger.info("5分钟内活跃IP流量TOP10------->测试数据");
             list.add(new IpActiveInt(start, "Астана", "119.108.229.153", i + 20));
@@ -113,7 +109,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         } catch (Exception e) {
             logger.error("互联网流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && OpenRecentData) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
             logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);
@@ -201,9 +197,9 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             }
         }
         logger.info("互联网流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && OPENFALSEDATA) {
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("互联网流量TOP10------->测试数据");
-            if (languageChose == 3) {
+            if (ConfigUtil.languageChose == 3) {
                 resule.add(new NetFlowWaterPush(start, "Астана", (long) (Math.random() * 10000)));
             } else {
                 resule.add(new NetFlowWaterPush(start, "Astana", (long) (Math.random() * 10000)));

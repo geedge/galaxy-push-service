@@ -1,5 +1,6 @@
 package com.nis.galaxy.common;
 
+import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.JsonMapper;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class InterfaceBase {
     /**
      * 传送失败后t_loop后再次推送
      */
-    private static int t_loop = 120 * 1000;
+    private static int t_loop = ConfigUtil.time;
 
 
     /**

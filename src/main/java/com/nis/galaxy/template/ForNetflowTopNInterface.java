@@ -4,12 +4,14 @@ import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.config.PushParams;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.service.NetflowTopNService;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Component
+@Async
 public class ForNetflowTopNInterface {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -43,6 +46,7 @@ public class ForNetflowTopNInterface {
      * 5分钟内活跃IP流量TOP10
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.5min.ip.active.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getIpActiveStatisticOf5m() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -68,6 +72,7 @@ public class ForNetflowTopNInterface {
      * 1小时内互联网流量TOP10
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.1hour.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetFlowWaterTop10() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -94,6 +99,7 @@ public class ForNetflowTopNInterface {
      * 24小时内互联网流量TOP10
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.24hour.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetFlowWaterTop10Of24h() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -120,6 +126,7 @@ public class ForNetflowTopNInterface {
      * 7天内互联网流量TOP10
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.7day.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetFlowWaterTop10Of7Day() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -144,6 +151,7 @@ public class ForNetflowTopNInterface {
 
 
     @Scheduled(fixedRate = 999999999)
+    @SchedulerLock(name = "FirstPushNetflowTopN", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void run() throws InterruptedException {
         if (a++ > 1) {
             return;

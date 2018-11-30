@@ -4,12 +4,14 @@ import com.nis.galaxy.common.InterfaceBase;
 import com.nis.galaxy.config.PushParams;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.web.service.NetflowService;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Component
+@Async
 public class ForNetflowInterface {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -46,6 +49,7 @@ public class ForNetflowInterface {
      * 5分钟内网络流量统计
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.5min.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetflowStatistic5m() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -71,6 +75,7 @@ public class ForNetflowInterface {
      * 1小时内网络协议统计
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.1hour.protocol", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getProtocolStatisticOf1h() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -96,6 +101,7 @@ public class ForNetflowInterface {
      * 5分钟内活跃IP信息
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.5min.ip.active", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getIpActiveInfoOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -123,6 +129,7 @@ public class ForNetflowInterface {
      * 地域流量 5分钟/次
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.area.netflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getAreaNetflowOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -152,6 +159,7 @@ public class ForNetflowInterface {
      * 端口流量 5分钟/次
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.port.netflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getPortNetflowOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -181,6 +189,7 @@ public class ForNetflowInterface {
      * 文本 天/次
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.monitor.txt", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorTxt() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -204,6 +213,7 @@ public class ForNetflowInterface {
      * 音视频 天/次
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.monitor.video", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorVideo() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -227,6 +237,7 @@ public class ForNetflowInterface {
      * APP 天/次
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.monitor.app", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorApp() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -251,6 +262,7 @@ public class ForNetflowInterface {
      * 加密类型 天/次
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.monitor.encrypt", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorEncrypt() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -273,6 +285,7 @@ public class ForNetflowInterface {
 
 
     @Scheduled(fixedRate = 999999999)
+    @SchedulerLock(name = "FirstPushNetflow", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void run() throws InterruptedException {
         if (a++ > 1) {
             return;
