@@ -63,6 +63,10 @@ public class ForMonitorInterface {
         } catch (Exception e) {
             logger.info("系统监控\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("系统监控\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "system_monitoring.global.gis", contentValue);
         logger.info("开始推送======>>>系统监控\t请求头和请求体：" + httpEntity);
@@ -90,6 +94,10 @@ public class ForMonitorInterface {
         }
         if (areaNetWaterMonitorExpTimes > 0 && contentValue != null) {
             areaNetWaterMonitorExpTimes = 0;
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("网络流量监控\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "network.waterflow", contentValue);

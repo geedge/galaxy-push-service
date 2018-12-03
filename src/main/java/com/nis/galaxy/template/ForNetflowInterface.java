@@ -64,6 +64,10 @@ public class ForNetflowInterface {
         } catch (Exception e) {
             logger.error("5分钟内网络流量统计\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("5分钟内网络流量统计\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.5min.waterflow", contentValue);
         logger.info("开始推送========>>>5分钟内网络流量统计 请求头和请求体：" + httpEntity);
@@ -89,6 +93,10 @@ public class ForNetflowInterface {
             contentValue = netflowService.getProtocolStatisticOf1h(start, end);
         } catch (Exception e) {
             logger.error("1小时内网络协议统计\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("1小时内网络协议统计\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.1hour.protocol", contentValue);
@@ -116,6 +124,10 @@ public class ForNetflowInterface {
 
         } catch (Exception e) {
             logger.error("5分钟内活跃IP信息\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("5分钟内活跃IP信息\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.5min.ip.active", contentValue);
@@ -148,6 +160,10 @@ public class ForNetflowInterface {
             //清零查询异常次数
             areaNetqueryExpTimes = 0;
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("地域流量\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.area.netflow", contentValue);
         logger.info("开始推送======>>>地域流量 请求头和请求体：" + httpEntity);
@@ -177,6 +193,10 @@ public class ForNetflowInterface {
             //清零查询异常次数
             portNetqueryExpTimes = 0;
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("端口流量\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.port.netflow", contentValue);
         logger.info("开始推送======>>>端口流量 请求头和请求体：" + httpEntity);
@@ -201,6 +221,10 @@ public class ForNetflowInterface {
         } catch (Exception e) {
             logger.error("文本\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("文本\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.txt", contentValue);
         logger.info("开始推送======>>>文本 请求头和请求体：" + httpEntity);
@@ -224,6 +248,10 @@ public class ForNetflowInterface {
             contentValue = netflowService.getNetflowMonitorVideo();
         } catch (Exception e) {
             logger.error("音视频\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("音视频\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.video", contentValue);
@@ -250,6 +278,10 @@ public class ForNetflowInterface {
         } catch (Exception e) {
             logger.error("APP\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("APP\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.app", contentValue);
         logger.info("开始推送======>>>APP 请求头和请求体：" + httpEntity);
@@ -274,6 +306,10 @@ public class ForNetflowInterface {
 
         } catch (Exception e) {
             logger.error("加密管控\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("加密管控\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.monitor.encrypt", contentValue);

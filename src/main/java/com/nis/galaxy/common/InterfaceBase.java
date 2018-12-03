@@ -40,7 +40,10 @@ public class InterfaceBase {
      * @param httpEntity 请求头
      */
     public static ResponseEntity<String> pushStart(RestTemplate restTemplate, String url, HttpEntity httpEntity) {
-        String s = httpEntity.getBody().toString();
+        String s = null;
+        if (httpEntity != null) {
+            s = String.valueOf(httpEntity.getBody());
+        }
         ResponseEntity<String> response = null;
         try {
             response = restTemplate.postForEntity(url, httpEntity, String.class);
@@ -94,9 +97,10 @@ public class InterfaceBase {
 
     /**
      * 请求头和请求体的封装
-     * @param headers  请求头信息
-     * @param reserve 预留字段
-     * @param tagValue  tag标签
+     *
+     * @param headers      请求头信息
+     * @param reserve      预留字段
+     * @param tagValue     tag标签
      * @param contentValue 请求数据
      * @return
      */
@@ -111,5 +115,17 @@ public class InterfaceBase {
         String params = JsonMapper.toJsonString(map);
         HttpEntity<String> httpEntity = new HttpEntity<>(params, headers);
         return httpEntity;
+    }
+
+    /**
+     * 判断contentValue为空或者null
+     * @param contentValue
+     * @return
+     */
+    public static boolean contentValueIsEmpty(List contentValue) {
+        if (contentValue == null || contentValue.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 }

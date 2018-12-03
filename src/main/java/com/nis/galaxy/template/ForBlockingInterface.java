@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ForBlockingInterface {
      * 封堵信息整体显示 5min/次
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.global", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "blocking.global", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getAllBlockInformation() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -59,6 +60,10 @@ public class ForBlockingInterface {
             contentValue = blockingService.getAllBlockInformation();
         } catch (Exception e) {
             logger.error("封堵信息整体显示\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("封堵信息整体显示无数据\t取消本次推送");
+            return;
         }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.global", contentValue);
         logger.info("开始推送======>>>封堵信息整体显示\t请求头和请求体：" + httpEntity);
@@ -70,7 +75,7 @@ public class ForBlockingInterface {
      * 封堵信息分布显示 5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.area",lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "blocking.area", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getDisBlockInformation() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -84,7 +89,10 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("封堵信息分布显示\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("封堵信息分布显示\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.area", contentValue);
         logger.info("开始推送======>>>封堵信息分布显示\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -95,7 +103,7 @@ public class ForBlockingInterface {
      * DNS欺骗信息显示 5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.dns.deceive",lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "blocking.dns.deceive", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getDNSDeceiveInformation() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -110,7 +118,10 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("DNS欺骗信息显示\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("DNS欺骗信息显示\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.dns.deceive", contentValue);
         logger.info("开始推送======>>>DNS欺骗信息显示\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -121,7 +132,7 @@ public class ForBlockingInterface {
      * 24小时内全国范围阻断协议信息 5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.24hour.global.protocol.block", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "blocking.24hour.global.protocol.block", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void get24hAllBlockEachProtocol() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -138,8 +149,10 @@ public class ForBlockingInterface {
         if (AllBlockEachProtocolExpTimes > 0 && contentValue != null) {
             AllBlockEachProtocolExpTimes = 0;
         }
-
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("24小时内全国范围阻断协议信息\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.24hour.global.protocol.block", contentValue);
         logger.info("开始推送======>>>24小时内全国范围阻断协议信息\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -150,7 +163,7 @@ public class ForBlockingInterface {
      * 24小时内全国热力图 5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.24hour.thermodynamic", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "blocking.24hour.thermodynamic", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getAllHotStatistis() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -165,7 +178,10 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("24小时内全国热力图\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("24小时内全国热力图\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.24hour.thermodynamic", contentValue);
         logger.info("开始推送======>>>24小时内全国热力图\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -177,7 +193,7 @@ public class ForBlockingInterface {
      * 实时打点图 10s
      */
     @Scheduled(cron = "${10s.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.realtime.point", lockAtLeastForString = "PT4S",lockAtMostForString = "PT8S")
+    @SchedulerLock(name = "blocking.realtime.point", lockAtLeastForString = "PT4S", lockAtMostForString = "PT8S")
     public void getPointMapOf10s() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -190,7 +206,10 @@ public class ForBlockingInterface {
             logger.error("实时打点图\t查询异常\trestTemplate", e);
 
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("实时打点图\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.realtime.point", contentValue);
         logger.info("开始推送======>>>实时打点图\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = restTemplate.postForEntity(REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity, String.class);
@@ -202,7 +221,7 @@ public class ForBlockingInterface {
      * 热力图接口 5min
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.thermodynamic", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "blocking.thermodynamic", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getDisBlockMap() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -217,7 +236,10 @@ public class ForBlockingInterface {
         } catch (Exception e) {
             logger.error("热力图接口\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("热力图接口\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.thermodynamic", contentValue);
         logger.info("开始推送======>>>热力图接口\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -228,7 +250,7 @@ public class ForBlockingInterface {
      * 全国协议配置信息 所有/24h
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.global.protocol.config", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "blocking.global.protocol.config", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getAllCfgInfo() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -241,7 +263,10 @@ public class ForBlockingInterface {
             logger.error("全国协议配置信息\t查询异常\trestTemplate", e);
 
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("全国协议配置信息\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "blocking.global.protocol.config", contentValue);
         logger.info("开始推送======>>>全国协议配置信息 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -249,7 +274,7 @@ public class ForBlockingInterface {
     }
 
     @Scheduled(fixedRate = 999999999)
-    @SchedulerLock(name = "FirstPushBlockingInterface", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "FirstPushBlockingInterface", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void run() throws InterruptedException {
         if (a++ > 1) {
             return;

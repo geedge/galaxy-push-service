@@ -63,7 +63,10 @@ public class ForBlockingTopNInterface {
         } catch (Exception e) {
             logger.error("24小时内区域阻断协议TOP10\t查询异常\trestTemplate", e);
         }
-        //请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("24小时内区域阻断协议TOP10\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.24hour.area.protocol.block", contentValue);
         logger.info("开始推送======>>>24小时内区域阻断协议TOP10\t请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -89,7 +92,10 @@ public class ForBlockingTopNInterface {
         } catch (Exception e) {
             logger.error("1小时内全国阻断URLTOP10\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("1小时内全国阻断URLTOP10\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.1hour.url.top_10", contentValue);
         logger.info("开始推送======>>>1小时内全国阻断URLTOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -115,7 +121,10 @@ public class ForBlockingTopNInterface {
         } catch (Exception e) {
             logger.error("1小时内全国阻断网站TOP10\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("1小时内全国阻断网站TOP10\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.1hour.website.top_10", contentValue);
         logger.info("开始推送======>>>1小时内全国阻断网站TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -144,7 +153,10 @@ public class ForBlockingTopNInterface {
         } catch (Exception e) {
             logger.error("5分钟内全国阻断URLTOP10\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("5分钟内全国阻断URLTOP10\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.5minute.url.top_10", contentValue);
         logger.info("开始推送======>>>5分钟内全国阻断URLTOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -172,7 +184,10 @@ public class ForBlockingTopNInterface {
         } catch (Exception e) {
             logger.error("5分钟内全国阻断网站TOP10\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("5分钟内全国阻断网站TOP10\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"blocking.5minute.website.top_10", contentValue);
         logger.info("开始推送======>>>5分钟内全国阻断网站TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);
@@ -199,7 +214,10 @@ public class ForBlockingTopNInterface {
         } catch (Exception e) {
             logger.error("1小时内全国阻断标签TOP10\t查询异常\trestTemplate", e);
         }
-        // 请求头和请求体
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("1小时内全国阻断标签TOP10\t无数据\t取消本次推送");
+            return;
+        }
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"netflow.1hour.keyword.top_10", contentValue);
         logger.info("开始推送======>>>1小时内全国阻断标签TOP10 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_BLOCKING, httpEntity);

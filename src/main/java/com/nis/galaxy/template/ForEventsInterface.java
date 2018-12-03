@@ -64,6 +64,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("系统总计\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"system.total", contentValue);
         logger.info("开始推送=======>>系统总计 请求头和请求体：" + httpEntity);
@@ -89,6 +93,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("特定APP访问监控\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"specific.app", contentValue);
         logger.info("开始推送=======>>特定APP访问监控 请求头和请求体：" + httpEntity);
@@ -109,6 +117,10 @@ public class ForEventsInterface {
             contentValue = systemService.getLetterCount();
         } catch (Exception e) {
             logger.error("来函统计报表\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("来函统计报表\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"letter.count", contentValue);
@@ -135,6 +147,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("业务类型统计报表\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"trans.type", contentValue);
         logger.info("开始推送=======>>业务类型统计报表 请求头和请求体：" + httpEntity);
@@ -157,6 +173,10 @@ public class ForEventsInterface {
             contentValue = systemService.getKeyPointSafaguardThing(start);
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("重点保障事件总览\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.key.protection", contentValue);
@@ -181,6 +201,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("特定网站监控\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("特定网站监控\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"specific.websites", contentValue);
         logger.info("开始推送=======>>特定网站监控 请求头和请求体：" + httpEntity);
@@ -203,6 +227,10 @@ public class ForEventsInterface {
             contentValue = systemService.getEventsMonitor(end);
         } catch (Exception e) {
             logger.error("事件监测\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("事件监测\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.monitor", contentValue);
@@ -227,6 +255,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("事件封堵\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("事件封堵\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.block", contentValue);
         logger.info("开始推送=======>>事件封堵 请求头和请求体：" + httpEntity);
@@ -250,6 +282,10 @@ public class ForEventsInterface {
             contentValue = systemService.getEventsAudioMonitor(start,end);
         } catch (Exception e) {
             logger.error("音频监控\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("音频监控\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"audio.monitor", contentValue);
@@ -276,6 +312,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("视频监控\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("视频监控\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"vedio.monitor", contentValue);
         logger.info("开始推送=======>>视频监控 请求头和请求体：" + httpEntity);
@@ -300,6 +340,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("图片监控\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("图片监控\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"image.monitor", contentValue);
         logger.info("开始推送=======>>图片监控 请求头和请求体：" + httpEntity);
@@ -323,6 +367,10 @@ public class ForEventsInterface {
             contentValue = systemService.getVoipMonitor(start, end);
         } catch (Exception e) {
             logger.error("VOIP监控\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("VOIP监控\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"voip.monitor", contentValue);
@@ -349,6 +397,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("网络行为预警\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("网络行为预警\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"ddos.alarm", contentValue);
         logger.info("开始推送=======>>网络行为预警 请求头和请求体：" + httpEntity);
@@ -372,6 +424,10 @@ public class ForEventsInterface {
             contentValue = systemService.getTargetNetwork(start, end);
         } catch (Exception e) {
             logger.error("目标行为网络监测\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("目标行为网络监测\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"target.network", contentValue);
@@ -397,6 +453,10 @@ public class ForEventsInterface {
         } catch (Exception e) {
             logger.error("硬件设备统计\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("硬件设备统计\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"device.num", contentValue);
         logger.info("开始推送=======>>硬件设备统计 请求头和请求体：" + httpEntity);
@@ -421,6 +481,10 @@ public class ForEventsInterface {
             contentValue = systemService.getRunningState(start,end);
         } catch (Exception e) {
             logger.error("运行状况\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("运行状况\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"running.state", contentValue);

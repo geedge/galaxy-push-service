@@ -61,6 +61,10 @@ public class ForNetflowTopNInterface {
         } catch (Exception e) {
             logger.error("5分钟内活跃IP流量TOP10\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("5分钟内活跃IP流量TOP10\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.5min.ip.active.waterflow", contentValue);
         logger.info("开始推送=======>>5分钟内活跃IP流量TOP10 请求头和请求体：" + httpEntity);
@@ -87,6 +91,10 @@ public class ForNetflowTopNInterface {
             contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, range);
         } catch (Exception e) {
             logger.error("1小时内互联网流量TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("1小时内互联网流量TOP10\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.1hour.waterflow.top_10", contentValue);
@@ -115,6 +123,10 @@ public class ForNetflowTopNInterface {
         } catch (Exception e) {
             logger.error("24小时内互联网流量TOP10\t查询异常\trestTemplate", e);
         }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("24小时内互联网流量TOP10\t无数据\t取消本次推送");
+            return;
+        }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.24hour.waterflow.top_10", contentValue);
         logger.info("开始推送=======>>24小时内互联网流量TOP10 请求头和请求体：" + httpEntity);
@@ -141,6 +153,10 @@ public class ForNetflowTopNInterface {
             contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, range);
         } catch (Exception e) {
             logger.error("7天内互联网流量TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("7天内互联网流量TOP10\t无数据\t取消本次推送");
+            return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.7day.waterflow.top_10", contentValue);
