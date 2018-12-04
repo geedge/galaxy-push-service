@@ -52,8 +52,8 @@ GROUP BY dic.area
     <!--端口流量-->
     <select id="getPortNetflowOf5min" resultType="com.nis.galaxy.domain.PortBPSTime">
         <![CDATA[
-        SELECT #{push} time,t.port port ,avg(t.speed)  bps
-        from ( SELECT RECV_TIME,PORT_DESC port,INOCTETS_SPEED+OUTOCTETS_SPEED as speed
+        SELECT #{push} time,t.port port ,MAX (t.speed)  bps
+        from ( SELECT RECV_TIME,PORT_DESC as port,(INOCTETS_SPEED+OUTOCTETS_SPEED) as speed
                FROM traffic_netflow_port_info
               where RECV_TIME >= #{start}
 			  and RECV_TIME < #{end} ) t

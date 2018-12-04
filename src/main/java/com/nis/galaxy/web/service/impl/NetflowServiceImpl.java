@@ -299,7 +299,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         } catch (Exception e) {
-            logger.error("端口流量\t查询异常\tserviceImpl", e);
+            logger.error("端口流量\t查询异常{}，serviceImpl", e);
             throw new RuntimeException();
         }
         if (ListUtils.isEmptyList(list) && ConfigUtil.tendencyData) {
