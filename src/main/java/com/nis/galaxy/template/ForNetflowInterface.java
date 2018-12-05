@@ -186,7 +186,7 @@ public class ForNetflowInterface {
         try {
             contentValue = netflowService.getPortNetflowOf5min(start, end, portNetqueryExpTimes);
         } catch (Exception e) {
-            logger.error("端口流量\t查询异常\trestTemplate\t异常次数："+ ++portNetqueryExpTimes, e);
+            logger.error("端口流量\t查询异常{},\t异常次数："+ ++portNetqueryExpTimes, e);
         }
         if (portNetqueryExpTimes > 0 && contentValue != null) {
             //清零查询异常次数
