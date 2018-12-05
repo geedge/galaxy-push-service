@@ -41,8 +41,7 @@ public class ForNetflowInterface {
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_NETFLOW}")
     private String SERVICE_PATH_NETFLOW;
-    @Value("${DICT.WAIT}")
-    private int DICTWAIT;
+
 
 
     /**
@@ -326,7 +325,7 @@ public class ForNetflowInterface {
         if (a++ > 1) {
             return;
         }
-        Thread.sleep(DICTWAIT);
+        logger.warn("应用启动首次推送所有接口5/6");
         getNetflowStatistic5m();
         getProtocolStatisticOf1h();
         getIpActiveInfoOf5min();

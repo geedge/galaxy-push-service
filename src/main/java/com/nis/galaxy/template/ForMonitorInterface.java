@@ -41,8 +41,6 @@ public class ForMonitorInterface {
     private String SERVICE_PATH_MONITOR;
     @Value("${SERVICE_PATH_BLOCKING}")
     private String SERVICE_PATH_BLOCKING;
-    @Value("${DICT.WAIT}")
-    private int DICTWAIT;
     @Value("${scheduled.monitor.enable}")
     private String scheduledMonitorEnable;
     private int areaNetWaterMonitorExpTimes = 0;
@@ -112,8 +110,18 @@ public class ForMonitorInterface {
         if (a++ > 1) {
             return;
         }
-        Thread.sleep(DICTWAIT);
+        logger.warn("应用启动首次推送所有接口4/6");
         getIpActiveInfoOf5min();
         getNetWaterMonitor();
     }
+
+    /**
+     * 服务应用监控
+     */
+    @Scheduled(fixedRate = 10*1000)
+    @SchedulerLock(name = "PushServiceMonitor", lockAtLeastForString = "PT5S",lockAtMostForString = "PT8S")
+    public void monitor(){
+        logger.debug("服务应用监控");
+    }
+
 }

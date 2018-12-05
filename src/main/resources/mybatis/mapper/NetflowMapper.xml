@@ -57,8 +57,7 @@ GROUP BY dic.area
                FROM traffic_netflow_port_info
               where RECV_TIME >= #{start}
 			  and RECV_TIME < #{end} ) t
-         GROUP BY port
-         having bps != 0;
+         GROUP BY port;
         ]]>
     </select>
     <!--文本-->

@@ -38,8 +38,6 @@ public class ForBlockingInterface {
 
     @Value("${scheduled.block.enable}")
     private String scheduledBlockEnable;
-    @Value("${DICT.WAIT}")
-    private int DICTWAIT;
     @Value("${REST_URL_PREFIX_PUSH}")
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_BLOCKING}")
@@ -279,7 +277,7 @@ public class ForBlockingInterface {
         if (a++ > 1) {
             return;
         }
-        Thread.sleep(DICTWAIT);
+        logger.warn("应用启动首次推送所有接口1/6");
         getAllBlockInformation();
         getDisBlockInformation();
         getDNSDeceiveInformation();

@@ -38,8 +38,7 @@ public class ForNetflowTopNInterface {
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_NETFLOW}")
     private String SERVICE_PATH_NETFLOW;
-    @Value("${DICT.WAIT}")
-    private int DICTWAIT;
+
 
 
     /**
@@ -172,7 +171,7 @@ public class ForNetflowTopNInterface {
         if (a++ > 1) {
             return;
         }
-        Thread.sleep(DICTWAIT);
+        logger.warn("应用启动首次推送所有接口6/6");
         getIpActiveStatisticOf5m();
         getNetFlowWaterTop10();
         getNetFlowWaterTop10Of24h();

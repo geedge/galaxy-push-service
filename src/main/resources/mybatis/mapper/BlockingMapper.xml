@@ -28,9 +28,9 @@
 from ntc_entrance_report WHERE report_time >= #{start}
         AND report_time <  #{end}
 				AND (
-				service BETWEEN 16 AND 65
-		    or service BETWEEN 256 AND 266
-		     or service BETWEEN 512 AND 576
+				service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576
 				)
 				GROUP BY entrance_id) a
 				 on d.entrance_id = a.entrance_id
@@ -39,9 +39,11 @@ from ntc_entrance_report WHERE report_time >= #{start}
 				 from ntc_entrance_report WHERE report_time >= #{start}
         AND report_time <  #{end}
 				AND (
-        service BETWEEN 128 AND 149
-		    or service BETWEEN 384 AND 394
+        service BETWEEN 128 AND 152
+		    or service BETWEEN 384 AND 513
+		    or service BETWEEN 848 AND 1030
 		    or service = 592
+		    or service = 1152
 				)
 				GROUP BY entrance_id ) b
 				ON d.entrance_id = b.entrance_id
@@ -75,9 +77,9 @@ from ntc_entrance_report WHERE report_time >= #{start}
           WHERE report_time >= #{start}
           AND report_time < #{end}
             AND (
-          service BETWEEN 16 AND 65
-          or service BETWEEN 256 AND 266
-          or service BETWEEN 512 AND 576
+          service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576
         )
         GROUP BY service;
         ]]>
@@ -109,9 +111,9 @@ from ntc_entrance_report WHERE report_time >= #{start}
        FROM ntc_entrance_report
           WHERE report_time >= #{start}
           AND report_time < #{end}
-          AND  (service between 16 AND 65
-       or service between 256 AND 266
-       or service between 512 AND 576)
+          AND  ( service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576)
         GROUP BY entrance_id
         ]]>
     </select>
@@ -143,9 +145,9 @@ from ntc_entrance_report WHERE report_time >= #{start}
          SELECT max(report_time)
          FROM ntc_entrance_report
          WHERE report_time < #{end}
-         AND (service between 16 AND 65
-       or service between 256 AND 266
-       or service between 512 AND 576)
+         AND ( service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576)
          ]]>
     </select>
     <!--DNS欺骗信息显示-->
@@ -163,9 +165,9 @@ from ntc_entrance_report WHERE report_time >= #{start}
         select max(report_time)
           FROM ntc_service_report
           WHERE report_time < #{end}
-           AND (service between 16 AND 65
-       or service between 256 AND 266
-       or service between 512 AND 576)
+           AND ( service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576)
         ]]>
     </select>
     <!--24小时内全国热力图-->
@@ -182,9 +184,9 @@ from ntc_entrance_report WHERE report_time >= #{start}
          SELECT max(report_time)
          FROM ntc_entrance_report
          WHERE report_time < #{end}
-         AND (service between 16 AND 65
-       or service between 256 AND 266
-       or service between 512 AND 576)
+         AND ( service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576)
          ]]>
     </select>
 </mapper>

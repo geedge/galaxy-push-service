@@ -40,8 +40,6 @@ public class ForBlockingTopNInterface {
     private String REST_URL_PREFIX_PUSH;
     @Value("${SERVICE_PATH_BLOCKING}")
     private String SERVICE_PATH_BLOCKING;
-    @Value("${DICT.WAIT}")
-    private int DICTWAIT;
 
 
     /**
@@ -230,7 +228,7 @@ public class ForBlockingTopNInterface {
         if (a++ > 1) {
             return;
         }
-        Thread.sleep(DICTWAIT);
+        logger.warn("应用启动首次推送所有接口2/6");
         getAreaBlockTop10ProtocolOf24h();
         getBlockTop10URLOf1h();
         getBlockTop10WebsiteOf1h();

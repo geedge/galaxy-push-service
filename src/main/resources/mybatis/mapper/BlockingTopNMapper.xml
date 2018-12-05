@@ -13,9 +13,9 @@
           WHERE report_time >= #{start}
           AND report_time < #{end}
           AND (
-            service BETWEEN 16 AND 65
-		    or service BETWEEN 256 AND 266
-		     or service BETWEEN 512 AND 576
+            service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576
           )
 		GROUP BY service , entrance_id
 		ORDER BY count desc
@@ -107,9 +107,9 @@
           FROM ntc_entrance_report
           WHERE report_time < #{end}
           AND (
-            service BETWEEN 16 AND 65
-		    or service BETWEEN 256 AND 266
-		     or service BETWEEN 512 AND 576
+            service BETWEEN 16 AND 40
+		    or service BETWEEN 258 AND 273
+		     or service = 576
           )
         ]]>
     </select>

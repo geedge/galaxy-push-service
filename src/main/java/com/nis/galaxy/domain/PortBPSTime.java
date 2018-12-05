@@ -16,4 +16,8 @@ public class PortBPSTime {
     private String port;
     private long bps;
     private String time;
+
+    public void setBps(double bps) {
+        this.bps =(long) bps;
+    }
 }

@@ -54,8 +54,8 @@
         FROM (select * from ui_task_info where is_valid=1) task left join (select * from ui_request_info  where is_valid=1) lwhh on task.id = lwhh.task_id left join  ( SELECT req.request_id, count(req.compile_id) cfg_num, sum(pz.reject_sum) reject_sum, sum(pz.monit_sum) monit_sum FROM (
           SELECT  t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) req
           LEFT JOIN ( SELECT s.cfg_id, SUM(s.reject_sum) reject_sum, SUM(s.monit_sum) monit_sum FROM (
-          SELECT p.cfg_id,( CASE WHEN (p.service BETWEEN 16 AND 65) OR (p.service BETWEEN 256 AND 266) OR (p.service BETWEEN 512 AND 576) THEN  p.sum ELSE  0 END ) reject_sum,
-          ( CASE WHEN (  (p.service BETWEEN 128 AND 149)  OR (p.service BETWEEN 384 AND 394)  OR (p.service = 592) ) THEN  p.sum ELSE  0 END ) monit_sum  FROM (
+          SELECT p.cfg_id,( CASE WHEN (p.service BETWEEN 16 AND 40) OR (p.service BETWEEN 258 AND 273) OR (p.service =576) THEN  p.sum ELSE  0 END ) reject_sum,
+          ( CASE WHEN (  (p.service BETWEEN 128 AND 152)  OR (p.service BETWEEN 384 AND 513) OR (p.service BETWEEN 848 AND 1030) OR (p.service = 592) OR (p.service = 1152)) THEN  p.sum ELSE  0 END ) monit_sum  FROM (
           SELECT  t.cfg_id,  t.service,  t.sum,  t.report_time FROM  ntc_pz_report t) p ) s GROUP BY s.cfg_id )
           pz on pz.cfg_id = req.compile_id  GROUP BY req.request_id ) num
            on lwhh.id = num.request_id group by task_name
@@ -141,29 +141,29 @@
              LIMIT 100;
      ]]>
     </select>
-   <!--事件封堵-->
-    <select id="getEventsBlock" resultType="com.nis.galaxy.domain.EventsBlock">
+   <!--事件监测-->
+    <select id="getEventsMonitor" resultType="com.nis.galaxy.domain.EventsMonitor">
       SELECT task.audit_time time, task.task_name event,
              sum(case t.service_id when 128 then t.sum else 0 end) as ipNum ,
 			 sum(case t.service_id when 129 then t.sum else 0 end) as httpNum ,
 			 sum(case t.service_id when 132 then t.sum else 0 end) as mailNum ,
-			 sum(case t.service_id when 389 then t.sum else 0 end) as vedioNum ,
+			 sum(case t.service_id when 390 then t.sum else 0 end) as vedioNum ,
 			 sum(case t.service_id when 592 then t.sum else 0 end) as agentNum
        FROM (select * from ui_task_info where is_valid=1) task
        LEFT JOIN (select * from ui_request_info  where is_valid=1) lwhh
        ON task.id = lwhh.task_id
-       LEFT JOIN (SELECT r.request_id,r.service_id,COALESCE(SUM(t.sum),0) sum  FROM ( SELECT t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) r , ( SELECT cfg_id, service, sum(sum) sum FROM ntc_pz_report WHERE service IN (128, 129, 132, 389, 592) GROUP BY service, cfg_id )t where t.cfg_id = r.compile_id group by r.request_id,r.service_id) t
+       LEFT JOIN (SELECT r.request_id,r.service_id,COALESCE(SUM(t.sum),0) sum  FROM ( SELECT t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) r , ( SELECT cfg_id, service, sum(sum) sum FROM ntc_pz_report WHERE service IN (128, 129, 132, 390, 592) GROUP BY service, cfg_id )t where t.cfg_id = r.compile_id group by r.request_id,r.service_id) t
        on t.request_id=lwhh.id
        group by  task.task_name
        having (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
-    <!--事件监测-->
-    <select id="getEventsMonitor" resultType="com.nis.galaxy.domain.EventsMonitor">
+    <!--事件封堵-->
+    <select id="getEventsBlock" resultType="com.nis.galaxy.domain.EventsBlock">
     SELECT  task.audit_time time, task.task_name event,
         sum(case t.service_id when 16 then t.sum else 0 end) as ipNum ,
 		sum(case t.service_id when 17 then t.sum else 0 end) as httpNum ,
 		sum(case t.service_id when 20 then t.sum else 0 end) as mailNum ,
-		sum(case t.service_id when 261 then t.sum else 0 end) as vedioNum ,
+		sum(case t.service_id when 262 then t.sum else 0 end) as vedioNum ,
 		sum(case t.service_id when 576 then t.sum else 0 end) as agentNum
     FROM (select *
           from ui_task_info
@@ -180,7 +180,7 @@
     							 GROUP BY t.request_id, t.service_id, t.compile_id ) r ,
     						 ( SELECT cfg_id, service, sum(sum) sum
     						   FROM ntc_pz_report
-    							 WHERE service IN (16, 17, 20, 261, 576)
+    							 WHERE service IN (16, 17, 20, 262, 576)
     							 GROUP BY service, cfg_id ) t
     				where t.cfg_id = r.compile_id
     				group by r.request_id,r.service_id) t
@@ -188,7 +188,6 @@
     group by  task.task_name
     having (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
-
     <!--时间：系统总计 -->
     <select id="getSystemTotalOf1DayLastTime" resultType="java.util.Date">
         <![CDATA[

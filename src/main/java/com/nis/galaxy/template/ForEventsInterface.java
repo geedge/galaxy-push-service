@@ -35,8 +35,7 @@ public class ForEventsInterface {
     private int before1day = -60 * 24;
     private int before60m = -60;
 
-    @Value("${DICT.WAIT}")
-    private int DICTWAIT;
+
 
     @Value("${scheduled.events.enable}")
     private String scheduledEventsEnable;
@@ -501,7 +500,7 @@ public class ForEventsInterface {
         if (a++ > 1) {
             return;
         }
-        Thread.sleep(DICTWAIT);
+        logger.warn("应用启动首次推送所有接口3/6");
         getSystemTotalOf1Day();
         getSpecifiedAPPMonitor();
         getLetterCount();

@@ -1,5 +1,6 @@
 package com.nis.galaxy.util;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ListUtils {
@@ -7,10 +8,7 @@ public class ListUtils {
         if (list == null || list.size() == 0) {
             return true;
         }
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            list.remove(null);
-        }
+        list.removeAll(Collections.singleton(null));
         if (list.isEmpty()) {
             return true;
         }

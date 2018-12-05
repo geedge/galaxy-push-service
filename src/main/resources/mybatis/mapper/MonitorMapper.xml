@@ -3,9 +3,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nis.galaxy.web.dao.MonitorDao">
     <select id="getSystemMonitor"   resultMap="BaseResultMap">
-     SELECT a.time time,'Астана' area,a.total total,a.normal normal,a.abnormal abnormal,b.hostname name,b.ip ip
+     SELECT a.time time,area area,a.total total,a.normal normal,a.abnormal abnormal,b.hostname name,b.ip ip
     FROM traffic_abnormal_machine b right JOIN
-    (SELECT id,commit_time time,area,total,normal,abnormal from traffic_nmsserver_statistic order by id desc limit 1) a
+    (SELECT id,commit_time time,area,total,normal,abnormal from traffic_nmsserver_statistic
+    WHERE commit_time=(SELECT commit_time time FROM traffic_nmsserver_statistic ORDER BY time desc limit 1) limit 1) a
     on b.nmsServer_Id = a.id
     </select>
     <resultMap id="BaseResultMap" type="com.nis.galaxy.domain.NmsServerBean" >
@@ -19,17 +20,6 @@
             <result column="ip" property="ip"  />
         </collection>
     </resultMap>
-
-    <select id="getNationalAgencyMonitor" resultType="String">
-        <![CDATA[
-        SELECT REDIRECT_NUM ,MONITOR_NUM,REPLACE_NUM
-        FROM pxy_total_report
-            WHERE REPORT_TIME >= #{start}
-            AND REPORT_TIME < #{end}
-        ]]>
-    </select>
-
-
     <!--网络流量监控_5min-->
     <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
         <![CDATA[
