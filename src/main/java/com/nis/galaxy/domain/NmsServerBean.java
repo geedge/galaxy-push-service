@@ -35,4 +35,7 @@ public class NmsServerBean {
         return this.system = "ntc";
     }
 
+    public String getTime() {
+        return time=DateUtils.getDateTime();
+    }
 }
