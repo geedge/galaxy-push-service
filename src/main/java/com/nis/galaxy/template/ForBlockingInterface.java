@@ -202,7 +202,6 @@ public class ForBlockingInterface {
             contentValue = blockingService.getPointMapOf10s();
         } catch (Exception e) {
             logger.error("实时打点图\t查询异常\trestTemplate", e);
-
         }
         if (InterfaceBase.contentValueIsEmpty(contentValue)) {
             logger.warn("实时打点图\t无数据\t取消本次推送");

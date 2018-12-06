@@ -9,6 +9,7 @@ import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.dao.BlockingDao;
 import com.nis.galaxy.web.service.BlockingService;
+import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class BlockingServiceImp implements BlockingService {
     BlockingDao blockingDao;
     @Autowired
     MyLoad myLoad;
+    @Autowired
+    DictService dictService;
 
     //运营商表
     public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
@@ -56,7 +59,7 @@ public class BlockingServiceImp implements BlockingService {
             logger.error("封堵信息整体显示\t查询异常\tserviceImpl", e);
         }
         if (ConfigUtil.actualData) {
-            if (list != null && list.size() == 1) {
+            if (!ListUtils.isEmptyList(list) && list.size() == 1) {
                 NtcTotalReport temp = list.get(0);
                 long num = temp.getNetworkFlowNum() + temp.getMonitorNum() + temp.getRefluxConNum();
                 if (num == 0) {
@@ -325,6 +328,28 @@ public class BlockingServiceImp implements BlockingService {
             list = blockingDao.getPointMapOf10sOnly();
         } catch (Exception e) {
             logger.error("实时打点图\t查询异常\tserviceImpl", e);
+        }
+        try {
+            int serviceCount = dictService.getNtcServiceDictCount();
+            if (listNtcService != null && serviceCount != listNtcService.size()) {
+                logger.warn("实时打点图\t业务表需要重新加载");
+                List<NtcServiceDict> ntcServiceDict = new ArrayList<>();
+                Map<String, NtcServiceDict> mapNtcService = new HashMap<>();
+                try {
+                    ntcServiceDict = dictService.getNtcServiceDict();
+                } catch (Exception e) {
+                    logger.error("实时打点图\t业务表加载出现异常", e);
+                }
+                if (!ntcServiceDict.isEmpty()) {
+                    for (NtcServiceDict serviceDict : ntcServiceDict) {
+                        mapNtcService.put(String.valueOf(serviceDict.getServiceCode()), serviceDict);
+                    }
+                    listNtcService = mapNtcService;
+                }
+            }
+        } catch (Exception ex) {
+            listNtcService = listNtcService();
+            logger.warn("实时打点图\t业务表逻辑处理出现异常\t使用5min加载的业务表", ex);
         }
         if (!ListUtils.isEmptyList(list)) {
             for (PointMap pointMap : list) {

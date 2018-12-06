@@ -5,7 +5,9 @@ import com.nis.galaxy.web.dao.DictDao;
 import com.nis.galaxy.web.service.DictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author GouGe
@@ -45,4 +47,8 @@ public class DictServiceImpl implements DictService {
         return dictDao.getUiCarrierDictInfo();
     }
 
+    @Override
+    public int getNtcServiceDictCount() {
+        return dictDao.getNtcServiceDictCount();
+    }
 }
