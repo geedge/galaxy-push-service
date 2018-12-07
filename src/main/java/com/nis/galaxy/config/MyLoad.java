@@ -31,8 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MyLoad {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private int a = 1;
-    @Value("${dict.moment.switch}")
-    private boolean dictMomentSwitch;
+
     @Autowired
     DictService dictService;
     /**
