@@ -37,15 +37,6 @@ public class DictServiceImpl implements DictService {
         return dictDao.getUiTagDicInfo();
     }
 
-    @Override
-    public List<UiAreaDictInfo> getUiAreaDictInfo() {
-        return dictDao.getUiAreaDictInfo();
-    }
-
-    @Override
-    public List<UiCarrierDictInfo> getUiCarrierDictInfo() {
-        return dictDao.getUiCarrierDictInfo();
-    }
 
     @Override
     public int getNtcServiceDictCount() {

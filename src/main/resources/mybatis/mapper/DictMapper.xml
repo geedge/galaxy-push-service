@@ -3,20 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.nis.galaxy.web.dao.DictDao">
-    <!--地域表-->
-    <select id="getUiAreaDictInfo" resultType="com.nis.galaxy.domain.dict.UiAreaDictInfo">
-      SELECT item_code areaId,item_value itemValue
-      FROM ui_sys_dict_info
-      WHERE item_type=1
-          AND is_valid=1;
-    </select>
-    <!--运行商表-->
-    <select id="getUiCarrierDictInfo" resultType="com.nis.galaxy.domain.dict.UiCarrierDictInfo">
-      SELECT item_code CarrierId,item_value itemValue
-      FROM ui_sys_dict_info
-      WHERE item_type=1
-          AND is_valid=1;
-    </select>
     <!--业务表-->
     <select id="getNtcServiceDict" resultType="com.nis.galaxy.domain.dict.NtcServiceDict">
         SELECT service_code serviceCode,service_name_zh serviceNameZh,service_name_en serviceNameEn,service_name_ru serviceNameRu

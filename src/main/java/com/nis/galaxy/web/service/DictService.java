@@ -16,9 +16,5 @@ public interface DictService {
 
     List<UiTagDictInfo> getUiTagDicInfo();
 
-    List<UiAreaDictInfo> getUiAreaDictInfo();
-
-    List<UiCarrierDictInfo> getUiCarrierDictInfo();
-
     int getNtcServiceDictCount();
 }

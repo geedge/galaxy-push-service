@@ -1,6 +1,8 @@
 package com.nis.galaxy.config;
 
 import com.nis.galaxy.domain.dict.*;
+import com.nis.galaxy.util.ConfigUtil;
+import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
@@ -47,21 +49,14 @@ public class MyLoad {
      */
     public Map<String, UiTagDictInfo> listUiTagDicInfo = new ConcurrentHashMap<>();
     /**
-     * 地域表
-     */
-//    public Map<String, UiAreaDictInfo> listUiAreaDicInfo = new ConcurrentHashMap<>();
-    /**
      * 运营商表
      */
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo = new ConcurrentHashMap<>();
+    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo = new HashMap<>();
 
     public Map<String, UiCarrierDictInfo> getListUiCarrierDictInfo() {
         return listUiCarrierDictInfo;
     }
 
-//    public Map<String, UiAreaDictInfo> getListUiAreaDicInfo() {
-//        return listUiAreaDicInfo;
-//    }
 
     public Map<String, UiTagDictInfo> getListUiTagDicInfo() {
         return listUiTagDicInfo;
@@ -75,20 +70,6 @@ public class MyLoad {
         return listNtcService;
     }
 
-//    @Scheduled(cron = "${dict.scheduled.cron.plan}")
-//    public void runMyLoadArea() {
-//        logger.info("执行初始化字典表：地域表\t运营商表\t业务表\t协议表");
-//        List<UiAreaDictInfo> uiAreaDictInfo = new ArrayList<>();
-//        try {
-//            uiAreaDictInfo = dictService.getUiAreaDictInfo();
-//        } catch (Exception e) {
-//            logger.error("地域表预加载出现异常", e);
-//        }
-//        for (UiAreaDictInfo areaDictInfo : uiAreaDictInfo) {
-//            listUiAreaDicInfo.put(areaDictInfo.getAreaId(), areaDictInfo);
-//        }
-//        logger.info("地域表的预加载结果\t" + listUiAreaDicInfo);
-//    }
 
     @Scheduled(cron = "${dict.service.cron.plan}")
     public void MyLoadService() {
@@ -109,36 +90,6 @@ public class MyLoad {
             logger.info("业务类型加载个数为\t" + listNtcService.size());
         } else {
             logger.info("listNtcService为null");
-        }
-    }
-
-    @Scheduled(cron = "${dict.entrance.cron.plan}")
-    public void MyLoadEntrance() {
-        List<UiCarrierDictInfo> uiCarrierDictInfo = new ArrayList<>();
-        Map<String, UiCarrierDictInfo> mapUiCarrierDictInfo = new HashMap<>();
-        try {
-            uiCarrierDictInfo = dictService.getUiCarrierDictInfo();
-        } catch (Exception e) {
-            logger.error("局点表加载出现异常", e);
-        }
-        if (!ListUtils.isEmptyList(uiCarrierDictInfo)) {
-            for (UiCarrierDictInfo carrierDictInfo : uiCarrierDictInfo) {
-                mapUiCarrierDictInfo.put(carrierDictInfo.getCarrierId(), carrierDictInfo);
-            }
-        }
-        if (dictMomentSwitch) {
-            mapUiCarrierDictInfo.put("0", new UiCarrierDictInfo("0", "Астана"));
-            mapUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "Астана"));
-            mapUiCarrierDictInfo.put("2", new UiCarrierDictInfo("2", "Алматы"));
-            mapUiCarrierDictInfo.put("3", new UiCarrierDictInfo("3", "Астана"));
-        }
-        if (mapUiCarrierDictInfo != null && mapUiCarrierDictInfo.size() > 0) {
-            listUiCarrierDictInfo = mapUiCarrierDictInfo;
-        }
-        if (listNtcService != null) {
-            logger.info("局点加载个数为\t" + listUiCarrierDictInfo.size());
-        } else {
-            logger.info("listUiCarrierDictInfo为null");
         }
     }
 
@@ -191,8 +142,17 @@ public class MyLoad {
         if (a++ > 1) {
             return;
         }
+        if (ConfigUtil.languageChose == 3) {
+            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "Астана"));
+            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("1", "Алматы"));
+        } else if (ConfigUtil.languageChose == 2) {
+            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "Astana"));
+            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("2", "Almaty"));
+        } else {
+            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "阿斯塔纳市"));
+            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("2", "阿拉木图市"));
+        }
         MyLoadService();
-        MyLoadEntrance();
         MyLoadProtocol();
         MyLoadTag();
     }

@@ -27,15 +27,11 @@ public class NmsServerBean {
     private long abnormal;
     private List<AbnormalBean> abnormalmachines;
 
-    public void setTime(Date time) {
-        this.time =DateUtils.formatDateTime(time);
+    public String getTime() {
+        return time = DateUtils.getRangeOf1min(new Date());
     }
 
     public String getSystem() {
         return this.system = "ntc";
-    }
-
-    public String getTime() {
-        return time=DateUtils.getDateTime();
     }
 }

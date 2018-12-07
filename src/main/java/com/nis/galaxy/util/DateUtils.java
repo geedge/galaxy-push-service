@@ -70,7 +70,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter5min(String time) {
-        if(time ==null || time.isEmpty()){
+        if (time == null || time.isEmpty()) {
             return "";
         }
         Date date = DateUtils.parseDate(time);
@@ -80,6 +80,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         return DateUtils.formatDateTime(gc.getTime());
         //return "2018-12-01 00:00:00";
     }
+
     /**
      * 距time 24h之后
      *
@@ -87,7 +88,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter24h(String time) {
-        if(time ==null || time.isEmpty()){
+        if (time == null || time.isEmpty()) {
             return "";
         }
         Date date = DateUtils.parseDate(time);
@@ -105,7 +106,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter1h(String time) {
-        if(time ==null || time.isEmpty()){
+        if (time == null || time.isEmpty()) {
             return "";
         }
         Date date = DateUtils.parseDate(time);
@@ -149,7 +150,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * 得到日期时间字符串，转换格式（yyyy-MM-dd HH:mm:ss）
      */
     public static String formatDateTime(Date date) {
-        if(date==null || "".equals(date)){
+        if (date == null || "".equals(date)) {
             return "";
         }
         return formatDate(date, "yyyy-MM-dd HH:mm:ss");
@@ -378,6 +379,23 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
+     * 获取time的整时间点：1min粒度
+     * eg:  2018-12-12 12:06:36 结果为：2018-12-12 12:06:00
+     * @param time
+     * @return
+     */
+    public static String getRangeOf1min(Date time) {
+        String timeString = DateUtils.formatDateTime(time);
+        if (timeString == null || timeString.length() < 19) {
+            return "";
+        }
+        timeString.length();
+        timeString = timeString.substring(0, 17);
+        timeString = timeString.concat("00");
+        return timeString;
+    }
+
+    /**
      * 获取距离time时间minute分钟的时间,之前需加符号-、之后为正+
      *
      * @param time
@@ -385,7 +403,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getBeforeNminOfTime(String time, int minute) {
-        if(time ==null || time.isEmpty()){
+        if (time == null || time.isEmpty()) {
             return "";
         }
         Date date = DateUtils.parseDate(time);
@@ -403,7 +421,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getRangeNhourOfTime(String time, int hour) {
-        if(time==null){
+        if (time == null) {
             return "";
         }
         Date date = DateUtils.parseDate(time);
@@ -421,7 +439,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getRangeNdayOfTime(String time, int day) {
-        if(time ==null || time.isEmpty()){
+        if (time == null || time.isEmpty()) {
             return "";
         }
         Date date = DateUtils.parseDate(time);

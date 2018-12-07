@@ -20,11 +20,7 @@
       	<![CDATA[
       	SELECT #{push} AS time,area,SUM(controlNum) AS controlNum,SUM(monitorNum) AS monitorNum,SUM(c.up) AS upstreamNum,SUM(c.dw) AS downstreamNum,(SUM(c.up)+SUM(c.dw)) AS networkFlowNum
       	FROM(
-      	    SELECT 1 AS area,0 AS entrance_id FROM ntc_entrance_report GROUP BY 1
-	        UNION ALL
 	        SELECT entrance_id AS area,entrance_id FROM ntc_device_info GROUP BY entrance_id
-	        UNION ALL
-	        SELECT 1 AS area,3 AS entrance_id FROM ntc_entrance_report  GROUP BY 1
 	        ) d
 	        LEFT JOIN
 	        (SELECT entrance_id,SUM(sum) AS controlNum
