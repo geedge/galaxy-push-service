@@ -2,7 +2,7 @@ package com.nis.galaxy.web.service.impl;
 
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
-import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.domain.dict.AreaDictInfo;
 import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
@@ -46,9 +46,9 @@ public class NetflowServiceImpl implements NetflowService {
         return myLoad.listProtocolDict;
     }
 
-    //运营商表
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
-        return myLoad.listUiCarrierDictInfo;
+    //地域表
+    public Map<String, AreaDictInfo> listAreaDictInfo() {
+        return myLoad.listAreaDictInfo;
     }
 
     /**
@@ -174,7 +174,7 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<IpActiveInfo> getIpActiveInfoOf5min(String start, String end) {
         List<IpActiveInfo> list = new ArrayList<>();
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getIpActiveInfoOf5minOnly(start, start, end);
@@ -195,9 +195,9 @@ public class NetflowServiceImpl implements NetflowService {
         if (!ListUtils.isEmptyList(list)) {
             for (IpActiveInfo ipActiveInfo : list) {
                 String area = ipActiveInfo.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo != null) {
-                    ipActiveInfo.setArea(uiCarrierDictInfo.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    ipActiveInfo.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -225,7 +225,7 @@ public class NetflowServiceImpl implements NetflowService {
     @Override
     public List<AreaBPSTime> getAreaNetflowOf5min(String start, String end, int areaNetqueryExpTimes) {
         List<AreaBPSTime> list = new ArrayList<>();
-        Map<String, UiCarrierDictInfo> uiCarrierDictInfo = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowDao.getAreaNetflowOf5min(start, start, end);
@@ -257,9 +257,9 @@ public class NetflowServiceImpl implements NetflowService {
         if (!ListUtils.isEmptyList(list)) {
             for (AreaBPSTime areaBPSTime : list) {
                 String area = areaBPSTime.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo1 = uiCarrierDictInfo.get(area);
-                if (uiCarrierDictInfo1 != null) {
-                    areaBPSTime.setArea(uiCarrierDictInfo1.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    areaBPSTime.setArea(areaDictInfo.getItemValue());
                 }
             }
         }

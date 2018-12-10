@@ -2,10 +2,7 @@ package com.nis.galaxy.web.dao;
 
 import com.nis.galaxy.domain.dict.*;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author GouGe
@@ -19,12 +16,6 @@ public interface DictDao {
     List<ProtocolDict> getProtocolDict();
 
     List<UiTagDictInfo> getUiTagDicInfo();
-
-    List<UiAreaDictInfo> getUiAreaDictInfo();
-
-    List<UiCarrierDictInfo> getUiCarrierDictInfo();
-
-    Map<String, String> getNtcServiceCurrent(@Param("languageChose") int languageChose);
 
     int getNtcServiceDictCount();
 }

@@ -42,23 +42,27 @@ public class ShedlockConfig {
                 count++;
                 Map<String, Object> timeLockempt1 = new HashMap<String, Object>();
                 try {
-                    timeLockempt1 = jdbcTemplate.queryForMap("SELECT locked_at FROM shedlock WHERE `name` = 'PushServiceMonitor'");
-                } catch (EmptyResultDataAccessException ex) {
-                    logger.warn("PushServiceMonitor\t不存在\t应为服务首次" + ex);
-                    break;
+                    try {
+                        timeLockempt1 = jdbcTemplate.queryForMap("SELECT locked_at FROM shedlock WHERE `name` = 'PushServiceMonitor'");
+                    } catch (EmptyResultDataAccessException ex) {
+                        logger.warn("PushServiceMonitor\t不存在\t应为服务首次" + ex);
+                        break;
+                    }
+                    Date lockEmpt1 = (Date) timeLockempt1.get("locked_at");
+                    Thread.sleep(13 * 1000);
+                    Map<String, Object> timeLockempt2 = jdbcTemplate.queryForMap("SELECT locked_at FROM shedlock WHERE `name` = 'PushServiceMonitor'");
+                    Date lockEmpt2 = (Date) timeLockempt2.get("locked_at");
+                    timeLock1 = lockEmpt1.getTime();
+                    timeLock2 = lockEmpt2.getTime();
+                    subTime = (timeLock2 - timeLock1) / 1000;
+                    if (subTime == 0) {
+                        logger.warn("大屏推送服务未运行\t跳出循环\t启动此服务");
+                        break;
+                    }
+                    logger.info("大屏推送服务ing\t此程序暂不需要启动\t监测次数：" + count);
+                } catch (Exception ex) {
+                    logger.info("大屏推送服务启动监测查询出现异常\t监测次数：" + count, ex);
                 }
-                Date lockEmpt1 = (Date) timeLockempt1.get("locked_at");
-                Thread.sleep(13 * 1000);
-                Map<String, Object> timeLockempt2 = jdbcTemplate.queryForMap("SELECT locked_at FROM shedlock WHERE `name` = 'PushServiceMonitor'");
-                Date lockEmpt2 = (Date) timeLockempt2.get("locked_at");
-                timeLock1 = lockEmpt1.getTime();
-                timeLock2 = lockEmpt2.getTime();
-                subTime = (timeLock2 - timeLock1) / 1000;
-                if (subTime == 0) {
-                    logger.warn("大屏推送服务未运行\t跳出循环\t启动此服务");
-                    break;
-                }
-                logger.info("大屏推送服务ing\t此程序暂不需要启动\t监测次数：" + count);
             }
             String date = DateUtils.getAfter1h(DateUtils.getDateTime());
             if (count == 1) {

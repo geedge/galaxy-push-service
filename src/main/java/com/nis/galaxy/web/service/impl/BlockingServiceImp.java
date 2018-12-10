@@ -3,7 +3,7 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.NtcServiceDict;
-import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.domain.dict.AreaDictInfo;
 import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
@@ -13,7 +13,6 @@ import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,9 +31,9 @@ public class BlockingServiceImp implements BlockingService {
     @Autowired
     DictService dictService;
 
-    //运营商表
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
-        return myLoad.listUiCarrierDictInfo;
+    //地域表
+    public Map<String, AreaDictInfo> listAreaDictInfo() {
+        return myLoad.listAreaDictInfo;
     }
 
     //业务表
@@ -98,8 +97,8 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<NtcEntranceReport> getDNSDeceiveInformation(String start, String end) {
-        //运营商表
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        //地域表
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         List<NtcEntranceReport> list = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
         try {
@@ -107,27 +106,37 @@ public class BlockingServiceImp implements BlockingService {
         } catch (Exception e) {
             logger.error("DNS欺骗信息显示\t查询异常\tserviceImpl", e);
         }
-
-        if (ListUtils.isEmptyList(list) && ConfigUtil.actualData) {
-            logger.warn("DNS欺骗信息显示\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
-            try {
-                Date lastTime = blockingDao.getDNSDeceiveInformationLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = blockingDao.getDNSDeceiveInformationOnly(start, time, DateUtils.getAfter5min(time));
-            } catch (Exception e) {
-                logger.error("DNS欺骗信息显示\t最近数据\t查询异常\tserviceImpl", e);
+        if (ConfigUtil.actualData) {
+            if (!ListUtils.isEmptyList(list)) {
+                long num = 0;
+                for (NtcEntranceReport temp : list) {
+                    num = num + temp.getCount();
+                }
+                if (num == 0) {
+                    list = new ArrayList<>();
+                }
+            }
+            if (ListUtils.isEmptyList(list)) {
+                logger.warn("DNS欺骗信息显示\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+                try {
+                    Date lastTime = blockingDao.getDNSDeceiveInformationLastTime(end);
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = blockingDao.getDNSDeceiveInformationOnly(start, time, DateUtils.getAfter5min(time));
+                } catch (Exception e) {
+                    logger.error("DNS欺骗信息显示\t最近数据\t查询异常\tserviceImpl", e);
+                }
             }
         }
         logger.info("DNS欺骗信息显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (!ListUtils.isEmptyList(list)) {
             for (NtcEntranceReport ntcEntranceReport : list) {
                 String area = ntcEntranceReport.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo == null) {
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo == null) {
                     continue;
                 }
-                ntcEntranceReport.setArea(uiCarrierDictInfo.getItemValue());
+                ntcEntranceReport.setArea(areaDictInfo.getItemValue());
             }
         }
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
@@ -218,8 +227,8 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<NtcDisReport> getDisBlockInformation(String start, String end) {
-        //运营商表
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        //地域表
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         List<NtcDisReport> list = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
         try {
@@ -241,9 +250,9 @@ public class BlockingServiceImp implements BlockingService {
         if (!ListUtils.isEmptyList(list)) {
             for (NtcDisReport ntcDisReport : list) {
                 String area = ntcDisReport.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo != null) {
-                    ntcDisReport.setArea(uiCarrierDictInfo.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    ntcDisReport.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -264,7 +273,7 @@ public class BlockingServiceImp implements BlockingService {
     @Override
     public List<HotStatistic> getAllHotStatistis(String start, String end) {
         Map<String, NtcServiceDict> listNtcService = listNtcService();
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         List<HotStatistic> list = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
         try {
@@ -288,9 +297,9 @@ public class BlockingServiceImp implements BlockingService {
                 String area = hotStatistic.getArea();
                 String type = hotStatistic.getType();
                 NtcServiceDict ntcServiceDict1 = listNtcService.get(type);
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo != null) {
-                    hotStatistic.setArea(uiCarrierDictInfo.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    hotStatistic.setArea(areaDictInfo.getItemValue());
                 }
                 if (ntcServiceDict1 == null) {
                     continue;
@@ -389,7 +398,7 @@ public class BlockingServiceImp implements BlockingService {
      */
     @Override
     public List<AreaCount> getDisBlockMap(String start, String end) {
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         List<AreaCount> list = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
         try {
@@ -412,11 +421,11 @@ public class BlockingServiceImp implements BlockingService {
         if (!ListUtils.isEmptyList(list)) {
             for (AreaCount areaCount : list) {
                 String area = areaCount.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo == null) {
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo == null) {
                     continue;
                 }
-                areaCount.setArea(uiCarrierDictInfo.getItemValue());
+                areaCount.setArea(areaDictInfo.getItemValue());
             }
         }
         logger.info("热力图接口耗时：" + (System.currentTimeMillis() - timeMillisStart));

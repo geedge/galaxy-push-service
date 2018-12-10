@@ -2,13 +2,10 @@ package com.nis.galaxy.config;
 
 import com.nis.galaxy.domain.dict.*;
 import com.nis.galaxy.util.ConfigUtil;
-import com.nis.galaxy.util.DateUtils;
-import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -48,12 +45,12 @@ public class MyLoad {
      */
     public Map<String, UiTagDictInfo> listUiTagDicInfo = new ConcurrentHashMap<>();
     /**
-     * 运营商表
+     * 地域表
      */
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo = new HashMap<>();
+    public Map<String, AreaDictInfo> listAreaDictInfo = new HashMap<>();
 
-    public Map<String, UiCarrierDictInfo> getListUiCarrierDictInfo() {
-        return listUiCarrierDictInfo;
+    public Map<String, AreaDictInfo> getlistAreaDictInfo() {
+        return listAreaDictInfo;
     }
 
 
@@ -65,6 +62,7 @@ public class MyLoad {
         return listProtocolDict;
     }
 
+    @Scheduled(cron = "${dict.service.cron.plan}")
     public Map<String, NtcServiceDict> getListNtcService() {
         return listNtcService;
     }
@@ -142,15 +140,16 @@ public class MyLoad {
             return;
         }
         if (ConfigUtil.languageChose == 3) {
-            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "Астана"));
-            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("1", "Алматы"));
+            listAreaDictInfo.put("1", new AreaDictInfo("1", "Астана"));
+            listAreaDictInfo.put("2", new AreaDictInfo("1", "Алматы"));
         } else if (ConfigUtil.languageChose == 2) {
-            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "Astana"));
-            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("2", "Almaty"));
+            listAreaDictInfo.put("1", new AreaDictInfo("1", "Astana"));
+            listAreaDictInfo.put("2", new AreaDictInfo("2", "Almaty"));
         } else {
-            listUiCarrierDictInfo.put("1", new UiCarrierDictInfo("1", "阿斯塔纳市"));
-            listUiCarrierDictInfo.put("2", new UiCarrierDictInfo("2", "阿拉木图市"));
+            listAreaDictInfo.put("1", new AreaDictInfo("1", "阿斯塔纳市"));
+            listAreaDictInfo.put("2", new AreaDictInfo("2", "阿拉木图市"));
         }
+        logger.info("目前地域表为：" + listAreaDictInfo);
         MyLoadService();
         MyLoadProtocol();
         MyLoadTag();

@@ -64,12 +64,16 @@
     <!--DNS欺骗信息显示 5min/条、粒度5min______映射局点表-->
     <select id="getDNSDeceiveInformationOnly" resultType="com.nis.galaxy.domain.NtcEntranceReport">
 		<![CDATA[
-        SELECT #{push} AS time,entrance_id AS area,SUM(sum) AS count
-        FROM ntc_entrance_report
-        WHERE report_time >= #{start}
-            AND report_time < #{end}
-            AND service = 18
-        GROUP BY area;
+        SELECT b.time,a.area area,b.count FROM
+            (SELECT entrance_id AS area FROM ntc_device_info GROUP BY entrance_id )AS a
+        LEFT JOIN
+            (SELECT #{push} AS time,entrance_id AS area,SUM(sum) AS count
+            FROM ntc_entrance_report
+            WHERE report_time >= #{start}
+                AND report_time < #{end}
+                AND service = 18
+            GROUP BY area) AS b
+        ON a.area=b.area
         ]]>
     </select>
 

@@ -5,7 +5,7 @@ import com.nis.galaxy.domain.Entrance;
 import com.nis.galaxy.domain.IpActiveInt;
 import com.nis.galaxy.domain.NetFlowWater;
 import com.nis.galaxy.domain.NetFlowWaterPush;
-import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.domain.dict.AreaDictInfo;
 import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
@@ -14,7 +14,6 @@ import com.nis.galaxy.web.service.NetflowTopNService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,9 +29,9 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
 
 
 
-    //运营商表
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
-        return myLoad.listUiCarrierDictInfo;
+    //地域表
+    public Map<String, AreaDictInfo> listAreaDictInfo() {
+        return myLoad.listAreaDictInfo;
     }
 
     /**
@@ -45,7 +44,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     @Override
     public List<IpActiveInt> getIpActiveStatisticOf5m(String start, String end) {
         List<IpActiveInt> list = new ArrayList<>();
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         long timeMillisStart = System.currentTimeMillis();
         try {
             list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, start, end);
@@ -66,9 +65,9 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         if (!ListUtils.isEmptyList(list)) {
             for (IpActiveInt ipActiveInt : list) {
                 String area = ipActiveInt.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo != null) {
-                    ipActiveInt.setArea(uiCarrierDictInfo.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    ipActiveInt.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -99,7 +98,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
      */
     @Override
     public List<NetFlowWaterPush> getNetFlowWaterTop10(String start, String end, int range) {
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         List<NetFlowWater> list = new ArrayList<>();
         List<NetFlowWaterPush> resule = new ArrayList<>();
         List<Entrance> entrance = netflowTopNDao.getIpEntranceRe();
@@ -189,11 +188,11 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             //映射地域
             for (NetFlowWaterPush netFlowWaterPush : resule) {
                 String area = netFlowWaterPush.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo == null) {
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo == null) {
                     continue;
                 }
-                netFlowWaterPush.setArea(uiCarrierDictInfo.getItemValue());
+                netFlowWaterPush.setArea(areaDictInfo.getItemValue());
             }
         }
         logger.info("互联网流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));

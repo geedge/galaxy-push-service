@@ -2,7 +2,7 @@ package com.nis.galaxy.web.service.impl;
 
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
-import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.domain.dict.AreaDictInfo;
 import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
 import com.nis.galaxy.util.ListUtils;
@@ -11,7 +11,6 @@ import com.nis.galaxy.web.service.MonitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,9 +29,9 @@ public class MonitorServiceImpl implements MonitorService {
     @Autowired
     MyLoad myLoad;
 
-    //运营商表
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
-        return myLoad.listUiCarrierDictInfo;
+    //地域表
+    public Map<String, AreaDictInfo> listAreaDictInfo() {
+        return myLoad.listAreaDictInfo;
     }
 
     /**
@@ -43,7 +42,7 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public List<NmsServerBean> getMonitorOf1m() {
         List<NmsServerBean> list = new ArrayList<>();
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         long timeMillisStart = System.currentTimeMillis();
         try {
             list = monitorDao.getSystemMonitor();
@@ -53,9 +52,9 @@ public class MonitorServiceImpl implements MonitorService {
         if (!ListUtils.isEmptyList(list)) {
             for (NmsServerBean nmsServerBean : list) {
                 String area = nmsServerBean.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo != null) {
-                    nmsServerBean.setArea(uiCarrierDictInfo.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    nmsServerBean.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -121,12 +120,12 @@ public class MonitorServiceImpl implements MonitorService {
             }
         }
         if (!ListUtils.isEmptyList(list)) {
-            Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+            Map<String, AreaDictInfo> listArea = listAreaDictInfo();
             for (NetWaterMonitor netWaterMonitor : list) {
                 String area = netWaterMonitor.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
-                if (uiCarrierDictInfo != null) {
-                    netWaterMonitor.setArea(uiCarrierDictInfo.getItemValue());
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo != null) {
+                    netWaterMonitor.setArea(areaDictInfo.getItemValue());
                 }
             }
         }

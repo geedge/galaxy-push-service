@@ -3,7 +3,7 @@ package com.nis.galaxy.web.service.impl;
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
 import com.nis.galaxy.domain.dict.NtcServiceDict;
-import com.nis.galaxy.domain.dict.UiCarrierDictInfo;
+import com.nis.galaxy.domain.dict.AreaDictInfo;
 import com.nis.galaxy.domain.dict.UiTagDictInfo;
 import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
@@ -13,7 +13,6 @@ import com.nis.galaxy.web.service.BlockingTopNService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,9 +28,9 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
 
 
 
-    //运营商表
-    public Map<String, UiCarrierDictInfo> listUiCarrierDictInfo() {
-        return myLoad.listUiCarrierDictInfo;
+    //地域表
+    public Map<String, AreaDictInfo> listAreaDictInfo() {
+        return myLoad.listAreaDictInfo;
     }
 
     //标签表
@@ -145,7 +144,7 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
     @Override
     public List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24(String start, String end) {
         List<AreaBlockProtocol> list = new ArrayList<>();
-        Map<String, UiCarrierDictInfo> listCarrier = listUiCarrierDictInfo();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         Map<String, NtcServiceDict> listNtcService = listNtcService();
         long timeMillisStart = System.currentTimeMillis();
         try {
@@ -169,10 +168,10 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
             for (AreaBlockProtocol areaBlockProtocol : list) {
                 String type = areaBlockProtocol.getType();
                 String area = areaBlockProtocol.getArea();
-                UiCarrierDictInfo uiCarrierDictInfo = listCarrier.get(area);
+                AreaDictInfo areaDictInfo = listArea.get(area);
                 NtcServiceDict ntcServiceDict = listNtcService.get(type);
-                if (uiCarrierDictInfo != null) {
-                    areaBlockProtocol.setArea(uiCarrierDictInfo.getItemValue());
+                if (areaDictInfo != null) {
+                    areaBlockProtocol.setArea(areaDictInfo.getItemValue());
                 }
                 if (ntcServiceDict == null) {
                     continue;
