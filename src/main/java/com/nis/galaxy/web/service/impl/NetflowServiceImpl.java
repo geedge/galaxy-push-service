@@ -24,9 +24,6 @@ public class NetflowServiceImpl implements NetflowService {
 
     @Autowired
     NetflowDao netflowDao;
-    @Autowired
-    MyLoad myLoad;
-
     @Value("${server.port}")
     private int serverPort;
 
@@ -43,12 +40,12 @@ public class NetflowServiceImpl implements NetflowService {
 
     //协议表
     public Map<String, String> listProtocolDict() {
-        return myLoad.listProtocolDict;
+        return MyLoad.listProtocolDict;
     }
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return myLoad.listAreaDictInfo;
+        return MyLoad.listAreaDictInfo;
     }
 
     /**

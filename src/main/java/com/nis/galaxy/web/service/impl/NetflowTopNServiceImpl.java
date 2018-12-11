@@ -24,14 +24,11 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
 
     @Autowired
     NetflowTopNDao netflowTopNDao;
-    @Autowired
-    MyLoad myLoad;
-
 
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return myLoad.listAreaDictInfo;
+        return MyLoad.listAreaDictInfo;
     }
 
     /**
@@ -101,8 +98,8 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         List<NetFlowWater> list = new ArrayList<>();
         List<NetFlowWaterPush> resule = new ArrayList<>();
-        List<Entrance> entrance = netflowTopNDao.getIpEntranceRe();
         long timeMillisStart = System.currentTimeMillis();
+        List<Entrance> entrance = netflowTopNDao.getIpEntranceRe();
         try {
             list = netflowTopNDao.getNetFlowWaterTop10(start, end);
         } catch (Exception e) {

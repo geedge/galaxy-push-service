@@ -26,12 +26,10 @@ public class MonitorServiceImpl implements MonitorService {
 
     @Autowired
     MonitorDao monitorDao;
-    @Autowired
-    MyLoad myLoad;
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return myLoad.listAreaDictInfo;
+        return MyLoad.listAreaDictInfo;
     }
 
     /**

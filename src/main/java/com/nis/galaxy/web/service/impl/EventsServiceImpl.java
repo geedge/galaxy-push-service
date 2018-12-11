@@ -22,8 +22,6 @@ public class EventsServiceImpl implements EventsService {
 
     @Autowired
     EventsDao eventsDao;
-    @Autowired
-    MyLoad myLoad;
 
     @Value("${Device.Server.Num}")
     private int DeviceServerNum;
@@ -38,7 +36,7 @@ public class EventsServiceImpl implements EventsService {
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
-        return myLoad.listNtcService;
+        return MyLoad.listNtcService;
     }
 
     /**

@@ -27,18 +27,16 @@ public class BlockingServiceImp implements BlockingService {
     @Autowired
     BlockingDao blockingDao;
     @Autowired
-    MyLoad myLoad;
-    @Autowired
     DictService dictService;
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return myLoad.listAreaDictInfo;
+        return MyLoad.listAreaDictInfo;
     }
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
-        return myLoad.listNtcService;
+        return MyLoad.listNtcService;
     }
 
     /**

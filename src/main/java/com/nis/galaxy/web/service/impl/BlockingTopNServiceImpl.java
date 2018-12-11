@@ -23,24 +23,22 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
 
     @Autowired
     BlockingTopNDao blockingTopNDao;
-    @Autowired
-    MyLoad myLoad;
 
 
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return myLoad.listAreaDictInfo;
+        return MyLoad.listAreaDictInfo;
     }
 
     //标签表
     public Map<String, UiTagDictInfo> listUiTagDicInfo() {
-        return myLoad.listUiTagDicInfo;
+        return MyLoad.listUiTagDicInfo;
     }
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
-        return myLoad.listNtcService;
+        return MyLoad.listNtcService;
     }
 
     /**

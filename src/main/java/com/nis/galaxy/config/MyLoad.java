@@ -2,6 +2,7 @@ package com.nis.galaxy.config;
 
 import com.nis.galaxy.domain.dict.*;
 import com.nis.galaxy.util.ConfigUtil;
+import com.nis.galaxy.util.ListUtils;
 import com.nis.galaxy.web.service.DictService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Order(1)
+@Async
 public class MyLoad {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     private int a = 1;
@@ -34,38 +36,20 @@ public class MyLoad {
     /**
      * 业务表
      */
-    public Map<String, NtcServiceDict> listNtcService = new ConcurrentHashMap<>();
+    public static Map<String, NtcServiceDict> listNtcService = new ConcurrentHashMap<>();
     /**
      * 协议表
      */
-    public Map<String, String> listProtocolDict = new ConcurrentHashMap<>();
+    public static Map<String, String> listProtocolDict = new ConcurrentHashMap<>();
     ;
     /**
      * 标签表
      */
-    public Map<String, UiTagDictInfo> listUiTagDicInfo = new ConcurrentHashMap<>();
+    public static Map<String, UiTagDictInfo> listUiTagDicInfo = new ConcurrentHashMap<>();
     /**
      * 地域表
      */
-    public Map<String, AreaDictInfo> listAreaDictInfo = new HashMap<>();
-
-    public Map<String, AreaDictInfo> getlistAreaDictInfo() {
-        return listAreaDictInfo;
-    }
-
-
-    public Map<String, UiTagDictInfo> getListUiTagDicInfo() {
-        return listUiTagDicInfo;
-    }
-
-    public Map<String, String> getListProtocolDict() {
-        return listProtocolDict;
-    }
-
-    @Scheduled(cron = "${dict.service.cron.plan}")
-    public Map<String, NtcServiceDict> getListNtcService() {
-        return listNtcService;
-    }
+    public static Map<String, AreaDictInfo> listAreaDictInfo = new HashMap<>();
 
 
     @Scheduled(cron = "${dict.service.cron.plan}")
@@ -77,7 +61,7 @@ public class MyLoad {
         } catch (Exception e) {
             logger.error("业务表加载出现异常", e);
         }
-        if (!ntcServiceDict.isEmpty()) {
+        if (!ListUtils.isEmptyList(ntcServiceDict)) {
             for (NtcServiceDict serviceDict : ntcServiceDict) {
                 mapNtcService.put(String.valueOf(serviceDict.getServiceCode()), serviceDict);
             }
@@ -87,6 +71,7 @@ public class MyLoad {
             logger.info("业务类型加载个数为\t" + listNtcService.size());
         } else {
             logger.info("listNtcService为null");
+            listNtcService = new HashMap<>();
         }
     }
 
@@ -99,7 +84,7 @@ public class MyLoad {
         } catch (Exception e) {
             logger.error("协议表加载出现异常", e);
         }
-        if (!protocolDict.isEmpty()) {
+        if (!ListUtils.isEmptyList(protocolDict)) {
             for (ProtocolDict dict : protocolDict) {
                 mapProtocolDict.put(dict.getViewCode(), dict.getProtocolType());
             }
@@ -109,6 +94,7 @@ public class MyLoad {
             logger.info("协议加载个数为\t" + listProtocolDict.size());
         } else {
             logger.info("listNtcService为null");
+            listProtocolDict = new HashMap<>();
         }
     }
 
@@ -121,7 +107,7 @@ public class MyLoad {
         } catch (Exception e) {
             logger.error("标签表加载出现异常", e);
         }
-        if (!uiTagDicInfo.isEmpty()) {
+        if (!ListUtils.isEmptyList(uiTagDicInfo)) {
             for (UiTagDictInfo tagDicInfo : uiTagDicInfo) {
                 mapUiTagDicInfo.put(tagDicInfo.getTagId(), tagDicInfo);
             }
@@ -131,6 +117,7 @@ public class MyLoad {
             logger.info("标签加载个数为\t" + listUiTagDicInfo.size());
         } else {
             logger.info("listUiTagDicInfo为null");
+            listUiTagDicInfo = new HashMap<>();
         }
     }
 

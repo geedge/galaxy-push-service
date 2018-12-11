@@ -6,7 +6,7 @@
      SELECT a.time time,area area,a.total total,a.normal normal,a.abnormal abnormal,b.hostname name,b.ip ip
     FROM traffic_abnormal_machine b right JOIN
     (SELECT id,commit_time time,area,total,normal,abnormal from traffic_nmsserver_statistic
-    WHERE commit_time=(SELECT commit_time time FROM traffic_nmsserver_statistic ORDER BY time desc limit 1) limit 1) a
+    WHERE commit_time=(SELECT commit_time time FROM traffic_nmsserver_statistic ORDER BY time desc limit 1)) a
     on b.nmsServer_Id = a.id
     </select>
     <resultMap id="BaseResultMap" type="com.nis.galaxy.domain.NmsServerBean" >
