@@ -18,9 +18,9 @@
     <!--封堵信息分布显示_____映射-->
     <select id="getDisBlockInformationOnly" resultType="com.nis.galaxy.domain.NtcDisReport">
       	<![CDATA[
-      	SELECT #{push} AS time,area,SUM(controlNum) AS controlNum,SUM(monitorNum) AS monitorNum,SUM(c.up) AS upstreamNum,SUM(c.dw) AS downstreamNum,(SUM(c.up)+SUM(c.dw)) AS networkFlowNum
+      	SELECT #{push} AS time,d.entrance_id AS area,SUM(controlNum) AS controlNum,SUM(monitorNum) AS monitorNum,SUM(c.up) AS upstreamNum,SUM(c.dw) AS downstreamNum,(SUM(c.up)+SUM(c.dw)) AS networkFlowNum
       	FROM(
-	        SELECT entrance_id AS area,entrance_id FROM ntc_device_info GROUP BY entrance_id
+	        SELECT entrance_id FROM ntc_device_info GROUP BY entrance_id
 	        ) d
 	        LEFT JOIN
 	        (SELECT entrance_id,SUM(sum) AS controlNum
@@ -106,7 +106,7 @@
       SELECT report_time AS time,s_ip AS src_ip,d_ip AS dst_ip,service AS type,sum AS count
       FROM ntc_service_behav_statistic
       WHERE report_time > DATE_SUB(NOW(),INTERVAL 24 HOUR)
-      ORDER BY report_time DESC
+      ORDER BY time DESC
       LIMIT 500;
     </select>
     <!--热力图接口 5min/次 粒度5min_____映射 -->
@@ -129,7 +129,7 @@
       SELECT service_id AS type,count(0) AS count
       FROM ui_cfg_num_statistics
       WHERE cfg_state = 1
-      GROUP BY service_id
+      GROUP BY type
       ORDER BY count DESC;
        ]]>
     </select>

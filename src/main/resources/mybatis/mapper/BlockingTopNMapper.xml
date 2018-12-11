@@ -17,7 +17,7 @@
 		      OR service BETWEEN 258 AND 273
 		      OR service = 576
 		      )
-	   GROUP BY type , area
+	   GROUP BY type,area
 	   ORDER BY count DESC
 	   LIMIT 10;
        ]]>
@@ -51,11 +51,11 @@
     <!--1小时内全国阻断网站TOP10 1h/条-->
     <select id="getBlockTop10WebsiteOf1h" resultType="com.nis.galaxy.domain.NtcRejectWebsiteStatistic">
         <![CDATA[
-        SELECT #{push} time ,website type ,sum(sum) count
+        SELECT #{push} time ,website type ,SUM(sum) count
         FROM ntc_reject_website_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-        GROUP BY website
+        GROUP BY type
         HAVING trim(type)!=''
         ORDER BY count desc
         LIMIT 100;
@@ -64,11 +64,11 @@
     <!--5分钟内全国阻断网站TOP10 5min/条-->
     <select id="getBlockTop10WebsiteOf5m" resultType="com.nis.galaxy.domain.NtcWebIpCount">
         <![CDATA[
-        SELECT #{push} time,website type,ip_addr ip,sum count
+        SELECT #{push} time,website type,ip_addr ip,SUM(sum) count
         FROM ntc_reject_website_statistic
         WHERE stat_time >= #{start}
             AND stat_time < #{end}
-        GROUP BY website ,ip_addr
+        GROUP BY type ,ip
         HAVING trim(website)!=''
         ORDER BY count desc
         LIMIT 100;
@@ -81,7 +81,7 @@
         FROM ntc_tag_report
         WHERE report_time >= #{start}
           AND report_time < #{end}
-		  GROUP BY tag
+		  GROUP BY type
 		  ORDER BY count desc;
         ]]>
     </select>

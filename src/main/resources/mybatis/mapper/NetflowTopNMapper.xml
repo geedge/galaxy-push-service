@@ -9,7 +9,7 @@
        FROM traffic_ip_active_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-       GROUP BY ip_addr ,area_id
+       GROUP BY IP ,area
        ORDER BY COUNT desc
        LIMIT 10;
         ]]>
@@ -17,16 +17,16 @@
     <!--互联网流量TOP10-->
     <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
-        SELECT ifnull(dic.area,0) as area,net.time time,sum(net.count)/1024/1024 count FROM (
+        SELECT ifnull(dic.area,0) as area,net.time AS time,sum(net.count)/1024/1024 count FROM (
  select RECV_TIME time,sum(INOCTETS+OUTOCTETS) count,NODE_IP ip
         from traffic_netflow_port_info
-        GROUP BY RECV_TIME,ip
-        HAVING RECV_TIME>= #{start}
-        and RECV_TIME< #{end} ) net
+        WHERE RECV_TIME>= #{start}
+        and RECV_TIME< #{end}
+        GROUP BY RECV_TIME,ip) net
 LEFT JOIN
 (SELECT entrance_id area,manager_ip ip from ntc_device_info) dic
  on net.ip = dic.ip
-GROUP BY area,net.time
+GROUP BY area,time
         ]]>
     </select>
 

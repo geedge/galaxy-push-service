@@ -99,7 +99,12 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
         List<NetFlowWater> list = new ArrayList<>();
         List<NetFlowWaterPush> resule = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
-        List<Entrance> entrance = netflowTopNDao.getIpEntranceRe();
+        List<Entrance> entrance = new ArrayList<>();
+        try {
+            entrance = netflowTopNDao.getIpEntranceRe();
+        } catch (Exception ex) {
+            logger.error("互联网流量TOP10\t获取局点异常\tserviceImpl", ex);
+        }
         try {
             list = netflowTopNDao.getNetFlowWaterTop10(start, end);
         } catch (Exception e) {
@@ -137,46 +142,48 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 resule.add(new NetFlowWaterPush(start, area, avg));
             } else if (size > 1) {
                 //根据局点遍历
-                for (Entrance entranceOne : entrance) {
-                    List<NetFlowWater> temp = new ArrayList<>();
-                    String entranceNanme = entranceOne.getEntrance();
-                    //遍历list结果集
-                    for (int i = 0; i < size; i++) {
-                        String area = list.get(i).getArea();
-                        if (entranceNanme.equals(area)) {
-                            temp.add(list.get(i));
-                        }
-                    }
-                    long endCount = 0;
-                    long startCount = 0;
-                    long count = 0;
-                    long avg = 0;
-                    Date timeEnd;
-                    Date timeStart;
-                    int tempSize = temp.size();
-                    for (int i = tempSize - 1; i > 0; i--) {
-                        endCount = temp.get(i).getCount();
-                        startCount = temp.get(i - 1).getCount();
-                        timeEnd = temp.get(i).getTime();
-                        timeStart = temp.get(i - 1).getTime();
-                        long timeSecond = (timeEnd.getTime() - timeStart.getTime()) / 1000;
-                        count = endCount - startCount;
-                        if (count >= 0) {
-                            avg = avg + count / timeSecond;
-                        } else {
-                            if (endCount > 0) {
-                                avg = avg + endCount / timeSecond;
+                if (!ListUtils.isEmptyList(entrance)) {
+                    for (Entrance entranceOne : entrance) {
+                        List<NetFlowWater> temp = new ArrayList<>();
+                        String entranceNanme = entranceOne.getEntrance();
+                        //遍历list结果集
+                        for (int i = 0; i < size; i++) {
+                            String area = list.get(i).getArea();
+                            if (entranceNanme.equals(area)) {
+                                temp.add(list.get(i));
                             }
                         }
+                        long endCount = 0;
+                        long startCount = 0;
+                        long count = 0;
+                        long avg = 0;
+                        Date timeEnd;
+                        Date timeStart;
+                        int tempSize = temp.size();
+                        for (int i = tempSize - 1; i > 0; i--) {
+                            endCount = temp.get(i).getCount();
+                            startCount = temp.get(i - 1).getCount();
+                            timeEnd = temp.get(i).getTime();
+                            timeStart = temp.get(i - 1).getTime();
+                            long timeSecond = (timeEnd.getTime() - timeStart.getTime()) / 1000;
+                            count = endCount - startCount;
+                            if (count >= 0) {
+                                avg = avg + count / timeSecond;
+                            } else {
+                                if (endCount > 0) {
+                                    avg = avg + endCount / timeSecond;
+                                }
+                            }
+                        }
+                        if (tempSize > 1) {
+                            avg = avg / (size - 1);
+                        } else if (tempSize == 1) {
+                            avg = temp.get(0).getCount();
+                        } else {
+                            continue;
+                        }
+                        resule.add(new NetFlowWaterPush(start, entranceNanme, avg));
                     }
-                    if (tempSize > 1) {
-                        avg = avg / (size - 1);
-                    } else if (tempSize == 1) {
-                        avg = temp.get(0).getCount();
-                    } else {
-                        continue;
-                    }
-                    resule.add(new NetFlowWaterPush(start, temp.get(0).getArea(), avg));
                 }
             } else {
                 long avg = 0;

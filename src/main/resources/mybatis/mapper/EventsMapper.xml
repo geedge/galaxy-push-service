@@ -24,8 +24,8 @@
                  and stat_time<#{end}
                  group by app_type) t , ui_code_app_dic a
         where t.app_type=a.view_code
-        order by link_sum
-	    desc limit 10;
+        order by num desc
+        limit 10;
         ]]>
     </select>
     <!--来函统计报表-->
@@ -35,7 +35,7 @@
               (SELECT t.request_id,t.service_id,t.compile_id,max(t.statistic_time) time FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id) s
       on r.id = s.request_id
       WHERE r.is_valid = 1
-      group by  r.request_title
+      group by  letter
     </select>
     <!--业务类型统计报表 天/次-->
     <select id="getServiceCount" resultType="com.nis.galaxy.domain.EventsServiceCount">
@@ -44,7 +44,7 @@
         from NTC_SERVICE_REPORT
         where report_time>= #{start}
         and report_time< #{end}
-        group by service;
+        group by type;
         ]]>
     </select>
     <!--重点保障事件总览 天/次-->
@@ -58,7 +58,7 @@
           ( CASE WHEN (  (p.service BETWEEN 128 AND 152)  OR (p.service BETWEEN 384 AND 513) OR (p.service BETWEEN 848 AND 1030) OR (p.service = 592) OR (p.service = 1152)) THEN  p.sum ELSE  0 END ) monit_sum  FROM (
           SELECT  t.cfg_id,  t.service,  t.sum,  t.report_time FROM  ntc_pz_report t) p ) s GROUP BY s.cfg_id )
           pz on pz.cfg_id = req.compile_id  GROUP BY req.request_id ) num
-           on lwhh.id = num.request_id group by task_name
+           on lwhh.id = num.request_id group by taskName,taskTime
             HAVING (letterNum + configNum + monitorNum+controlNum > 0);
         ]]>
     </select>
@@ -79,7 +79,7 @@
               FROM MM_AUDIO_REPORT
               where report_time >= #{start}
               and report_time < #{end}
-              group by pid
+              group by audioId
             order by  num desc
             limit 10
         ]]>
@@ -91,7 +91,7 @@
               FROM MM_VIDEO_REPORT
               where report_time >= #{start}
               and report_time < #{end}
-              group by pid
+              group by vedioId
                order by  num desc
             limit 10
         ]]>
@@ -103,7 +103,7 @@
               FROM MM_PIC_REPORT
               where report_time >= #{start}
               and report_time < #{end}
-              group by pid
+              group by imageId
                order by  num desc
             limit 10
         ]]>
@@ -115,7 +115,7 @@
               FROM MM_VOIP_REPORT
               where report_time >= #{start}
               and report_time < #{end}
-              group by account
+              group by phonenum
                order by  num desc
             limit 10
         ]]>
@@ -136,7 +136,7 @@
         FROM ntc_radius_report
         WHERE report_time >= #{start}
             AND report_time < #{end}
-            GROUP BY ACCOUNT ,NAS_IP
+            GROUP BY account ,nas_ip
             ORDER BY num DESC
              LIMIT 100;
      ]]>
@@ -154,7 +154,7 @@
        ON task.id = lwhh.task_id
        LEFT JOIN (SELECT r.request_id,r.service_id,COALESCE(SUM(t.sum),0) sum  FROM ( SELECT t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) r , ( SELECT cfg_id, service, sum(sum) sum FROM ntc_pz_report WHERE service IN (128, 129, 132, 390, 592) GROUP BY service, cfg_id )t where t.cfg_id = r.compile_id group by r.request_id,r.service_id) t
        on t.request_id=lwhh.id
-       group by  task.task_name
+       group by  event,time
        having (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
     <!--事件封堵-->
@@ -185,7 +185,7 @@
     				where t.cfg_id = r.compile_id
     				group by r.request_id,r.service_id) t
     on t.request_id=lwhh.id
-    group by  task.task_name
+    group by  event,time
     having (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
     <!--时间：系统总计 -->

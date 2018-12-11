@@ -9,7 +9,7 @@
         FROM traffic_protocol_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-        GROUP BY proto_type;
+        GROUP BY type;
         ]]>
         </select>
     <!--1小时内网络协议统计_-->
@@ -20,7 +20,7 @@
       FROM traffic_protocol_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
-      GROUP BY proto_type
+      GROUP BY type
         ]]>
   </select>
     <!--5分钟内活跃IP信息 5min __映射-->
@@ -31,7 +31,7 @@
         FROM traffic_ip_active_statistic
         WHERE stat_time >= #{start}
         AND stat_time < #{end}
-        group by ip_addr,area_id
+        group by ip,area
         ]]>
     </select>
     <!--地域流量-->
@@ -46,13 +46,13 @@ SELECT  t.node_ip ip,sum(t.speed) bps
 	 LEFT JOIN
 	 (SELECT entrance_id area,manager_ip ip FROM ntc_device_info GROUP BY area,ip) dic
 	 on dic.ip = rt.ip
-GROUP BY dic.area
+GROUP BY area
         ]]>
     </select>
     <!--端口流量-->
     <select id="getPortNetflowOf5min" resultType="com.nis.galaxy.domain.PortBPSTime">
         <![CDATA[
-        SELECT #{push} time,t.port port ,MAX (t.speed)  bps
+        SELECT #{push} time,t.port port ,MAX(t.speed)  bps
         from ( SELECT RECV_TIME,PORT_DESC as port,(INOCTETS_SPEED+OUTOCTETS_SPEED) as speed
                FROM traffic_netflow_port_info
               where RECV_TIME >= #{start}
