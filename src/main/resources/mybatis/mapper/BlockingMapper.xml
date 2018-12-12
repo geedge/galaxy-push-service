@@ -139,62 +139,74 @@
     <!--时间：封堵信息整体显示-->
     <select id="getAllBlockInformationLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT MAX(report_time)
+        SELECT report_time
         FROM ntc_total_report
         WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
         ]]>
     </select>
     <!--封堵信息分布显示-->
     <select id="getDisBlockInformationLastTime" resultType="java.util.Date">
         <![CDATA[
-         SELECT MAX(report_time)
+         SELECT report_time
          FROM ntc_entrance_report
          WHERE report_time < #{end}
          AND (service BETWEEN 16 AND 40
              OR service BETWEEN 258 AND 273
 		     OR service = 576
 		     )
+		 ORDER BY report_time DESC
+		 LIMIT 1
          ]]>
     </select>
     <!--DNS欺骗信息显示-->
     <select id="getDNSDeceiveInformationLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT MAX(report_time)
+        SELECT report_time
         FROM ntc_entrance_report
         WHERE report_time < #{end}
             AND service = 18
+        ORDER BY report_time DESC
+        LIMIT 1
         ]]>
     </select>
     <!--24小时全国范围阻断协议信息-->
     <select id="get24hAllBlockEachProtocolOLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT MAX(report_time)
+        SELECT report_time
         FROM ntc_service_report
         WHERE report_time < #{end}
             AND (service BETWEEN 16 AND 40
                 OR service BETWEEN 258 AND 273
                 OR service = 576
                 )
+        ORDER BY report_time DESC
+        LIMIT 1
         ]]>
     </select>
     <!--24小时内全国热力图-->
     <select id="getAllHotStatistisLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT MAX(report_time)
+        SELECT report_time
         FROM ntc_service_behav_statistic
         WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
         ]]>
     </select>
     <!--热力图接口-->
     <select id="getDisBlockMapLastTime" resultType="java.util.Date">
          <![CDATA[
-         SELECT MAX(report_time)
+         SELECT report_time
          FROM ntc_entrance_report
          WHERE report_time < #{end}
          AND (service BETWEEN 16 AND 40
              OR service BETWEEN 258 AND 273
              OR service = 576
 		     )
+		 ORDER BY report_time DESC
+		 LIMIT 1
          ]]>
     </select>
 </mapper>

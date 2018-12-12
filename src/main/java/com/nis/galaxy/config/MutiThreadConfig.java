@@ -50,16 +50,11 @@ public class MutiThreadConfig implements AsyncConfigurer {
         return new MyAsyncExceptionHandler();
     }
 
-    /**
-     * 自定义异常处理类
-     *
-     * @author achen
-     */
     class MyAsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
         @Override
         public void handleUncaughtException(Throwable throwable, Method method, Object... obj) {
-            logger.info("Exception message - " + throwable.getMessage());
+            logger.info("Exception message - " + throwable.getMessage(),throwable);
             logger.info("Method name - " + method.getName());
             for (Object param : obj) {
                 logger.info("Parameter value - " + param);

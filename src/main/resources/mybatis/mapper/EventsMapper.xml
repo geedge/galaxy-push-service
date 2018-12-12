@@ -5,140 +5,185 @@
 <mapper namespace="com.nis.galaxy.web.dao.EventsDao">
     <!--系统总计 /天-->
     <select id="getSystemTotalOf1Day" resultType="com.nis.galaxy.domain.SystemTotal">
-    <![CDATA[
-        SELECT p.pz_num configNum,t.byte_sum totalNum,t.reject_sum blockNum,t.monitor_sum monitorNum,t.drop_conn_sum discardedNum,t.loop_conn_sum refluxNum
+        <![CDATA[
+        SELECT p.pz_num AS configNum,t.byte_sum AS totalNum,t.reject_sum AS blockNum,t.monitor_sum AS monitorNum,t.drop_conn_sum AS discardedNum,t.loop_conn_sum AS refluxNum
         FROM
-          ( SELECT count(0) pz_num FROM ui_cfg_num_statistics WHERE cfg_state = 1 ) p,
-          ( SELECT sum(c2s_byte_len + s2c_byte_len) byte_sum, sum(reject_num) reject_sum,sum(monitor_num) monitor_sum, sum(drop_conn_num) drop_conn_sum, sum(loop_conn_num) loop_conn_sum
-              FROM NTC_TOTAL_REPORT
+          ( SELECT COUNT(0) pz_num FROM ui_cfg_num_statistics WHERE cfg_state = 1 ) p,
+          ( SELECT SUM(c2s_byte_len + s2c_byte_len) AS byte_sum,sum(reject_num) AS reject_sum,sum(monitor_num) AS monitor_sum,sum(drop_conn_num) AS drop_conn_sum,sum(loop_conn_num) AS loop_conn_sum
+            FROM NTC_TOTAL_REPORT
             WHERE report_time >= #{start} AND report_time < #{end} ) t
-    ]]>
+        ]]>
     </select>
     <!--特定APP访问监控 /小时-->
     <select id="getSpecifiedAPPMonitor" resultType="com.nis.galaxy.domain.EventsAppMonitor">
-    <![CDATA[
-       select #{push} time,a.app_name name,t.link_sum num
-       from (select app_type,max(link_num) link_sum
-              from TRAFFIC_APP_STATISTIC
-              where stat_time>= #{start}
-                 and stat_time<#{end}
-                 group by app_type) t , ui_code_app_dic a
-        where t.app_type=a.view_code
-        order by num desc
-        limit 10;
+        <![CDATA[
+        SELECT #{push} AS time,a.app_name AS name,t.link_sum AS num
+        FROM (SELECT app_type,MAX(link_num) AS link_sum
+              FROM TRAFFIC_APP_STATISTIC
+              WHERE stat_time>= #{start}
+                 AND stat_time<#{end}
+              GROUP BY app_type) t ,
+              ui_code_app_dic a
+        WHERE t.app_type=a.view_code
+        ORDER BY num DESC
+        LIMIT 10;
         ]]>
     </select>
     <!--来函统计报表-->
     <select id="getLetterCount" resultType="com.nis.galaxy.domain.EventsLetterCount">
-      select max(s.time) time,r.request_title letter,count(s.compile_id) num
-      from ui_request_info r RIGHT join
-              (SELECT t.request_id,t.service_id,t.compile_id,max(t.statistic_time) time FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id) s
-      on r.id = s.request_id
+      SELECT MAX(s.time) AS time,r.request_title AS letter,COUNT(s.compile_id) AS num
+      FROM ui_request_info r
+          RIGHT JOIN
+          ( SELECT t.request_id,t.service_id,t.compile_id,MAX(t.statistic_time) AS time
+          FROM ui_request_num_statistics t
+          GROUP BY t.request_id, t.service_id, t.compile_id
+          ) s
+          ON r.id = s.request_id
       WHERE r.is_valid = 1
-      group by  letter
+      GROUP BY  letter
     </select>
     <!--业务类型统计报表 天/次-->
     <select id="getServiceCount" resultType="com.nis.galaxy.domain.EventsServiceCount">
         <![CDATA[
-        select #{push} time,service type,sum(sum) num
-        from NTC_SERVICE_REPORT
-        where report_time>= #{start}
-        and report_time< #{end}
-        group by type;
+        SELECT #{push} AS time,service AS type,SUM(sum) AS num
+        FROM NTC_SERVICE_REPORT
+        WHERE report_time>= #{start}
+        AND report_time< #{end}
+        GROUP BY type;
         ]]>
     </select>
     <!--重点保障事件总览 天/次-->
     <select id="getKeyPointSafaguardThing" resultType="com.nis.galaxy.domain.EventsKeyPointSafaguardThing">
         <![CDATA[
-       SELECT  #{start} time,task.audit_time taskTime,task.task_name taskName, count(lwhh.id) letterNum,COALESCE(sum(num.cfg_num),0) configNum,COALESCE( sum(num.reject_sum),0) monitorNum,COALESCE( sum(num.monit_sum),0) controlNum
-        FROM (select * from ui_task_info where is_valid=1) task left join (select * from ui_request_info  where is_valid=1) lwhh on task.id = lwhh.task_id left join  ( SELECT req.request_id, count(req.compile_id) cfg_num, sum(pz.reject_sum) reject_sum, sum(pz.monit_sum) monit_sum FROM (
-          SELECT  t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) req
-          LEFT JOIN ( SELECT s.cfg_id, SUM(s.reject_sum) reject_sum, SUM(s.monit_sum) monit_sum FROM (
-          SELECT p.cfg_id,( CASE WHEN (p.service BETWEEN 16 AND 40) OR (p.service BETWEEN 258 AND 273) OR (p.service =576) THEN  p.sum ELSE  0 END ) reject_sum,
-          ( CASE WHEN (  (p.service BETWEEN 128 AND 152)  OR (p.service BETWEEN 384 AND 513) OR (p.service BETWEEN 848 AND 1030) OR (p.service = 592) OR (p.service = 1152)) THEN  p.sum ELSE  0 END ) monit_sum  FROM (
-          SELECT  t.cfg_id,  t.service,  t.sum,  t.report_time FROM  ntc_pz_report t) p ) s GROUP BY s.cfg_id )
-          pz on pz.cfg_id = req.compile_id  GROUP BY req.request_id ) num
-           on lwhh.id = num.request_id group by taskName,taskTime
-            HAVING (letterNum + configNum + monitorNum+controlNum > 0);
+        SELECT #{start} AS time,task.audit_time AS taskTime,task.task_name AS taskName,COUNT(lwhh.id) AS letterNum,
+                COALESCE(SUM(num.cfg_num),0) AS configNum,
+                COALESCE( SUM(num.reject_sum),0) AS monitorNum,
+                COALESCE( sum(num.monit_sum),0) AS controlNum
+        FROM ( SELECT *
+                FROM ui_task_info
+                WHERE is_valid=1) task
+                LEFT JOIN
+                ( SELECT *
+                FROM ui_request_info
+                WHERE is_valid=1
+                ) lwhh
+                ON task.id = lwhh.task_id
+                LEFT JOIN
+                ( SELECT req.request_id,COUNT(req.compile_id) AS cfg_num,
+                    SUM(pz.reject_sum) reject_sum,
+                    SUM(pz.monit_sum) monit_sum
+                  FROM
+                      ( SELECT  t.request_id, t.service_id, t.compile_id
+                        FROM ui_request_num_statistics t
+                        GROUP BY t.request_id, t.service_id, t.compile_id
+                        ) req
+                LEFT JOIN
+                ( SELECT s.cfg_id, SUM(s.reject_sum) reject_sum, SUM(s.monit_sum) monit_sum
+                FROM
+                ( SELECT p.cfg_id,( CASE WHEN (p.service BETWEEN 16 AND 40) OR (p.service BETWEEN 258 AND 273) OR (p.service =576) THEN  p.sum ELSE  0 END ) AS reject_sum,
+                                   ( CASE WHEN (  (p.service BETWEEN 128 AND 152)  OR (p.service BETWEEN 384 AND 513) OR (p.service BETWEEN 848 AND 1030) OR (p.service = 592) OR (p.service = 1152)) THEN  p.sum ELSE  0 END ) AS monit_sum
+                  FROM
+                  ( SELECT  t.cfg_id,  t.service,  t.sum,  t.report_time
+                    FROM  ntc_pz_report t) p ) s
+                    GROUP BY s.cfg_id ) pz
+                ON pz.cfg_id = req.compile_id
+                GROUP BY req.request_id ) num
+                ON lwhh.id = num.request_id
+                GROUP BY taskName,taskTime
+        HAVING (letterNum + configNum + monitorNum+controlNum > 0);
         ]]>
     </select>
     <!--1.	特定网站监控 小时/次-->
     <select id="getSpecificWebsites" resultType="com.nis.galaxy.domain.EventsSpecificWebsites">
         <![CDATA[
-          select #{end} time,t.website name,COALESCE(SUM(s.link_sum),0) num
-          from (select t.id,w.website from ui_website_domain_topic t left join
-           (select item_code webid,item_value website from ui_sys_data_dictionary_item where type=1 and dictionary_id=111) w
-           on w.webid = t.website_service_id ) t right JOIN (select web_id,sum(link_num) link_sum from
-           TRAFFIC_HTTP_STATISTIC  where web_id>0 group by web_id ) s on s.web_id = t.id group by t.website  HAVING name is not null order by num desc limit 10;
+        SELECT #{end} AS time,t.website AS name,COALESCE(SUM(s.link_sum),0) AS num
+        FROM (SELECT t.id,w.website FROM ui_website_domain_topic t
+               LEFT JOIN
+               (SELECT item_code webid,item_value website
+               FROM ui_sys_data_dictionary_item
+               WHERE type=1
+                   AND dictionary_id=111
+               ) w
+               ON w.webid = t.website_service_id ) t
+        RIGHT JOIN
+        (SELECT web_id,SUM(link_num) AS link_sum
+         FROM TRAFFIC_HTTP_STATISTIC
+         WHERE web_id>0
+         GROUP BY web_id ) s
+        ON s.web_id = t.id
+        GROUP BY t.website
+        HAVING name is not null
+        ORDER BY num desc
+        LIMIT 10;
         ]]>
     </select>
     <!--音频监控 小时/次-->
     <select id="getEventsAudioMonitor" resultType="com.nis.galaxy.domain.EventsAudioMonitor">
         <![CDATA[
-            SELECT pid audioId,sum(num) num,max(LOG_URI) url
-              FROM MM_AUDIO_REPORT
-              where report_time >= #{start}
-              and report_time < #{end}
-              group by audioId
-            order by  num desc
-            limit 10
+        SELECT pid AS audioId,SUM(num) AS num,MAX(LOG_URI) AS url
+        FROM MM_AUDIO_REPORT
+        WHERE report_time >= #{start}
+            AND report_time < #{end}
+        GROUP BY audioId
+        ORDER BY num DESC
+        LIMIT 10
         ]]>
     </select>
     <!--视频监控 小时/次-->
     <select id="getVedioMonitor" resultType="com.nis.galaxy.domain.EventsVedioMonitor">
         <![CDATA[
-            SELECT pid vedioId,sum(num) num,max(LOG_URI) url
-              FROM MM_VIDEO_REPORT
-              where report_time >= #{start}
-              and report_time < #{end}
-              group by vedioId
-               order by  num desc
-            limit 10
+        SELECT pid AS vedioId,SUM(num) AS num,MAX(LOG_URI) AS url
+        FROM MM_VIDEO_REPORT
+        WHERE report_time >= #{start}
+            AND report_time < #{end}
+        GROUP BY vedioId
+        ORDER BY num DESC
+        LIMIT 10
         ]]>
     </select>
     <!--图片监控 小时/次-->
     <select id="getImageMonitor" resultType="com.nis.galaxy.domain.EventsImageMonitor">
         <![CDATA[
-            SELECT pid imageId,sum(num) num,max(LOG_URI) url
-              FROM MM_PIC_REPORT
-              where report_time >= #{start}
-              and report_time < #{end}
-              group by imageId
-               order by  num desc
-            limit 10
+        SELECT pid AS imageId,SUM(num) AS num,MAX(LOG_URI) AS url
+        FROM MM_PIC_REPORT
+        WHERE report_time >= #{start}
+             AND report_time < #{end}
+        GROUP BY imageId
+        ORDER BY  num DESC
+        LIMIT 10
         ]]>
     </select>
  <!--VOIP监控 小时/次-->
     <select id="getVoipMonitor" resultType="com.nis.galaxy.domain.EventsVoipMonitor">
         <![CDATA[
-            SELECT account phonenum,sum(num) num,max(LOG_URI) url
-              FROM MM_VOIP_REPORT
-              where report_time >= #{start}
-              and report_time < #{end}
-              group by phonenum
-               order by  num desc
-            limit 10
+        SELECT account AS phonenum,SUM(num) AS num,MAX(LOG_URI) AS url
+        FROM MM_VOIP_REPORT
+        WHERE report_time >= #{start}
+            AND report_time < #{end}
+        GROUP BY phonenum
+        ORDER BY  num desc
+        LIMIT 10
         ]]>
     </select>
     <!--运行状态-->
     <select id="getRunningState" resultType="com.nis.galaxy.domain.EventsRunningState">
-    <![CDATA[
-	SELECT sum(MONITOR_NUM) as visitsNum,sum(REJECT_NUM)  as controlNum,sum(REPLACE_NUM) as replaceNum
+        <![CDATA[
+	    SELECT SUM(MONITOR_NUM) AS visitsNum,SUM(REJECT_NUM) AS controlNum,SUM(REPLACE_NUM) AS replaceNum
         FROM pxy_total_report
         WHERE REPORT_TIME >= #{start}
-       AND REPORT_TIME < #{end}
-     ]]>
+           AND REPORT_TIME < #{end}
+        ]]>
     </select>
     <!--目标行为网络监测-->
     <select id="getTargetNetwork" resultType="com.nis.galaxy.domain.EvevtsTargetNetwork">
     <![CDATA[
-        SELECT #{push} time,ACCOUNT account,NAS_IP nas_ip,sum(num) num
+        SELECT #{push} AS time,ACCOUNT AS account,NAS_IP AS nas_ip,SUM(num) AS num
         FROM ntc_radius_report
         WHERE report_time >= #{start}
             AND report_time < #{end}
-            GROUP BY account ,nas_ip
-            ORDER BY num DESC
-             LIMIT 100;
+        GROUP BY account ,nas_ip
+        ORDER BY num DESC
+        LIMIT 100;
      ]]>
     </select>
    <!--事件监测-->
@@ -152,10 +197,22 @@
        FROM (select * from ui_task_info where is_valid=1) task
        LEFT JOIN (select * from ui_request_info  where is_valid=1) lwhh
        ON task.id = lwhh.task_id
-       LEFT JOIN (SELECT r.request_id,r.service_id,COALESCE(SUM(t.sum),0) sum  FROM ( SELECT t.request_id, t.service_id, t.compile_id FROM ui_request_num_statistics t GROUP BY t.request_id, t.service_id, t.compile_id ) r , ( SELECT cfg_id, service, sum(sum) sum FROM ntc_pz_report WHERE service IN (128, 129, 132, 390, 592) GROUP BY service, cfg_id )t where t.cfg_id = r.compile_id group by r.request_id,r.service_id) t
-       on t.request_id=lwhh.id
-       group by  event,time
-       having (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
+       LEFT JOIN (SELECT r.request_id,r.service_id,COALESCE(SUM(t.sum),0) AS sum
+                   FROM
+                   ( SELECT t.request_id, t.service_id, t.compile_id
+                     FROM ui_request_num_statistics t
+                     GROUP BY t.request_id, t.service_id, t.compile_id
+                    ) r ,
+                    ( SELECT cfg_id, service, sum(sum) AS sum
+                      FROM ntc_pz_report
+                      WHERE service IN (128, 129, 132, 390, 592)
+                      GROUP BY service, cfg_id )t
+                   WHERE t.cfg_id = r.compile_id
+                   GROUP BY r.request_id,r.service_id
+                   ) t
+       ON t.request_id=lwhh.id
+       GROUP BY  event,time
+       HAVING (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
     <!--事件封堵-->
     <select id="getEventsBlock" resultType="com.nis.galaxy.domain.EventsBlock">
@@ -182,82 +239,100 @@
     						   FROM ntc_pz_report
     							 WHERE service IN (16, 17, 20, 262, 576)
     							 GROUP BY service, cfg_id ) t
-    				where t.cfg_id = r.compile_id
-    				group by r.request_id,r.service_id) t
-    on t.request_id=lwhh.id
-    group by  event,time
-    having (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
+    				WHERE t.cfg_id = r.compile_id
+    				GROUP BY r.request_id,r.service_id) t
+    ON t.request_id=lwhh.id
+    GROUP BY  event,time
+    HAVING (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
     <!--时间：系统总计 -->
     <select id="getSystemTotalOf1DayLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM NTC_TOTAL_REPORT
-        where report_time < #{end}
+        WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
     <!--时间：特定APP访问监控-->
     <select id="getSpecifiedAPPMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(stat_time)
+        SELECT stat_time
         FROM TRAFFIC_APP_STATISTIC
-        where stat_time < #{end}
+        WHERE stat_time < #{end}
+        ORDER BY stat_time DESC
+        LIMIT 1
          ]]>
     </select>
     <!--时间：业务类型统计报表-->
     <select id="getServiceCountLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM NTC_SERVICE_REPORT
-        where report_time < #{end}
+        WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
     <!--时间：音频监控-->
     <select id="getEventsAudioMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM  MM_AUDIO_REPORT
-        where report_time < #{end}
+        WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
     <!--时间：音频监控-->
     <select id="getVedioMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM  MM_VIDEO_REPORT
-        where report_time < #{end}
+        WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
     <!--时间：音频监控-->
     <select id="getImageMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM   MM_PIC_REPORT
-        where report_time < #{end}
+        WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
     <!--时间：VOIP监控-->
     <select id="getVoipMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM  MM_VOIP_REPORT
-        where report_time < #{end}
+        WHERE report_time < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
  <!--时间：运行状态-->
     <select id="getRunningStateLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM  pxy_total_report
-        where REPORT_TIME < #{end}
+        WHERE REPORT_TIME < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
 <!--时间：目标行为网络监测-->
     <select id="getTargetNetworkLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(report_time)
+        SELECT report_time
         FROM  ntc_radius_report
-        where REPORT_TIME < #{end}
+        WHERE REPORT_TIME < #{end}
+        ORDER BY report_time DESC
+        LIMIT 1
          ]]>
     </select>
 </mapper>

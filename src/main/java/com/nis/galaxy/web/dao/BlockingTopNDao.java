@@ -15,7 +15,7 @@ public interface BlockingTopNDao {
 
     List<NtcUrlIpCount> getBlockTop10URLOf5m(@Param("push") String push,@Param("start") String start, @Param("end") String end);
 
-    List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(@Param("push") String push,@Param("start") String start, @Param("end") String end);
+    List<NtcWebIpCount> getBlockTop10WebsiteOf5m(@Param("push") String push,@Param("start") String start, @Param("end") String end);
 
     List<AreaBlockProtocol> getAreaBlockTop10ProtocolOf24hOnly(@Param("push") String push,@Param("start") String start, @Param("end") String end);
 

@@ -3,11 +3,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nis.galaxy.web.dao.MonitorDao">
     <select id="getSystemMonitor"   resultMap="BaseResultMap">
-     SELECT a.time time,area area,a.total total,a.normal normal,a.abnormal abnormal,b.hostname name,b.ip ip
-    FROM traffic_abnormal_machine b right JOIN
-    (SELECT id,commit_time time,area,total,normal,abnormal from traffic_nmsserver_statistic
-    WHERE commit_time=(SELECT commit_time time FROM traffic_nmsserver_statistic ORDER BY time desc limit 1)) a
-    on b.nmsServer_Id = a.id
+    SELECT a.time AS time,area AS area,a.total AS total,a.normal AS normal,a.abnormal AS abnormal,b.hostname AS name,b.ip AS ip
+    FROM traffic_abnormal_machine AS b
+    RIGHT JOIN
+    (SELECT id,commit_time AS time,area,total,normal,abnormal
+     FROM traffic_nmsserver_statistic
+     WHERE commit_time = (SELECT commit_time AS time
+                           FROM traffic_nmsserver_statistic
+                           ORDER BY time DESC
+                           LIMIT 1)
+                           ) a
+    ON b.nmsServer_Id = a.id
     </select>
     <resultMap id="BaseResultMap" type="com.nis.galaxy.domain.NmsServerBean" >
         <result column="total" property="total"  />
@@ -23,56 +29,64 @@
     <!--网络流量监控_5min-->
     <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
         <![CDATA[
-SELECT ifnull(d.entrance_id,0)  as  area,'INOCTETS' as type,sum(tt.incount) as count ,time FROM (
-SELECT if((b.INOCTETS - a.INOCTETS ) >0  ,b.INOCTETS - a.INOCTETS ,b.INOCTETS) as incount,
-b.ip2 as ip,
-#{push} time
-FROM
-(SELECT sum(INOCTETS) INOCTETS,NODE_IP ip1
-       FROM traffic_netflow_port_info
-       WHERE RECV_TIME >= #{before}
-       and RECV_TIME< #{start}
-			 GROUP BY ip1) a RIGHT JOIN
-(SELECT  sum(INOCTETS) INOCTETS,NODE_IP ip2
-       FROM traffic_netflow_port_info
-       WHERE RECV_TIME >= #{start}
-       and RECV_TIME< #{end}
+        SELECT ifnull(d.entrance_id,0) AS area,'INOCTETS' AS type,SUM(tt.incount) AS count,time
+        FROM
+            (SELECT IF((b.INOCTETS - a.INOCTETS ) >0  ,b.INOCTETS - a.INOCTETS ,b.INOCTETS) AS incount,b.ip2 AS ip,#{push} AS time
+             FROM
+                 (SELECT SUM(INOCTETS) AS INOCTETS,NODE_IP AS ip1
+                  FROM traffic_netflow_port_info
+                  WHERE RECV_TIME >= #{before}
+                      AND RECV_TIME< #{start}
+			      GROUP BY ip1
+			      ) a
+			 RIGHT JOIN
+            (SELECT SUM(INOCTETS) AS INOCTETS,NODE_IP AS ip2
+             FROM traffic_netflow_port_info
+             WHERE RECV_TIME >= #{start}
+                 AND RECV_TIME< #{end}
 			 GROUP BY ip2) b
-			 on a.ip1=b.ip2 ) tt
+			 ON a.ip1=b.ip2
+			 ) tt
 	LEFT JOIN
-	(select entrance_id,manager_ip FROM ntc_device_info ) d
-	on d.manager_ip = tt.ip
+	(SELECT entrance_id,manager_ip
+	 FROM ntc_device_info
+	 ) d
+	ON d.manager_ip = tt.ip
 	GROUP BY area
 	UNION ALL
-SELECT ifnull(d.entrance_id,0) as area,'OUTOCTETS' as type,sum(tt.outcount) as count,time FROM (
-SELECT
-if((b.OUTOCTETS - a.OUTOCTETS ) >0  ,b.OUTOCTETS - a.OUTOCTETS ,b.OUTOCTETS) as outcount,
-b.ip2 as ip,
-#{push} time
-FROM
-(SELECT sum(OUTOCTETS) OUTOCTETS,NODE_IP ip1
-       FROM traffic_netflow_port_info
-       WHERE RECV_TIME >= #{before}
-       and RECV_TIME< #{start}
-			 GROUP BY ip1) a RIGHT JOIN
-(SELECT  sum(OUTOCTETS) OUTOCTETS,NODE_IP ip2
-       FROM traffic_netflow_port_info
-       WHERE RECV_TIME >= #{start}
-       and RECV_TIME< #{end}
-			 GROUP BY ip2) b
-			 on a.ip1=b.ip2 ) tt
+    SELECT ifnull(d.entrance_id,0) AS area,'OUTOCTETS' AS type,SUM(tt.outcount) AS count,time
+    FROM (SELECT if((b.OUTOCTETS - a.OUTOCTETS ) >0  ,b.OUTOCTETS - a.OUTOCTETS ,b.OUTOCTETS) AS outcount,b.ip2 AS ip,#{push} AS time
+           FROM
+              (SELECT SUM(OUTOCTETS)AS OUTOCTETS,NODE_IP AS ip1
+               FROM traffic_netflow_port_info
+               WHERE RECV_TIME >= #{before}
+                   AND RECV_TIME< #{start}
+			   GROUP BY ip1) a
+			 RIGHT JOIN
+             (SELECT SUM(OUTOCTETS) AS OUTOCTETS,NODE_IP AS ip2
+               FROM traffic_netflow_port_info
+               WHERE RECV_TIME >= #{start}
+               AND RECV_TIME< #{end}
+			   GROUP BY ip2) b
+			  ON a.ip1=b.ip2
+		  ) tt
 	LEFT JOIN
-	(select entrance_id,manager_ip FROM ntc_device_info group by entrance_id,manager_ip) d
-	on d.manager_ip = tt.ip
-GROUP BY area
+	(SELECT entrance_id,manager_ip
+	 FROM ntc_device_info
+	 GROUP BY entrance_id,manager_ip
+	 ) d
+	ON d.manager_ip = tt.ip
+    GROUP BY area
         ]]>
     </select>
     <!--时间:网络流量监控_5min-->
     <select id="getNetWaterMonitorLastTime" resultType="java.util.Date">
         <![CDATA[
-        SELECT max(RECV_TIME)
+        SELECT RECV_TIME
         FROM traffic_netflow_port_info
-          WHERE RECV_TIME < #{end}
+        WHERE RECV_TIME < #{end}
+        ORDER BY RECV_TIME DESC
+        LIMIT 1
         ]]>
     </select>
 </mapper>

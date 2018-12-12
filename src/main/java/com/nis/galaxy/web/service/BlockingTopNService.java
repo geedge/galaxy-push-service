@@ -12,7 +12,7 @@ public interface BlockingTopNService {
 
     List<NtcUrlIpCount> getBlockTop10URLOf5m(String start, String end);
 
-    List<NtcUrlIpCount> getBlockTop10WebsiteOf5m(String start, String end);
+    List<NtcWebIpCount> getBlockTop10WebsiteOf5m(String start, String end);
 
     List<NtcTagReport> getBlockTop100Tag1h(String start, String end);
 }
