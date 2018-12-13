@@ -179,25 +179,34 @@ public class BlockingTopNServiceImpl implements BlockingTopNService {
                 logger.error("24小时内区域阻断协议TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (AreaBlockProtocol areaBlockProtocol : list) {
-                String type = areaBlockProtocol.getType();
-                String area = areaBlockProtocol.getArea();
-                AreaDictInfo areaDictInfo = listArea.get(area);
+            Iterator<AreaBlockProtocol> areaBlockProtocol = list.iterator();
+            while (areaBlockProtocol.hasNext()) {
+                AreaBlockProtocol next = areaBlockProtocol.next();
+                String area = next.getArea();
+                String type = next.getType();
                 NtcServiceDict ntcServiceDict = listNtcService.get(type);
+                AreaDictInfo areaDictInfo = listArea.get(area);
                 if (areaDictInfo != null) {
-                    areaBlockProtocol.setArea(areaDictInfo.getItemValue());
+                    next.setArea(areaDictInfo.getItemValue());
+                } else {
+                    areaBlockProtocol.remove();
+                    continue;
                 }
                 if (ntcServiceDict == null) {
                     continue;
                 }
                 if (ConfigUtil.languageChose == 2) {
-                    areaBlockProtocol.setType(ntcServiceDict.getServiceNameEn());
+                    next.setType(ntcServiceDict.getServiceNameEn());
                 } else if (ConfigUtil.languageChose == 3) {
-                    areaBlockProtocol.setType(ntcServiceDict.getServiceNameRu());
+                    next.setType(ntcServiceDict.getServiceNameRu());
                 } else {
-                    areaBlockProtocol.setType(ntcServiceDict.getServiceNameZh());
+                    next.setType(ntcServiceDict.getServiceNameZh());
                 }
+            }
+            if (list.size() > 10) {
+                list = list.subList(0, 10);
             }
         }
         logger.info("24小时内区域阻断协议TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));

@@ -59,13 +59,22 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 logger.error("5分钟内活跃IP流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (IpActiveInt ipActiveInt : list) {
-                String area = ipActiveInt.getArea();
+            Iterator<IpActiveInt> ipActiveInt = list.iterator();
+            while (ipActiveInt.hasNext()) {
+                IpActiveInt next = ipActiveInt.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
-                if (areaDictInfo != null) {
-                    ipActiveInt.setArea(areaDictInfo.getItemValue());
+                if (areaDictInfo == null) {
+                    ipActiveInt.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
+            }
+            if (list.size() > 10) {
+                list = list.subList(0, 10);
             }
         }
         logger.info("5分钟内活跃IP流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));
@@ -187,16 +196,19 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 }
             } else {
                 long avg = 0;
-                avg = 0;
             }
             //映射地域
-            for (NetFlowWaterPush netFlowWaterPush : resule) {
-                String area = netFlowWaterPush.getArea();
+            Iterator<NetFlowWaterPush> netFlowWaterPush = resule.iterator();
+            while (netFlowWaterPush.hasNext()) {
+                NetFlowWaterPush next = netFlowWaterPush.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
                 if (areaDictInfo == null) {
+                    netFlowWaterPush.remove();
                     continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
-                netFlowWaterPush.setArea(areaDictInfo.getItemValue());
             }
         }
         logger.info("互联网流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));

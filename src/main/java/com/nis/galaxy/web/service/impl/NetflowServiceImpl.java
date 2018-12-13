@@ -189,12 +189,18 @@ public class NetflowServiceImpl implements NetflowService {
                 logger.error("5分钟内活跃IP信息\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (IpActiveInfo ipActiveInfo : list) {
-                String area = ipActiveInfo.getArea();
+            Iterator<IpActiveInfo> ipActiveInfo = list.iterator();
+            while (ipActiveInfo.hasNext()) {
+                IpActiveInfo next = ipActiveInfo.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
-                if (areaDictInfo != null) {
-                    ipActiveInfo.setArea(areaDictInfo.getItemValue());
+                if (areaDictInfo == null) {
+                    ipActiveInfo.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -251,12 +257,18 @@ public class NetflowServiceImpl implements NetflowService {
                 logger.error("地域流量\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (AreaBPSTime areaBPSTime : list) {
-                String area = areaBPSTime.getArea();
+            Iterator<AreaBPSTime> areaBPSTime = list.iterator();
+            while (areaBPSTime.hasNext()) {
+                AreaBPSTime next = areaBPSTime.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
-                if (areaDictInfo != null) {
-                    areaBPSTime.setArea(areaDictInfo.getItemValue());
+                if (areaDictInfo == null) {
+                    areaBPSTime.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
             }
         }

@@ -126,17 +126,22 @@ public class BlockingServiceImp implements BlockingService {
                 }
             }
         }
-        logger.info("DNS欺骗信息显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (NtcEntranceReport ntcEntranceReport : list) {
-                String area = ntcEntranceReport.getArea();
+            Iterator<NtcEntranceReport> ntcEntranceReport = list.iterator();
+            while (ntcEntranceReport.hasNext()) {
+                NtcEntranceReport next = ntcEntranceReport.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
                 if (areaDictInfo == null) {
+                    ntcEntranceReport.remove();
                     continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
-                ntcEntranceReport.setArea(areaDictInfo.getItemValue());
             }
         }
+        logger.info("DNS欺骗信息显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("DNS欺骗信息显示------->测试数据");
             list.add(new NtcEntranceReport(start, "Астана", (int) (Math.random() * 100)));
@@ -245,12 +250,18 @@ public class BlockingServiceImp implements BlockingService {
                 logger.error("封堵信息分布显示\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (NtcDisReport ntcDisReport : list) {
-                String area = ntcDisReport.getArea();
+            Iterator<NtcDisReport> ntcDisReport = list.iterator();
+            while (ntcDisReport.hasNext()){
+                NtcDisReport next = ntcDisReport.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
-                if (areaDictInfo != null) {
-                    ntcDisReport.setArea(areaDictInfo.getItemValue());
+                if (areaDictInfo == null) {
+                    ntcDisReport.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -290,24 +301,30 @@ public class BlockingServiceImp implements BlockingService {
                 logger.error("24小时内全国热力图\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (HotStatistic hotStatistic : list) {
-                String area = hotStatistic.getArea();
-                String type = hotStatistic.getType();
-                NtcServiceDict ntcServiceDict1 = listNtcService.get(type);
+            Iterator<HotStatistic> hotStatistic = list.iterator();
+            while (hotStatistic.hasNext()){
+                HotStatistic next = hotStatistic.next();
+                String area = next.getArea();
+                String type = next.getType();
+                NtcServiceDict ntcServiceDict = listNtcService.get(type);
                 AreaDictInfo areaDictInfo = listArea.get(area);
                 if (areaDictInfo != null) {
-                    hotStatistic.setArea(areaDictInfo.getItemValue());
+                    next.setArea(areaDictInfo.getItemValue());
+                }else {
+                    hotStatistic.remove();
+                    continue;
                 }
-                if (ntcServiceDict1 == null) {
+                if (ntcServiceDict == null) {
                     continue;
                 }
                 if (ConfigUtil.languageChose == 2) {
-                    hotStatistic.setType(ntcServiceDict1.getServiceNameEn());
+                    next.setType(ntcServiceDict.getServiceNameEn());
                 } else if (ConfigUtil.languageChose == 3) {
-                    hotStatistic.setType(ntcServiceDict1.getServiceNameRu());
+                    next.setType(ntcServiceDict.getServiceNameRu());
                 } else {
-                    hotStatistic.setType(ntcServiceDict1.getServiceNameZh());
+                    next.setType(ntcServiceDict.getServiceNameZh());
                 }
             }
         }
@@ -416,14 +433,19 @@ public class BlockingServiceImp implements BlockingService {
                 logger.error("热力图接口\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (AreaCount areaCount : list) {
-                String area = areaCount.getArea();
+            Iterator<AreaCount> areaCount = list.iterator();
+            while (areaCount.hasNext()) {
+                AreaCount next = areaCount.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
                 if (areaDictInfo == null) {
+                    areaCount.remove();
                     continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
-                areaCount.setArea(areaDictInfo.getItemValue());
             }
         }
         logger.info("热力图接口耗时：" + (System.currentTimeMillis() - timeMillisStart));

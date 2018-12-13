@@ -70,7 +70,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
      * @return
      */
     public static String getAfter5min(String time) {
-        if (time == null || time.isEmpty()) {
+        if (time == null || "".equals(time.trim())) {
             return "";
         }
         Date date = DateUtils.parseDate(time);

@@ -19,7 +19,7 @@
 		      )
 	   GROUP BY type,area
 	   ORDER BY count DESC
-	   LIMIT 10;
+	   LIMIT 20;
        ]]>
      </select>
     <!--1小时内全国阻断URLTOP10 1h/条 小时报-->

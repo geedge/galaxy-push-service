@@ -47,12 +47,18 @@ public class MonitorServiceImpl implements MonitorService {
         } catch (Exception e) {
             logger.error("系统监控\t查询异常\tserviceImpl", e);
         }
+        //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
-            for (NmsServerBean nmsServerBean : list) {
-                String area = nmsServerBean.getArea();
+            Iterator<NmsServerBean> nmsServerBean = list.iterator();
+            while (nmsServerBean.hasNext()) {
+                NmsServerBean next = nmsServerBean.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
-                if (areaDictInfo != null) {
-                    nmsServerBean.setArea(areaDictInfo.getItemValue());
+                if (areaDictInfo == null) {
+                    nmsServerBean.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
@@ -88,6 +94,7 @@ public class MonitorServiceImpl implements MonitorService {
     @Override
     public List<NetWaterMonitor> getNetWaterMonitor(String start, String end, int areaNetWaterMonitorExpTimes) {
         List<NetWaterMonitor> list = new ArrayList<>();
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
         long timeMillisStart = System.currentTimeMillis();
         try {
             String before = DateUtils.getBeforeNminOfTime(start, -5);
@@ -118,12 +125,16 @@ public class MonitorServiceImpl implements MonitorService {
             }
         }
         if (!ListUtils.isEmptyList(list)) {
-            Map<String, AreaDictInfo> listArea = listAreaDictInfo();
-            for (NetWaterMonitor netWaterMonitor : list) {
-                String area = netWaterMonitor.getArea();
+            Iterator<NetWaterMonitor> netWaterMonitor = list.iterator();
+            while (netWaterMonitor.hasNext()) {
+                NetWaterMonitor next = netWaterMonitor.next();
+                String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
-                if (areaDictInfo != null) {
-                    netWaterMonitor.setArea(areaDictInfo.getItemValue());
+                if (areaDictInfo == null) {
+                    netWaterMonitor.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
                 }
             }
         }
