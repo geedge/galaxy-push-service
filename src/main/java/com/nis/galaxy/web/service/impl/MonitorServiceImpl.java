@@ -29,7 +29,12 @@ public class MonitorServiceImpl implements MonitorService {
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return MyLoad.listAreaDictInfo;
+        Map<String, AreaDictInfo> listAreaDictInfo = MyLoad.listAreaDictInfo;
+        if (listAreaDictInfo == null || listAreaDictInfo.size() == 0) {
+            logger.warn("地域表无数据");
+            listAreaDictInfo = new HashMap<>();
+        }
+        return listAreaDictInfo;
     }
 
     /**
@@ -117,9 +122,13 @@ public class MonitorServiceImpl implements MonitorService {
             logger.warn("网络流量监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = monitorDao.getNetWaterMonitorLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = monitorDao.getNetWaterMonitor(start, time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = monitorDao.getNetWaterMonitor(start, time, DateUtils.getAfter5min(time), DateUtils.getBeforeNminOfTime(time, -5));
+                } else {
+                    logger.warn("网络流量监控\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("网络流量监控\t最近数据\t查询异常\tserviceImpl", e);
             }

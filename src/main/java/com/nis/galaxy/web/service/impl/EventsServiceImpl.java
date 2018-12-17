@@ -36,8 +36,13 @@ public class EventsServiceImpl implements EventsService {
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
-        return MyLoad.listNtcService;
-    }
+        Map<String, NtcServiceDict> listNtcService = MyLoad.listNtcService;
+        if (listNtcService == null || listNtcService.size() == 0) {
+            logger.warn("业务表无数据");
+            listNtcService = new HashMap<>();
+        }
+        return listNtcService;
+}
 
     /**
      * 系统总计
@@ -59,9 +64,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("系统总计\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getSystemTotalOf1DayLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfday(time);
-                list = eventsDao.getSystemTotalOf1Day(start, time, DateUtils.getAfter24h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfday(time);
+                    list = eventsDao.getSystemTotalOf1Day(start, time, DateUtils.getAfter24h(time));
+                } else {
+                    logger.warn("系统总计\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("系统总计\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -95,9 +104,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("特定APP访问监控\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getSpecifiedAPPMonitorLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getSpecifiedAPPMonitor(start, time, DateUtils.getAfter1h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getSpecifiedAPPMonitor(start, time, DateUtils.getAfter1h(time));
+                } else {
+                    logger.warn("特定APP访问监控\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("特定APP访问监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -164,9 +177,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getServiceCountLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getServiceCount(start, time, DateUtils.getAfter1h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getServiceCount(start, time, DateUtils.getAfter1h(time));
+                } else {
+                    logger.warn("业务类型统计报表\tNTC_SERVICE_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("业务类型统计报表\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -330,9 +347,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("音频监控\tMM_AUDIO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getEventsAudioMonitorLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getEventsAudioMonitor(start, time, DateUtils.getAfter1h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getEventsAudioMonitor(start, time, DateUtils.getAfter1h(time));
+                } else {
+                    logger.warn("音频监控\tMM_AUDIO_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("音频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -375,9 +396,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("视频监控\tMM_VIDEO_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getVedioMonitorLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getVedioMonitor(start, time, DateUtils.getAfter1h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getVedioMonitor(start, time, DateUtils.getAfter1h(time));
+                } else {
+                    logger.warn("视频监控\tMM_VIDEO_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("视频监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -420,9 +445,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("图片监控\tMM_PIC_REPORT" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getImageMonitorLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getImageMonitor(start, time, DateUtils.getAfter1h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getImageMonitor(start, time, DateUtils.getAfter1h(time));
+                } else {
+                    logger.warn("图片监控\tMM_PIC_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("图片监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -464,9 +493,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("VOIP监控\tMM_VOIP_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getVoipMonitorLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getVoipMonitor(start, time, DateUtils.getAfter1h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getVoipMonitor(start, time, DateUtils.getAfter1h(time));
+                } else {
+                    logger.warn("VOIP监控\tMM_VOIP_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("VOIP监控\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -525,9 +558,13 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getTargetNetworkLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfday(time);
-                list = eventsDao.getTargetNetwork(start, time, DateUtils.getAfter24h(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfday(time);
+                    list = eventsDao.getTargetNetwork(start, time, DateUtils.getAfter24h(time));
+                } else {
+                    logger.warn("目标行为网络监测\tNTC_RADIUS_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("目标行为网络监测\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -582,10 +619,14 @@ public class EventsServiceImpl implements EventsService {
             logger.warn("运行状况\tPXY_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = eventsDao.getRunningStateLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOfhour(time);
-                list = eventsDao.getRunningState(start, time, DateUtils.getAfter1h(time));
-                list.removeAll(Collections.singleton(null));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOfhour(time);
+                    list = eventsDao.getRunningState(start, time, DateUtils.getAfter1h(time));
+                    list.removeAll(Collections.singleton(null));
+                } else {
+                    logger.warn("运行状况\tPXY_TOTAL_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("运行状况\t最近数据\t查询异常\tserviceImpl", e);
             }

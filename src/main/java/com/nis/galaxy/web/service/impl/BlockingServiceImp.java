@@ -31,12 +31,22 @@ public class BlockingServiceImp implements BlockingService {
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return MyLoad.listAreaDictInfo;
+        Map<String, AreaDictInfo> listAreaDictInfo = MyLoad.listAreaDictInfo;
+        if (listAreaDictInfo == null || listAreaDictInfo.size() == 0) {
+            logger.warn("地域表无数据");
+            listAreaDictInfo = new HashMap<>();
+        }
+        return listAreaDictInfo;
     }
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
-        return MyLoad.listNtcService;
+        Map<String, NtcServiceDict> listNtcService = MyLoad.listNtcService;
+        if (listNtcService == null || listNtcService.size() == 0) {
+            logger.warn("业务表无数据");
+            listNtcService = new HashMap<>();
+        }
+        return listNtcService;
     }
 
     /**
@@ -66,12 +76,14 @@ public class BlockingServiceImp implements BlockingService {
             if (ListUtils.isEmptyList(list)) {
                 logger.warn("封堵信息整体显示\tNTC_TOTAL_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
                 try {
-                    long timeMillis = System.currentTimeMillis();
                     Date lastTime = blockingDao.getAllBlockInformationLastTime(end);
-                    String time = DateUtils.formatDateTime(lastTime);
-                    time = DateUtils.getRangeOf5min(time);
-                    list = blockingDao.getAllBlockInformation(start, time, DateUtils.getAfter5min(time));
-                    logger.trace("封堵信息整体显示\t最近数据查询耗时\t" + String.valueOf(System.currentTimeMillis() - timeMillis));
+                    if (lastTime != null) {
+                        String time = DateUtils.formatDateTime(lastTime);
+                        time = DateUtils.getRangeOf5min(time);
+                        list = blockingDao.getAllBlockInformation(start, time, DateUtils.getAfter5min(time));
+                    } else {
+                        logger.warn("封堵信息整体显示\tNTC_TOTAL_REPORT\t无数据");
+                    }
                 } catch (Exception e) {
                     logger.error("封堵信息整体显示\t最近数据\t查询异常\tserviceImpl", e);
                 }
@@ -118,9 +130,13 @@ public class BlockingServiceImp implements BlockingService {
                 logger.warn("DNS欺骗信息显示\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
                 try {
                     Date lastTime = blockingDao.getDNSDeceiveInformationLastTime(end);
-                    String time = DateUtils.formatDateTime(lastTime);
-                    time = DateUtils.getRangeOf5min(time);
-                    list = blockingDao.getDNSDeceiveInformationOnly(start, time, DateUtils.getAfter5min(time));
+                    if (lastTime != null) {
+                        String time = DateUtils.formatDateTime(lastTime);
+                        time = DateUtils.getRangeOf5min(time);
+                        list = blockingDao.getDNSDeceiveInformationOnly(start, time, DateUtils.getAfter5min(time));
+                    } else {
+                        logger.warn("DNS欺骗信息显示\tNTC_ENTRANCE_REPORT\t无数据");
+                    }
                 } catch (Exception e) {
                     logger.error("DNS欺骗信息显示\t最近数据\t查询异常\tserviceImpl", e);
                 }
@@ -182,9 +198,13 @@ public class BlockingServiceImp implements BlockingService {
             logger.warn("24小时内全国范围阻断协议信息\tNTC_SERVICE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.get24hAllBlockEachProtocolOLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = blockingDao.get24hAllBlockEachProtocolOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = blockingDao.get24hAllBlockEachProtocolOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("24小时内全国范围阻断协议信息\tNTC_SERVICE_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("24小时内全国范围阻断协议信息\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -243,9 +263,13 @@ public class BlockingServiceImp implements BlockingService {
             logger.warn("封堵信息分布显示\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getDisBlockInformationLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = blockingDao.getDisBlockInformationOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = blockingDao.getDisBlockInformationOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("封堵信息分布显示\tNTC_ENTRANCE_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("封堵信息分布显示\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -253,7 +277,7 @@ public class BlockingServiceImp implements BlockingService {
         //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
             Iterator<NtcDisReport> ntcDisReport = list.iterator();
-            while (ntcDisReport.hasNext()){
+            while (ntcDisReport.hasNext()) {
                 NtcDisReport next = ntcDisReport.next();
                 String area = next.getArea();
                 AreaDictInfo areaDictInfo = listArea.get(area);
@@ -294,9 +318,13 @@ public class BlockingServiceImp implements BlockingService {
             logger.warn("24小时内全国热力图\tNTC_SERVICE_BEHAV_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getAllHotStatistisLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = blockingDao.getAllHotStatistisOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = blockingDao.getAllHotStatistisOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("24小时内全国热力图\tNTC_SERVICE_BEHAV_STATISTIC\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("24小时内全国热力图\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -304,7 +332,7 @@ public class BlockingServiceImp implements BlockingService {
         //迭代映射地域表，过滤无地域映射数据
         if (!ListUtils.isEmptyList(list)) {
             Iterator<HotStatistic> hotStatistic = list.iterator();
-            while (hotStatistic.hasNext()){
+            while (hotStatistic.hasNext()) {
                 HotStatistic next = hotStatistic.next();
                 String area = next.getArea();
                 String type = next.getType();
@@ -312,7 +340,7 @@ public class BlockingServiceImp implements BlockingService {
                 AreaDictInfo areaDictInfo = listArea.get(area);
                 if (areaDictInfo != null) {
                     next.setArea(areaDictInfo.getItemValue());
-                }else {
+                } else {
                     hotStatistic.remove();
                     continue;
                 }
@@ -328,7 +356,7 @@ public class BlockingServiceImp implements BlockingService {
                 }
             }
         }
-        logger.info("封堵信息分布显示耗时：" + (System.currentTimeMillis() - timeMillisStart));
+        logger.info("24小时内全国热力图：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("24小时内全国热力图------->测试数据");
             list.add(new HotStatistic(start, "Астана", "103.227.81.43", "10.11.36.42", "IP Address Monitor", (int) (Math.random() * 100)));
@@ -426,9 +454,13 @@ public class BlockingServiceImp implements BlockingService {
             logger.warn("热力图接口\tNTC_ENTRANCE_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = blockingDao.getDisBlockMapLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = blockingDao.getDisBlockMapOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = blockingDao.getDisBlockMapOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("热力图接口\tNTC_ENTRANCE_REPORT\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("热力图接口\t最近数据\t查询异常\tserviceImpl", e);
             }

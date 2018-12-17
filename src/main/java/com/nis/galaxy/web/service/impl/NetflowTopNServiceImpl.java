@@ -28,7 +28,12 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return MyLoad.listAreaDictInfo;
+        Map<String, AreaDictInfo> listAreaDictInfo = MyLoad.listAreaDictInfo;
+        if (listAreaDictInfo == null || listAreaDictInfo.size() == 0) {
+            logger.warn("地域表无数据");
+            listAreaDictInfo = new HashMap<>();
+        }
+        return listAreaDictInfo;
     }
 
     /**
@@ -52,9 +57,13 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             logger.warn("5分钟内活跃IP流量TOP10\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getIpActiveStatisticOf5mLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = netflowTopNDao.getIpActiveStatisticOf5mOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("5分钟内活跃IP流量TOP10\tTRAFFIC_IP_ACTIVE_STATISTIC\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("5分钟内活跃IP流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -123,18 +132,22 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                String lastEnd = DateUtils.getAfter5min(time);
-                String lastStart = null;
-                if (range == 1) {
-                    lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60);
-                } else if (range == 7) {
-                    lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24 * 7);
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    String lastEnd = DateUtils.getAfter5min(time);
+                    String lastStart = null;
+                    if (range == 1) {
+                        lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60);
+                    } else if (range == 7) {
+                        lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24 * 7);
+                    } else {
+                        lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24);
+                    }
+                    list = netflowTopNDao.getNetFlowWaterTop10(lastStart, lastEnd);
                 } else {
-                    lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24);
+                    logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t无数据");
                 }
-                list = netflowTopNDao.getNetFlowWaterTop10(lastStart, lastEnd);
             } catch (Exception e) {
                 logger.error("互联网流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }

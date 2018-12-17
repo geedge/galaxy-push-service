@@ -40,12 +40,21 @@ public class NetflowServiceImpl implements NetflowService {
 
     //协议表
     public Map<String, String> listProtocolDict() {
-        return MyLoad.listProtocolDict;
+        Map<String, String> listProtocolDict = MyLoad.listProtocolDict;
+        if (listProtocolDict == null || listProtocolDict.size() == 0) {
+            logger.warn("协议表无数据");
+        }
+        return listProtocolDict;
     }
 
     //地域表
     public Map<String, AreaDictInfo> listAreaDictInfo() {
-        return MyLoad.listAreaDictInfo;
+        Map<String, AreaDictInfo> listAreaDictInfo = MyLoad.listAreaDictInfo;
+        if (listAreaDictInfo == null || listAreaDictInfo.size() == 0) {
+            logger.warn("地域表无数据");
+            listAreaDictInfo = new HashMap<>();
+        }
+        return listAreaDictInfo;
     }
 
     /**
@@ -69,9 +78,13 @@ public class NetflowServiceImpl implements NetflowService {
             logger.warn("5分钟内网络流量统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getNetflowStatistic5mLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getNetflowStatistic5mOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = netflowDao.getNetflowStatistic5mOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("5分钟内网络流量统计\tTRAFFIC_PROTOCOL_STATISTIC\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("5分钟内网络流量统计\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -87,7 +100,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
-        logger.info("5分钟内网络流量统计耗时："+(System.currentTimeMillis()-timeMillisStart));
+        logger.info("5分钟内网络流量统计耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("5分钟内网络流量统计------->测试数据");
             int i = (int) (Math.random() * 1000);
@@ -124,9 +137,13 @@ public class NetflowServiceImpl implements NetflowService {
             logger.warn("1小时内网络协议统计\tTRAFFIC_PROTOCOL_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getProtocolStatisticOf1hLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getProtocolStatisticOf1hOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = netflowDao.getProtocolStatisticOf1hOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("1小时内网络协议统计\tTRAFFIC_PROTOCOL_STATISTIC\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("1小时内网络协议统计\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -144,7 +161,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
-        logger.info("1小时内网络协议统计耗时："+(System.currentTimeMillis()-timeMillisStart));
+        logger.info("1小时内网络协议统计耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("1小时内网络协议统计------->测试数据");
             int i = (int) (Math.random() * 5000);
@@ -182,9 +199,13 @@ public class NetflowServiceImpl implements NetflowService {
             logger.warn("5分钟内活跃IP信息\tTRAFFIC_IP_ACTIVE_STATISTIC\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getIpActiveInfoOf5minLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getIpActiveInfoOf5minOnly(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = netflowDao.getIpActiveInfoOf5minOnly(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("5分钟内活跃IP信息\tTRAFFIC_IP_ACTIVE_STATISTIC\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("5分钟内活跃IP信息\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -204,7 +225,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
-        logger.info("5分钟内活跃IP信息耗时："+(System.currentTimeMillis()-timeMillisStart));
+        logger.info("5分钟内活跃IP信息耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("5分钟内活跃IP信息------->测试数据");
             long c = (long) (Math.random() * 5000000);
@@ -250,9 +271,13 @@ public class NetflowServiceImpl implements NetflowService {
             logger.warn("地域流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getAreaNetflowOf5minLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getAreaNetflowOf5min(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = netflowDao.getAreaNetflowOf5min(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("地域流量\tTRAFFIC_NETFLOW_PORT_INFO\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("地域流量\t最近数据\t查询异常\tserviceImpl", e);
             }
@@ -272,7 +297,7 @@ public class NetflowServiceImpl implements NetflowService {
                 }
             }
         }
-        logger.info("地域流量耗时："+(System.currentTimeMillis()-timeMillisStart));
+        logger.info("地域流量耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("地域流量------->测试数据");
             if (ConfigUtil.languageChose == 3) {
@@ -315,14 +340,18 @@ public class NetflowServiceImpl implements NetflowService {
             logger.warn("端口流量\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowDao.getPortNetflowOf5minLastTime(end);
-                String time = DateUtils.formatDateTime(lastTime);
-                time = DateUtils.getRangeOf5min(time);
-                list = netflowDao.getPortNetflowOf5min(start, time, DateUtils.getAfter5min(time));
+                if (lastTime != null) {
+                    String time = DateUtils.formatDateTime(lastTime);
+                    time = DateUtils.getRangeOf5min(time);
+                    list = netflowDao.getPortNetflowOf5min(start, time, DateUtils.getAfter5min(time));
+                } else {
+                    logger.warn("端口流量\tTRAFFIC_NETFLOW_PORT_INFO\t无数据");
+                }
             } catch (Exception e) {
                 logger.error("端口流量\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        logger.info("端口流量耗时："+(System.currentTimeMillis()-timeMillisStart));
+        logger.info("端口流量耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             list = new ArrayList<>();
             logger.info("端口流量------->测试数据");
