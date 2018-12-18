@@ -2,6 +2,7 @@ package com.nis.galaxy.web.service.impl;
 
 import com.nis.galaxy.config.MyLoad;
 import com.nis.galaxy.domain.*;
+import com.nis.galaxy.domain.dict.AreaDictInfo;
 import com.nis.galaxy.domain.dict.NtcServiceDict;
 import com.nis.galaxy.util.ConfigUtil;
 import com.nis.galaxy.util.DateUtils;
@@ -23,16 +24,26 @@ public class EventsServiceImpl implements EventsService {
     @Autowired
     EventsDao eventsDao;
 
-    @Value("${Device.Server.Num}")
-    private int DeviceServerNum;
-    @Value("${Device.CoreSwtich.Num}")
-    private int DeviceCoreSwtichNum;
-    @Value("${Device.AccessSwitch.Num}")
-    private int DeviceAccessSwitchNum;
-    @Value("${Device.Asem.Num}")
-    private int DeviceAsemNum;
-    @Value("${Device.Adc.Num}")
-    private int DeviceAdcNum;
+    @Value("${Astana.Device.Server.Num}")
+    private int AstanaDeviceServerNum;
+    @Value("${Astana.Device.CoreSwtich.Num}")
+    private int AstanaDeviceCoreSwtichNum;
+    @Value("${Astana.Device.AccessSwitch.Num}")
+    private int AstanaDeviceAccessSwitchNum;
+    @Value("${Astana.Device.Asem.Num}")
+    private int AstanaDeviceAsemNum;
+    @Value("${Astana.Device.Adc.Num}")
+    private int AstanaDeviceAdcNum;
+    @Value("${Almaty.Device.Server.Num}")
+    private int AlmatyDeviceServerNum;
+    @Value("${Almaty.Device.CoreSwtich.Num}")
+    private int AlmatyDeviceCoreSwtichNum;
+    @Value("${Almaty.Device.AccessSwitch.Num}")
+    private int AlmatyDeviceAccessSwitchNum;
+    @Value("${Almaty.Device.Asem.Num}")
+    private int AlmatyDeviceAsemNum;
+    @Value("${Almaty.Device.Adc.Num}")
+    private int AlmatyDeviceAdcNum;
 
     //业务表
     public Map<String, NtcServiceDict> listNtcService() {
@@ -42,7 +53,17 @@ public class EventsServiceImpl implements EventsService {
             listNtcService = new HashMap<>();
         }
         return listNtcService;
-}
+    }
+
+    //地域表
+    public Map<String, AreaDictInfo> listAreaDictInfo() {
+        Map<String, AreaDictInfo> listAreaDictInfo = MyLoad.listAreaDictInfo;
+        if (listAreaDictInfo == null || listAreaDictInfo.size() == 0) {
+            logger.warn("地域表无数据");
+            listAreaDictInfo = new HashMap<>();
+        }
+        return listAreaDictInfo;
+    }
 
     /**
      * 系统总计
@@ -114,6 +135,20 @@ public class EventsServiceImpl implements EventsService {
             } catch (Exception e) {
                 logger.error("特定APP访问监控\t最近数据\t查询异常\tserviceImpl", e);
             }
+        }
+        if (!ListUtils.isEmptyList(list)) {
+            Collections.sort(list, new Comparator<EventsAppMonitor>() {
+                @Override
+                public int compare(EventsAppMonitor o1, EventsAppMonitor o2) {
+                    if (o1.getNum() > o2.getNum()) {
+                        return -1;
+                    } else if (o1.getNum() == o2.getNum()) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
         }
         logger.info("特定APP访问监控耗时：" + (System.currentTimeMillis() - timeMillisStart));
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
@@ -591,11 +626,31 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public List<EventsDeviceNum> getDeviceNum(String end) {
         List<EventsDeviceNum> list = new ArrayList<>();
-        list.add(new EventsDeviceNum(end, "server", DeviceServerNum));
-        list.add(new EventsDeviceNum(end, "core swtich", DeviceCoreSwtichNum));
-        list.add(new EventsDeviceNum(end, "access switch", DeviceAccessSwitchNum));
-        list.add(new EventsDeviceNum(end, "asem", DeviceAsemNum));
-        list.add(new EventsDeviceNum(end, "adc", DeviceAdcNum));
+        Map<String, AreaDictInfo> listArea = listAreaDictInfo();
+        list.add(new EventsDeviceNum("1", end, "server", AstanaDeviceServerNum));
+        list.add(new EventsDeviceNum("1", end, "core swtich", AstanaDeviceCoreSwtichNum));
+        list.add(new EventsDeviceNum("1", end, "access switch", AstanaDeviceAccessSwitchNum));
+        list.add(new EventsDeviceNum("1", end, "asem", AstanaDeviceAsemNum));
+        list.add(new EventsDeviceNum("1", end, "adc", AstanaDeviceAdcNum));
+        list.add(new EventsDeviceNum("2", end, "server", AlmatyDeviceServerNum));
+        list.add(new EventsDeviceNum("2", end, "core swtich", AlmatyDeviceCoreSwtichNum));
+        list.add(new EventsDeviceNum("2", end, "access switch", AlmatyDeviceAccessSwitchNum));
+        list.add(new EventsDeviceNum("2", end, "asem", AlmatyDeviceAsemNum));
+        list.add(new EventsDeviceNum("2", end, "adc", AlmatyDeviceAdcNum));
+        if (!ListUtils.isEmptyList(list)) {
+            Iterator<EventsDeviceNum> ntcDisReport = list.iterator();
+            while (ntcDisReport.hasNext()) {
+                EventsDeviceNum next = ntcDisReport.next();
+                String area = next.getArea();
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo == null) {
+                    ntcDisReport.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
+                }
+            }
+        }
         return list;
     }
 
@@ -635,6 +690,94 @@ public class EventsServiceImpl implements EventsService {
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("运行状况------->测试数据");
             list.add(new EventsRunningState((int) (Math.random() * 300), (int) (Math.random() * 200), (int) (Math.random() * 300)));
+        }
+        return list;
+    }
+
+    /**
+     * HTTPS监控TOP10、IP监控TOP10、APP阻断TOP10、HTTP阻断TOP10、IP阻断TOP10
+     *
+     * @param start
+     * @param end
+     * @param type
+     * @return
+     */
+    @Override
+    public List<EventsNameNumTime> getTypeMonitorReject(String start, String end, String type) {
+        long timeMillisStart = System.currentTimeMillis();
+        String logMark = null;
+        int serviceId;
+        if ("HttpsMonitor".equals(type)) {
+            logMark = "HTTPS监控TOP10";
+            serviceId = 129;
+        } else if ("IpMonitor".equals(type)) {
+            logMark = "IP监控TOP10";
+            serviceId = 128;
+        } else if ("SpecificAppBlock".equals(type)) {
+            logMark = "APP阻断TOP10";
+            serviceId = 33;
+        } else if ("HttpBlock".equals(type)) {
+            logMark = "HTTP阻断TOP10";
+            serviceId = 17;
+        } else {
+            logMark = "IP阻断TOP10";
+            serviceId = 16;
+        }
+        Date startDate = DateUtils.getDateOfString(start);
+        Date endDate = DateUtils.getDateOfString(end);
+        List<EventsNameNumTime> list = new ArrayList<>();
+        try {
+            list = eventsDao.getHttpsMonitor(start, startDate, endDate, serviceId);
+        } catch (Exception e) {
+            logger.error(logMark + "\t查询异常\tserviceImpl", e);
+        }
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
+            logger.warn(logMark + "\tNTC_PZ_REPORT\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            try {
+                Date lastTime = eventsDao.getHttpsMonitorLastTime(DateUtils.getDateOfString(end), serviceId);
+                if (lastTime != null) {
+                    String startTime = DateUtils.formatDateTime(lastTime);
+                    startTime = DateUtils.getRangeOfhour(startTime);
+                    String endTime = DateUtils.getAfter1h(startTime);
+                    list = eventsDao.getHttpsMonitor(start, DateUtils.getDateOfString(startTime), DateUtils.getDateOfString(endTime), serviceId);
+                } else {
+                    logger.warn(logMark + "\tNTC_PZ_REPORT\t无数据");
+                }
+            } catch (Exception e) {
+                logger.error(logMark + "\t最近数据\t查询异常\tserviceImpl", e);
+            }
+        }
+        if (!ListUtils.isEmptyList(list)) {
+            Collections.sort(list, new Comparator<EventsNameNumTime>() {
+                @Override
+                public int compare(EventsNameNumTime o1, EventsNameNumTime o2) {
+                    if (o1.getNum() > o2.getNum()) {
+                        return -1;
+                    } else if (o1.getNum() == o2.getNum()) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
+            if (list.size() > 10) {
+                list = list.subList(0, 10);
+            }
+        }
+        logger.info(logMark + "\t耗时：" + (System.currentTimeMillis() - timeMillisStart));
+        if (ConfigUtil.testData && ListUtils.isEmptyList(list)) {
+            logger.info(logMark + "------->测试数据");
+            list = new ArrayList<>();
+            list.add(new EventsNameNumTime("1", 1000L, start));
+            list.add(new EventsNameNumTime("4", 987L, start));
+            list.add(new EventsNameNumTime("35", 645L, start));
+            list.add(new EventsNameNumTime("112", 623L, start));
+            list.add(new EventsNameNumTime("34", 563L, start));
+            list.add(new EventsNameNumTime("5", 456L, start));
+            list.add(new EventsNameNumTime("6", 456L, start));
+            list.add(new EventsNameNumTime("7", 60L, start));
+            list.add(new EventsNameNumTime("67", 36L, start));
+            list.add(new EventsNameNumTime("8", 30L, start));
         }
         return list;
     }

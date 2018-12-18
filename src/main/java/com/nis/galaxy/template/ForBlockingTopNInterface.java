@@ -45,8 +45,8 @@ public class ForBlockingTopNInterface {
     /**
      * 24小时内区域阻断协议TOP10
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.24hour.area.protocol.block", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.24hour.area.protocol.block", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getAreaBlockTop10ProtocolOf24h() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
@@ -74,8 +74,8 @@ public class ForBlockingTopNInterface {
     /**
      * 1小时内全国阻断URLTOP10
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.1hour.url.top_10", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.1hour.url.top_10", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getBlockTop10URLOf1h() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
@@ -103,8 +103,8 @@ public class ForBlockingTopNInterface {
     /**
      * 1小时内全国阻断网站TOP10
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.1hour.website.top_10", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.1hour.website.top_10", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getBlockTop10WebsiteOf1h() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
@@ -134,8 +134,8 @@ public class ForBlockingTopNInterface {
     /**
      * 5分钟内全国阻断URLTOP10 5/min
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.5minute.url.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.5minute.url.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getBlockTop10URLOf5m() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
@@ -165,8 +165,8 @@ public class ForBlockingTopNInterface {
     /**
      * 5分钟内全国阻断websiteTOP10 5/min
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.5minute.website.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.5minute.website.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getBlockTop10WebsiteOf5m() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
@@ -196,8 +196,8 @@ public class ForBlockingTopNInterface {
     /**
      * 1小时内全国阻断标签TOP10  1h
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.1hour.keyword.top_10", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.1hour.keyword.top_10", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
     public void getBlockTop100Tag1h() {
         if (!Boolean.parseBoolean(scheduledBlockTopnEnable)) {
             return;
@@ -229,12 +229,12 @@ public class ForBlockingTopNInterface {
             return;
         }
         logger.warn("应用启动首次推送所有接口2/6");
-        getAreaBlockTop10ProtocolOf24h();
-        getBlockTop10URLOf1h();
-        getBlockTop10WebsiteOf1h();
-        getBlockTop10URLOf5m();
-        getBlockTop10WebsiteOf5m();
-        getBlockTop100Tag1h();
+//        getAreaBlockTop10ProtocolOf24h();
+//        getBlockTop10URLOf1h();
+//        getBlockTop10WebsiteOf1h();
+//        getBlockTop10URLOf5m();
+//        getBlockTop10WebsiteOf5m();
+//        getBlockTop100Tag1h();
 
     }
 }

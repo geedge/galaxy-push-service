@@ -3,7 +3,9 @@
  */
 package com.nis.galaxy.util;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -25,29 +27,23 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
     /**
-     * 获取距当前5分30s前的时间
+     * 将String类型时间转成Date、若出现异常则返回当前时间
      *
+     * @param time
      * @return
      */
-    public static String getBeforeTimeOf5min30s() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.MINUTE, -5);
-        gc.add(Calendar.SECOND, -30);
-        return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-07-01 00:00:00";
-    }
-
-    /**
-     * 获取距当前1h30s前的时间
-     *
-     * @return
-     */
-    public static String getBeforeTimeOf1h30s() {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.HOUR, -1);
-        gc.add(Calendar.SECOND, -30);
-        return DateUtils.formatDateTime(gc.getTime());
-        //return "2018-07-01 00:00:00";
+    public static Date getDateOfString(String time) {
+        if (time == null) {
+            new Throwable("Parameters of the abnormal");
+        }
+        DateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parse = myFormat.parse(time);
+            return parse;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new Date();
     }
 
     /**
@@ -381,6 +377,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     /**
      * 获取time的整时间点：1min粒度
      * eg:  2018-12-12 12:06:36 结果为：2018-12-12 12:06:00
+     *
      * @param time
      * @return
      */

@@ -47,8 +47,8 @@ public class ForNetflowInterface {
     /**
      * 5分钟内网络流量统计
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.5min.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.5min.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetflowStatistic5m() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -139,8 +139,8 @@ public class ForNetflowInterface {
     /**
      * 地域流量 5分钟/次
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.area.netflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.area.netflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getAreaNetflowOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -173,8 +173,8 @@ public class ForNetflowInterface {
     /**
      * 端口流量 5分钟/次
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.port.netflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.port.netflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getPortNetflowOf5min() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -207,8 +207,8 @@ public class ForNetflowInterface {
     /**
      * 文本 天/次
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.monitor.txt", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.monitor.txt", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorTxt() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -235,8 +235,8 @@ public class ForNetflowInterface {
     /**
      * 音视频 天/次
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.monitor.video", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.monitor.video", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorVideo() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -263,8 +263,8 @@ public class ForNetflowInterface {
     /**
      * APP 天/次
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.monitor.app", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.monitor.app", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorApp() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -292,8 +292,8 @@ public class ForNetflowInterface {
     /**
      * 加密类型 天/次
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.monitor.encrypt", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.monitor.encrypt", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
     public void getNetflowMonitorEncrypt() {
         if (!Boolean.parseBoolean(scheduledNetflowEnable)) {
             return;
@@ -326,14 +326,14 @@ public class ForNetflowInterface {
             return;
         }
         logger.warn("应用启动首次推送所有接口5/6");
-        getNetflowStatistic5m();
+//        getNetflowStatistic5m();
         getProtocolStatisticOf1h();
         getIpActiveInfoOf5min();
-        getAreaNetflowOf5min();
-        getPortNetflowOf5min();
-        getNetflowMonitorTxt();
-        getNetflowMonitorVideo();
-        getNetflowMonitorApp();
-        getNetflowMonitorEncrypt();
+//        getAreaNetflowOf5min();
+//        getPortNetflowOf5min();
+//        getNetflowMonitorTxt();
+//        getNetflowMonitorVideo();
+//        getNetflowMonitorApp();
+//        getNetflowMonitorEncrypt();
     }
 }

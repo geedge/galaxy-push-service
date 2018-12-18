@@ -25,8 +25,6 @@
               GROUP BY app_type) t ,
               ui_code_app_dic a
         WHERE t.app_type=a.view_code
-        ORDER BY num DESC
-        LIMIT 10;
         ]]>
     </select>
     <!--来函统计报表-->
@@ -245,6 +243,18 @@
     GROUP BY  event,time
     HAVING (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
+    <!--HTTPS监控TOP10-->
+    <select id="getHttpsMonitor" resultType="com.nis.galaxy.domain.EventsNameNumTime">
+        <![CDATA[
+        SELECT cfg_id AS name,SUM(sum) AS num,#{push} AS time
+        FROM ntc_pz_report
+        WHERE report_time > #{start}
+            AND report_time < #{end}
+            AND service = #{serviceId}
+        GROUP BY name;
+        ]]>
+    </select>
+
     <!--时间：系统总计 -->
     <select id="getSystemTotalOf1DayLastTime" resultType="java.util.Date">
         <![CDATA[
@@ -334,5 +344,16 @@
         ORDER BY report_time DESC
         LIMIT 1
          ]]>
+    </select>
+    <!--时间：HTTPS监控TOP10-->
+    <select id="getHttpsMonitorLastTime" resultType="java.util.Date">
+        <![CDATA[
+        SELECT report_time
+        FROM  ntc_pz_report
+        WHERE REPORT_TIME < #{end}
+            AND service = #{serviceId}
+        ORDER BY report_time DESC
+        LIMIT 1
+        ]]>
     </select>
 </mapper>

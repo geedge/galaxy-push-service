@@ -44,8 +44,8 @@ public class ForNetflowTopNInterface {
     /**
      * 5分钟内活跃IP流量TOP10
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.5min.ip.active.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.5min.ip.active.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getIpActiveStatisticOf5m() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -105,8 +105,8 @@ public class ForNetflowTopNInterface {
     /**
      * 24小时内互联网流量TOP10
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.24hour.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.24hour.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetFlowWaterTop10Of24h() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -136,8 +136,8 @@ public class ForNetflowTopNInterface {
     /**
      * 7天内互联网流量TOP10
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.7day.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.7day.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
     public void getNetFlowWaterTop10Of7Day() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -172,9 +172,9 @@ public class ForNetflowTopNInterface {
             return;
         }
         logger.warn("应用启动首次推送所有接口6/6");
-        getIpActiveStatisticOf5m();
+//        getIpActiveStatisticOf5m();
         getNetFlowWaterTop10();
-        getNetFlowWaterTop10Of24h();
-        getNetFlowWaterTop10Of7Day();
+//        getNetFlowWaterTop10Of24h();
+//        getNetFlowWaterTop10Of7Day();
     }
 }

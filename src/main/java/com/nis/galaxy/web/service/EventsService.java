@@ -123,5 +123,12 @@ public interface EventsService {
      */
     List<EventsRunningState> getRunningState(String start,String end);
 
-
+    /**
+     * HTTPS监控TOP10、IP监控TOP10、APP阻断TOP10、HTTP阻断TOP10、IP阻断TOP10
+     * @param start
+     * @param end
+     * @param type
+     * @return
+     */
+    List<EventsNameNumTime> getTypeMonitorReject(String start, String end, String type);
 }

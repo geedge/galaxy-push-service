@@ -27,14 +27,13 @@ public class ForEventsInterface {
     @Autowired
     RestTemplate restTemplate;
     @Autowired
-    EventsService systemService;
+    EventsService eventsService;
     @Autowired
     PushParams pushParams;
 
     private int a = 1;
     private int before1day = -60 * 24;
     private int before60m = -60;
-
 
 
     @Value("${scheduled.events.enable}")
@@ -48,8 +47,8 @@ public class ForEventsInterface {
     /**
      * 系统总计 1天/条
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "system.total", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "system.total", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getSystemTotalOf1Day() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -59,7 +58,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
-            contentValue = systemService.getSystemTotalOf1Day(start, end);
+            contentValue = eventsService.getSystemTotalOf1Day(start, end);
         } catch (Exception e) {
             logger.error("系统总计\t查询异常\trestTemplate", e);
         }
@@ -68,7 +67,7 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"system.total", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "system.total", contentValue);
         logger.info("开始推送=======>>系统总计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("系统总计\t推送返回结果" + response);
@@ -78,7 +77,7 @@ public class ForEventsInterface {
      * 特定APP访问监控 1小时条
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "specific.app", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "specific.app", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getSpecifiedAPPMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -88,7 +87,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getSpecifiedAPPMonitor(start, end);
+            contentValue = eventsService.getSpecifiedAPPMonitor(start, end);
         } catch (Exception e) {
             logger.error("特定APP访问监控\t查询异常\trestTemplate", e);
         }
@@ -97,23 +96,24 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"specific.app", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "specific.app", contentValue);
         logger.info("开始推送=======>>特定APP访问监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("特定APP访问监控\t推送返回结果" + response);
     }
+
     /**
      * 来函统计报表 一天上送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "letter.count", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "letter.count", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getLetterCount() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
         }
         List contentValue = null;
         try {
-            contentValue = systemService.getLetterCount();
+            contentValue = eventsService.getLetterCount();
         } catch (Exception e) {
             logger.error("来函统计报表\t查询异常\trestTemplate", e);
         }
@@ -122,7 +122,7 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"letter.count", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "letter.count", contentValue);
         logger.info("开始推送=======>>来函统计报表 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("来函统计报表\t推送返回结果" + response);
@@ -132,7 +132,7 @@ public class ForEventsInterface {
      * 业务类型统计报表 一天上送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "trans.type", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "trans.type", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getServiceCount() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -142,7 +142,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
-            contentValue = systemService.getServiceCount(start,end);
+            contentValue = eventsService.getServiceCount(start, end);
         } catch (Exception e) {
             logger.error("业务类型统计报表\t查询异常\trestTemplate", e);
         }
@@ -151,16 +151,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"trans.type", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "trans.type", contentValue);
         logger.info("开始推送=======>>业务类型统计报表 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("业务类型统计报表\t推送返回结果" + response);
     }
+
     /**
      * 重点保障事件总览 一天上送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "events.key.protection", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "events.key.protection", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getKeyPointSafaguardThing() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -169,7 +170,7 @@ public class ForEventsInterface {
         String start = DateUtils.getRangeNdayOfTime(end, -1);
         List contentValue = null;
         try {
-            contentValue = systemService.getKeyPointSafaguardThing(start);
+            contentValue = eventsService.getKeyPointSafaguardThing(start);
         } catch (Exception e) {
             logger.error("重点保障事件总览\t查询异常\trestTemplate", e);
         }
@@ -178,16 +179,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.key.protection", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "events.key.protection", contentValue);
         logger.info("开始推送=======>>重点保障事件总览 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("重点保障事件总览\t推送返回结果" + response);
     }
+
     /**
      * 特定网站监控 1小时送一次数据
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "specific.websites", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "specific.websites", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getSpecificWebsites() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -196,7 +198,7 @@ public class ForEventsInterface {
         String end = DateUtils.getRangeOfhour(now);
         List contentValue = null;
         try {
-            contentValue = systemService.getSpecificWebsites(end);
+            contentValue = eventsService.getSpecificWebsites(end);
         } catch (Exception e) {
             logger.error("特定网站监控\t查询异常\trestTemplate", e);
         }
@@ -205,16 +207,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"specific.websites", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "specific.websites", contentValue);
         logger.info("开始推送=======>>特定网站监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("特定网站监控\t推送返回结果" + response);
     }
+
     /**
      * 事件监测 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "events.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "events.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getEventsMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -223,7 +226,7 @@ public class ForEventsInterface {
         String end = DateUtils.getRangeOfhour(now);
         List contentValue = null;
         try {
-            contentValue = systemService.getEventsMonitor(end);
+            contentValue = eventsService.getEventsMonitor(end);
         } catch (Exception e) {
             logger.error("事件监测\t查询异常\trestTemplate", e);
         }
@@ -232,16 +235,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "events.monitor", contentValue);
         logger.info("开始推送=======>>事件监测 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("事件监测\t推送返回结果" + response);
     }
+
     /**
      * 事件封堵 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "events.block", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "events.block", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getEventsBlock() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -250,7 +254,7 @@ public class ForEventsInterface {
         String end = DateUtils.getRangeOfhour(now);
         List contentValue = null;
         try {
-            contentValue = systemService.getEventsBlock(end);
+            contentValue = eventsService.getEventsBlock(end);
         } catch (Exception e) {
             logger.error("事件封堵\t查询异常\trestTemplate", e);
         }
@@ -259,26 +263,27 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"events.block", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "events.block", contentValue);
         logger.info("开始推送=======>>事件封堵 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("事件封堵\t推送返回结果" + response);
     }
+
     /**
      * 音频监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "audio.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "audio.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getEventsAudioMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
         }
         String now = DateUtils.getDateTime();
         String end = DateUtils.getRangeOfhour(now);
-        String start = DateUtils.getBeforeNminOfTime(end,before60m);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getEventsAudioMonitor(start,end);
+            contentValue = eventsService.getEventsAudioMonitor(start, end);
         } catch (Exception e) {
             logger.error("音频监控\t查询异常\trestTemplate", e);
         }
@@ -287,7 +292,7 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"audio.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "audio.monitor", contentValue);
         logger.info("开始推送=======>>音频监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("音频监控\t推送返回结果" + response);
@@ -297,7 +302,7 @@ public class ForEventsInterface {
      * 视频监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "vedio.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "vedio.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getVedioMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -307,7 +312,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getVedioMonitor(start, end);
+            contentValue = eventsService.getVedioMonitor(start, end);
         } catch (Exception e) {
             logger.error("视频监控\t查询异常\trestTemplate", e);
         }
@@ -316,16 +321,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"vedio.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "vedio.monitor", contentValue);
         logger.info("开始推送=======>>视频监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("视频监控\t推送返回结果" + response);
     }
+
     /**
      * 图片监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "image.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "image.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getImageMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -335,7 +341,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getImageMonitor(start, end);
+            contentValue = eventsService.getImageMonitor(start, end);
         } catch (Exception e) {
             logger.error("图片监控\t查询异常\trestTemplate", e);
         }
@@ -344,16 +350,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"image.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "image.monitor", contentValue);
         logger.info("开始推送=======>>图片监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("图片监控\t推送返回结果" + response);
     }
+
     /**
      * VOIP监控 1小时送一次数据
      */
     @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "voip.monitor", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+    @SchedulerLock(name = "voip.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getVoipMonitor() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -363,7 +370,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getVoipMonitor(start, end);
+            contentValue = eventsService.getVoipMonitor(start, end);
         } catch (Exception e) {
             logger.error("VOIP监控\t查询异常\trestTemplate", e);
         }
@@ -372,7 +379,7 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"voip.monitor", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "voip.monitor", contentValue);
         logger.info("开始推送=======>>VOIP监控 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("VOIP监控\t推送返回结果" + response);
@@ -381,8 +388,8 @@ public class ForEventsInterface {
     /**
      * 网络行为预警  DDOS告警 1小时送一次数据
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "ddos.alarm", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "ddos.alarm", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getDdosAlarm() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -392,7 +399,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getDdosAlarm(start, end);
+            contentValue = eventsService.getDdosAlarm(start, end);
         } catch (Exception e) {
             logger.error("网络行为预警\t查询异常\trestTemplate", e);
         }
@@ -401,16 +408,17 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"ddos.alarm", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "ddos.alarm", contentValue);
         logger.info("开始推送=======>>网络行为预警 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("网络行为预警\t推送返回结果" + response);
     }
+
     /**
      * 目标行为网络监测 24小时送一次数据
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "target.network", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "target.network", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getTargetNetwork() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -420,7 +428,7 @@ public class ForEventsInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before1day);
         List contentValue = null;
         try {
-            contentValue = systemService.getTargetNetwork(start, end);
+            contentValue = eventsService.getTargetNetwork(start, end);
         } catch (Exception e) {
             logger.error("目标行为网络监测\t查询异常\trestTemplate", e);
         }
@@ -429,7 +437,7 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"target.network", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "target.network", contentValue);
         logger.info("开始推送=======>>目标行为网络监测 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("目标行为网络监测\t推送返回结果" + response);
@@ -439,7 +447,7 @@ public class ForEventsInterface {
      * 硬件设备统计 24小时送一次数据
      */
     @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "device.num", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "device.num", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getDeviceNum() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -448,7 +456,7 @@ public class ForEventsInterface {
         String end = DateUtils.getRangeOfday(now);
         List contentValue = null;
         try {
-            contentValue = systemService.getDeviceNum(end);
+            contentValue = eventsService.getDeviceNum(end);
         } catch (Exception e) {
             logger.error("硬件设备统计\t查询异常\trestTemplate", e);
         }
@@ -457,7 +465,7 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"device.num", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "device.num", contentValue);
         logger.info("开始推送=======>>硬件设备统计 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("硬件设备统计\t推送返回结果" + response);
@@ -466,18 +474,18 @@ public class ForEventsInterface {
     /**
      * 运行状况 1小时送一次数据
      */
-    @Scheduled(cron = "${1h.scheduled.cron.plan}")
-    @SchedulerLock(name = "running.state", lockAtLeastForString = "PT20M",lockAtMostForString = "PT40M")
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "running.state", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
     public void getRunningState() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
         }
         String now = DateUtils.getDateTime();
         String end = DateUtils.getRangeOfhour(now);
-        String start = DateUtils.getBeforeNminOfTime(end,before60m);
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
         List contentValue = null;
         try {
-            contentValue = systemService.getRunningState(start,end);
+            contentValue = eventsService.getRunningState(start, end);
         } catch (Exception e) {
             logger.error("运行状况\t查询异常\trestTemplate", e);
         }
@@ -486,37 +494,185 @@ public class ForEventsInterface {
             return;
         }
         // 请求头和请求体
-        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(),null,"running.state", contentValue);
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "running.state", contentValue);
         logger.info("开始推送=======>>运行状况 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
         logger.info("运行状况\t推送返回结果" + response);
     }
 
+    /**
+     * HTTPS监控TOP10
+     */
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "https.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
+    public void getHttpsMonitor() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String end = DateUtils.getRangeOfhour(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        List contentValue = null;
+        String type = "HttpsMonitor";
+        try {
+            contentValue = eventsService.getTypeMonitorReject(start, end, type);
+        } catch (Exception e) {
+            logger.error("HTTPS监控TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("HTTPS监控TOP10\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "https.monitor", contentValue);
+        logger.info("开始推送=======>>HTTPS监控TOP10 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("HTTPS监控TOP10\t推送返回结果" + response);
+    }
+
+    /**
+     * IP监控TOP10
+     */
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "ip.monitor", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
+    public void getIpMonitor() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String end = DateUtils.getRangeOfhour(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        List contentValue = null;
+        String type = "IpMonitor";
+        try {
+            contentValue = eventsService.getTypeMonitorReject(start, end, type);
+        } catch (Exception e) {
+            logger.error("IP监控TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("IP监控TOP10\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "ip.monitor", contentValue);
+        logger.info("开始推送=======>>IP监控TOP10 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("IP监控TOP10\t推送返回结果" + response);
+    }
+
+    /**
+     * APP阻断TOP10
+     */
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "specific.app.block", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
+    public void getSpecificAppBlock() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String end = DateUtils.getRangeOfhour(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        List contentValue = null;
+        String type = "SpecificAppBlock";
+        try {
+            contentValue = eventsService.getTypeMonitorReject(start, end, type);
+        } catch (Exception e) {
+            logger.error("APP阻断TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("APP阻断TOP10\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "specific.app.block", contentValue);
+        logger.info("开始推送=======>>APP阻断TOP10 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("APP阻断TOP10\t推送返回结果" + response);
+    }
+
+    /**
+     * HTTP阻断TOP10
+     */
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "http.block", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
+    public void getHttpBlock() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String end = DateUtils.getRangeOfhour(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        List contentValue = null;
+        String type = "HttpBlock";
+        try {
+            contentValue = eventsService.getTypeMonitorReject(start, end, type);
+        } catch (Exception e) {
+            logger.error("HTTP阻断TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("HTTP阻断TOP10\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "http.block", contentValue);
+        logger.info("开始推送=======>>HTTP阻断TOP10 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("HTTP阻断TOP10\t推送返回结果" + response);
+    }
+
+    /**
+     * IP阻断TOP10
+     */
+    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+    @SchedulerLock(name = "ip.block", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
+    public void getIpBlock() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String end = DateUtils.getRangeOfhour(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        List contentValue = null;
+        String type = "IpBlock";
+        try {
+            contentValue = eventsService.getTypeMonitorReject(start, end, type);
+        } catch (Exception e) {
+            logger.error("IP阻断TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("IP阻断TOP10\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "ip.block", contentValue);
+        logger.info("开始推送=======>>IP阻断TOP10 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("IP阻断TOP10\t推送返回结果" + response);
+    }
 
 
     @Scheduled(fixedRate = 999999999)
-    @SchedulerLock(name = "FirstPushEvents", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "FirstPushEvents", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void run() throws InterruptedException {
         if (a++ > 1) {
             return;
         }
         logger.warn("应用启动首次推送所有接口3/6");
-        getSystemTotalOf1Day();
+//        getSystemTotalOf1Day();
         getSpecifiedAPPMonitor();
         getLetterCount();
         getServiceCount();
         getKeyPointSafaguardThing();
-        getSpecificWebsites();
+//        getSpecificWebsites();
         getEventsMonitor();
         getEventsBlock();
         getEventsAudioMonitor();
         getVedioMonitor();
         getImageMonitor();
         getVoipMonitor();
-        getDdosAlarm();
+//        getDdosAlarm();
         getDeviceNum();
-        getRunningState();
-        getTargetNetwork();
-
+//        getRunningState();
+//        getTargetNetwork();
+        getHttpsMonitor();
+        getIpMonitor();
+        getSpecificAppBlock();
+        getHttpBlock();
+        getIpBlock();
     }
 }

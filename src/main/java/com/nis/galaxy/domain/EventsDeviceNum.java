@@ -12,8 +12,9 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EventsDeviceNum {
-    private String time;     // 时间
+    private String area;    //地域
+    private String time;    // 时间
     private String type;    // 业务分类
-    private long num;     //数量
+    private long num;      //数量
 
 }

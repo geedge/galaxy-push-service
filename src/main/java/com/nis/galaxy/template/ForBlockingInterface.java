@@ -47,8 +47,8 @@ public class ForBlockingInterface {
     /**
      * 封堵信息整体显示 5min/次
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.global", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.global", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getAllBlockInformation() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -100,8 +100,8 @@ public class ForBlockingInterface {
     /**
      * DNS欺骗信息显示 5min
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.dns.deceive", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.dns.deceive", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getDNSDeceiveInformation() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -190,8 +190,8 @@ public class ForBlockingInterface {
     /**
      * 实时打点图 10s
      */
-    @Scheduled(cron = "${10s.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.realtime.point", lockAtLeastForString = "PT4S", lockAtMostForString = "PT8S")
+//    @Scheduled(cron = "${10s.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.realtime.point", lockAtLeastForString = "PT4S", lockAtMostForString = "PT8S")
     public void getPointMapOf10s() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -217,8 +217,8 @@ public class ForBlockingInterface {
     /**
      * 热力图接口 5min
      */
-    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "blocking.thermodynamic", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "blocking.thermodynamic", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getDisBlockMap() {
         if (!Boolean.parseBoolean(scheduledBlockEnable)) {
             return;
@@ -277,12 +277,12 @@ public class ForBlockingInterface {
             return;
         }
         logger.warn("应用启动首次推送所有接口1/6");
-        getAllBlockInformation();
+//        getAllBlockInformation();
         getDisBlockInformation();
-        getDNSDeceiveInformation();
+//        getDNSDeceiveInformation();
         get24hAllBlockEachProtocol();
         getAllHotStatistis();
-        getDisBlockMap();
+//        getDisBlockMap();
         getAllCfgInfo();
     }
 }
