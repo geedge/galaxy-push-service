@@ -19,7 +19,7 @@
         ]]>
     </select>
     <!--互联网流量TOP10-->
-    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
+    <select id="getNetFlowWaterTop10_old" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
         SELECT ifnull(dic.area,0) AS area,net.time AS time,sum(net.count)/1024/1024 AS count
         FROM (
@@ -32,6 +32,18 @@
         (SELECT entrance_id area,manager_ip ip from ntc_device_info) dic
         ON net.ip = dic.ip
         GROUP BY area,time
+        ]]>
+    </select>
+
+
+    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
+        <![CDATA[
+
+        select entrance_id as area ,stat_time as time, IFNULL(SUM(c2s_byte_len+s2c_byte_len),0)/1024/1024 as count
+        from traffic_trans_statistic where STAT_TIME>= #{start} and STAT_TIME<#{end}
+        group by stat_time,entrance_id
+
+
         ]]>
     </select>
     <!--1小时互联网流量TOP10-->
