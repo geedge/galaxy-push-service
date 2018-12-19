@@ -645,6 +645,34 @@ public class ForEventsInterface {
         logger.info("IP阻断TOP10\t推送返回结果" + response);
     }
 
+    /**
+     * 端口信息
+     */
+//    @Scheduled(cron = "${1h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "port.info", lockAtLeastForString = "PT20M", lockAtMostForString = "PT40M")
+    public void getPortInfo() {
+        if (!Boolean.parseBoolean(scheduledEventsEnable)) {
+            return;
+        }
+        String end = DateUtils.getRangeOfhour(DateUtils.getDateTime());
+        String start = DateUtils.getBeforeNminOfTime(end, before60m);
+        List contentValue = null;
+        try {
+            contentValue = eventsService.getPortInfo(start, end);
+        } catch (Exception e) {
+            logger.error("端口信息\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("端口信息\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "ip.block", contentValue);
+        logger.info("开始推送=======>>端口信息 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_EVENTS, httpEntity);
+        logger.info("端口信息\t推送返回结果" + response);
+    }
+
 
     @Scheduled(fixedRate = 999999999)
     @SchedulerLock(name = "FirstPushEvents", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
@@ -674,5 +702,6 @@ public class ForEventsInterface {
         getSpecificAppBlock();
         getHttpBlock();
         getIpBlock();
+//        getPortInfo();
     }
 }

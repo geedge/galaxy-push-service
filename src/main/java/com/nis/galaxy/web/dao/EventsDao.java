@@ -58,4 +58,8 @@ public interface EventsDao {
     List<EventsNameNumTime> getHttpsMonitor(@Param("push") String push, @Param("start") Date start, @Param("end") Date end, @Param("serviceId") int serviceId);
 
     Date getHttpsMonitorLastTime(@Param("end") Date end, @Param("serviceId") int serviceId);
+
+    List<EventsPortInfo> getPortInfo(@Param("push") String push, @Param("start") Date start, @Param("end") Date end);
+
+    Date getPortInfoLastTime(@Param("end") Date end);
 }

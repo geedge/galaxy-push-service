@@ -29,7 +29,7 @@
     </select>
     <!--来函统计报表-->
     <select id="getLetterCount" resultType="com.nis.galaxy.domain.EventsLetterCount">
-      SELECT MAX(s.time) AS time,r.request_title AS letter,COUNT(s.compile_id) AS num
+      SELECT MAX(s.time) AS time,r.request_title AS letterNo,r.request_number AS topic,COUNT(s.compile_id) AS num
       FROM ui_request_info r
           RIGHT JOIN
           ( SELECT t.request_id,t.service_id,t.compile_id,MAX(t.statistic_time) AS time
@@ -38,7 +38,7 @@
           ) s
           ON r.id = s.request_id
       WHERE r.is_valid = 1
-      GROUP BY  letter
+      GROUP BY  letterNo,topic
     </select>
     <!--业务类型统计报表 天/次-->
     <select id="getServiceCount" resultType="com.nis.galaxy.domain.EventsServiceCount">
@@ -254,6 +254,9 @@
         GROUP BY name;
         ]]>
     </select>
+    <!--端口信息-->
+    <select id="getPortInfo" resultType="com.nis.galaxy.domain.EventsPortInfo">
+    </select>
 
     <!--时间：系统总计 -->
     <select id="getSystemTotalOf1DayLastTime" resultType="java.util.Date">
@@ -355,5 +358,8 @@
         ORDER BY report_time DESC
         LIMIT 1
         ]]>
+    </select>
+    <!--时间：端口信息-->
+    <select id="getPortInfoLastTime" resultType="java.util.Date">
     </select>
 </mapper>

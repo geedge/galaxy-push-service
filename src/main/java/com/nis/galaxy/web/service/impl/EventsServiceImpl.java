@@ -182,13 +182,13 @@ public class EventsServiceImpl implements EventsService {
         if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
             logger.info("来函统计报表------->测试数据");
             int i = (int) (Math.random() * 100);
-            list.add(new EventsLetterCount("2018-04-05", "Request Title", 12 + i));
-            list.add(new EventsLetterCount("2018-07-19", "test letter num", 19 + i));
-            list.add(new EventsLetterCount("2018-02-19", "Request_10002", 16 + i));
-            list.add(new EventsLetterCount("2018-09-19", "reqeest_02111", 0 + i));
-            list.add(new EventsLetterCount("2018-06-20", "letter number statistic", 7 + i));
-            list.add(new EventsLetterCount("2018-07-05", "20180321_001", 2 + i));
-            list.add(new EventsLetterCount("2018-04-19", "reqeest_02111", 32 + i));
+            list.add(new EventsLetterCount("2018-04-05", "Request Title", "125", 12 + i));
+            list.add(new EventsLetterCount("2018-07-19", "test letter num", "025", 19 + i));
+            list.add(new EventsLetterCount("2018-02-19", "Request_10002", "3655", 16 + i));
+            list.add(new EventsLetterCount("2018-09-19", "reqeest_02111", "5", 0 + i));
+            list.add(new EventsLetterCount("2018-06-20", "letter number statistic", "5625", 7 + i));
+            list.add(new EventsLetterCount("2018-07-05", "20180321_001", "1256", 2 + i));
+            list.add(new EventsLetterCount("2018-04-19", "reqeest_02111", "625", 32 + i));
         }
         return list;
     }
@@ -778,6 +778,47 @@ public class EventsServiceImpl implements EventsService {
             list.add(new EventsNameNumTime("7", 60L, start));
             list.add(new EventsNameNumTime("67", 36L, start));
             list.add(new EventsNameNumTime("8", 30L, start));
+        }
+        return list;
+    }
+
+    /**
+     * 端口信息
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    @Override
+    public List<EventsPortInfo> getPortInfo(String start, String end) {
+        long timeMillisStart = System.currentTimeMillis();
+        List<EventsPortInfo> list = new ArrayList<>();
+        try {
+            list = eventsDao.getPortInfo(start, DateUtils.getDateOfString(start), DateUtils.getDateOfString(end));
+        } catch (Exception e) {
+            logger.error("端口信息\t查询异常\tserviceImpl", e);
+        }
+        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
+            logger.warn("端口信息\t********\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
+            try {
+                Date lastTime = eventsDao.getPortInfoLastTime(DateUtils.getDateOfString(end));
+                if (lastTime != null) {
+                    String startRecent = DateUtils.formatDateTime(lastTime);
+                    startRecent = DateUtils.getRangeOfhour(startRecent);
+                    String endRecent = DateUtils.getAfter1h(startRecent);
+                    list = eventsDao.getPortInfo(start, DateUtils.getDateOfString(startRecent), DateUtils.getDateOfString(endRecent));
+                } else {
+                    logger.warn("端口信息\t*********\t无数据");
+                }
+            } catch (Exception e) {
+                logger.error("端口信息\t最近数据\t查询异常\tserviceImpl", e);
+            }
+        }
+        logger.info("端口信息耗时：" + (System.currentTimeMillis() - timeMillisStart));
+        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
+            logger.info("端口信息------->测试数据");
+            list = new ArrayList<>();
+            list.add(new EventsPortInfo(start, "", "", "", ""));
         }
         return list;
     }

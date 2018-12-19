@@ -2,21 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nis.galaxy.web.dao.NetflowTopNDao">
-    <!--5分钟内活跃IP流量TOP10 5min-->
-    <select id="getIpActiveStatisticOf5mOnly" resultType="com.nis.galaxy.domain.IpActiveInt" parameterType="String">
+    <!--5分钟内活跃IP流量-->
+    <select id="getNetflow5minIpActiveWaterflow" resultType="com.nis.galaxy.domain.IpActiveInt">
        <![CDATA[
-       SELECT #{push} AS time,area_id AS area,ip_addr AS IP,SUM(c2s_byte_len+s2c_byte_len) AS count
+       SELECT #{push} AS time,'up' AS type,area_id AS area,ip_addr AS IP,SUM(c2s_byte_len) AS count
        FROM traffic_ip_active_statistic
           WHERE stat_time >= #{start}
           AND stat_time < #{end}
        GROUP BY IP ,area
-       ORDER BY count DESC
-       LIMIT 20;
+       UNION ALL
+       ( SELECT #{push} AS time,'down' AS type,area_id AS area,ip_addr AS IP,SUM(s2c_byte_len) AS count
+       FROM traffic_ip_active_statistic
+          WHERE stat_time >= #{start}
+          AND stat_time < #{end}
+       GROUP BY IP ,area )
         ]]>
     </select>
-
     <!--互联网流量TOP10-->
-    <select id="getNetFlowWaterTop10_old" resultType="com.nis.galaxy.domain.NetFlowWater">
+    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
         SELECT ifnull(dic.area,0) AS area,net.time AS time,sum(net.count)/1024/1024 AS count
         FROM (
@@ -31,22 +34,23 @@
         GROUP BY area,time
         ]]>
     </select>
-
-
-    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
-        <![CDATA[
-
-        select entrance_id as area ,stat_time as time, IFNULL(SUM(c2s_byte_len+s2c_byte_len),0)/1024/1024 as count
-        from traffic_trans_statistic where STAT_TIME>= #{start} and STAT_TIME<#{end}
-        group by stat_time,entrance_id
-
-
-        ]]>
+    <!--1小时互联网流量TOP10-->
+    <select id="getNetflow1HourWaterflowTop10" resultType="com.nis.galaxy.domain.NetFlowWater" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=") UNION ALL (">
+            <![CDATA[
+            SELECT ifnull(dic.area,0) as area,#{item.start} time,sum(net.count)/1024/1024 count FROM (
+            select sum(INOCTETS+OUTOCTETS) count,NODE_IP ip
+            from traffic_netflow_port_info
+            WHERE RECV_TIME>= #{item.start}
+            AND RECV_TIME< #{item.end}
+            GROUP BY ip) net
+            LEFT JOIN
+            (SELECT entrance_id area,manager_ip ip from ntc_device_info) dic
+            on net.ip = dic.ip
+            GROUP BY area
+            ]]>
+        </foreach>
     </select>
-
-
-
-
     <!--通过ip获取局点-->
     <select id="getIpEntranceRe" resultType="com.nis.galaxy.domain.Entrance">
         SELECT entrance_id AS entrance
@@ -56,7 +60,7 @@
 
     <!--最近数据时间的获取 and 小于参数end-->
     <!--时间：5分钟内活跃IP流量TOP10-->
-    <select id="getIpActiveStatisticOf5mLastTime" resultType="java.util.Date">
+    <select id="getNetflow5minIpActiveWaterflowLastTime" resultType="java.util.Date">
         <![CDATA[
         SELECT stat_time
         FROM traffic_ip_active_statistic
