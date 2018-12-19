@@ -40,13 +40,12 @@ public class ForNetflowTopNInterface {
     private String SERVICE_PATH_NETFLOW;
 
 
-
     /**
-     * 5分钟内活跃IP流量TOP10
+     * 5分钟内活跃IP流量
      */
-//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
-//    @SchedulerLock(name = "netflow.5min.ip.active.waterflow", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
-    public void getIpActiveStatisticOf5m() {
+    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+    @SchedulerLock(name = "netflow.5min.ip.active.waterflow", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
+    public void getNetflow5minIpActiveWaterflow() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
         }
@@ -55,27 +54,26 @@ public class ForNetflowTopNInterface {
         String start = DateUtils.getBeforeNminOfTime(end, before5m);
         List contentValue = null;
         try {
-            //获取并封装数据
-            contentValue = netflowTopNService.getIpActiveStatisticOf5m(start, end);
+            contentValue = netflowTopNService.getNetflow5minIpActiveWaterflow(start, end);
         } catch (Exception e) {
-            logger.error("5分钟内活跃IP流量TOP10\t查询异常\trestTemplate", e);
+            logger.error("5分钟内活跃IP流量\t查询异常\trestTemplate", e);
         }
         if (InterfaceBase.contentValueIsEmpty(contentValue)) {
-            logger.warn("5分钟内活跃IP流量TOP10\t无数据\t取消本次推送");
+            logger.warn("5分钟内活跃IP流量\t无数据\t取消本次推送");
             return;
         }
         // 请求头和请求体
         HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.5min.ip.active.waterflow", contentValue);
-        logger.info("开始推送=======>>5分钟内活跃IP流量TOP10 请求头和请求体：" + httpEntity);
+        logger.info("开始推送=======>>5分钟内活跃IP流量 请求头和请求体：" + httpEntity);
         ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
-        logger.info("5分钟内活跃IP流量TOP10\t推送返回结果" + response);
+        logger.info("5分钟内活跃IP流量\t推送返回结果" + response);
     }
 
     /**
      * 1小时内互联网流量TOP10
      */
     @Scheduled(cron = "${5m.scheduled.cron.plan}")
-    @SchedulerLock(name = "netflow.1hour.waterflow.top_10", lockAtLeastForString = "PT2M",lockAtMostForString = "PT4M")
+    @SchedulerLock(name = "netflow.1hour.waterflow.top_10", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
     public void getNetFlowWaterTop10() {
         if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
             return;
@@ -88,6 +86,34 @@ public class ForNetflowTopNInterface {
         try {
             //获取并封装数据
             contentValue = netflowTopNService.getNetFlowWaterTop10(start, end, range);
+        } catch (Exception e) {
+            logger.error("1小时内互联网流量TOP10\t查询异常\trestTemplate", e);
+        }
+        if (InterfaceBase.contentValueIsEmpty(contentValue)) {
+            logger.warn("1小时内互联网流量TOP10\t无数据\t取消本次推送");
+            return;
+        }
+        // 请求头和请求体
+        HttpEntity<String> httpEntity = InterfaceBase.getHttpEntity(pushParams.getHeaders(), null, "netflow.1hour.waterflow.top_10", contentValue);
+        logger.info("开始推送=======>>1小时内互联网流量TOP10 请求头和请求体：" + httpEntity);
+        ResponseEntity<String> response = InterfaceBase.pushStart(restTemplate, REST_URL_PREFIX_PUSH + SERVICE_PATH_NETFLOW, httpEntity);
+        logger.info("1小时内互联网流量TOP10\t推送返回结果" + response);
+    }
+
+    /**
+     * 1小时内互联网流量TOP10
+     */
+//    @Scheduled(cron = "${5m.scheduled.cron.plan}")
+//    @SchedulerLock(name = "netflow.1hour.waterflow.top_10", lockAtLeastForString = "PT2M", lockAtMostForString = "PT4M")
+    public void getNetflow1HourWaterflowTop10() {
+        if (!Boolean.parseBoolean(scheduledNetflowTopnEnable)) {
+            return;
+        }
+        String now = DateUtils.getDateTime();
+        String end = DateUtils.getRangeOf5min(now);
+        List contentValue = null;
+        try {
+            contentValue = netflowTopNService.getNetflow1HourWaterflowTop10(end);
         } catch (Exception e) {
             logger.error("1小时内互联网流量TOP10\t查询异常\trestTemplate", e);
         }
@@ -166,15 +192,17 @@ public class ForNetflowTopNInterface {
 
 
     @Scheduled(fixedRate = 999999999)
-    @SchedulerLock(name = "FirstPushNetflowTopN", lockAtLeastForString = "PT1H",lockAtMostForString = "PT2H")
+    @SchedulerLock(name = "FirstPushNetflowTopN", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void run() throws InterruptedException {
         if (a++ > 1) {
             return;
         }
         logger.warn("应用启动首次推送所有接口6/6");
-//        getIpActiveStatisticOf5m();
+        getNetflow5minIpActiveWaterflow();
         getNetFlowWaterTop10();
 //        getNetFlowWaterTop10Of24h();
 //        getNetFlowWaterTop10Of7Day();
+//        getNetflow1HourWaterflowTop10();
+
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 public interface EventsService {
     /**
      * 系统总计
+     *
      * @param start
      * @param end
      * @return
@@ -15,6 +16,7 @@ public interface EventsService {
 
     /**
      * 特定APP访问监控
+     *
      * @param start
      * @param end
      * @return
@@ -23,18 +25,21 @@ public interface EventsService {
 
     /**
      * 来函统计报表
+     *
      * @return
      */
     List<EventsLetterCount> getLetterCount();
 
     /**
      * 业务类型统计报表
+     *
      * @return
      */
-    List<EventsServiceCount> getServiceCount(String start,String end);
+    List<EventsServiceCount> getServiceCount(String start, String end);
 
     /**
      * 重点保障事件总览
+     *
      * @param start
      * @return
      */
@@ -42,12 +47,14 @@ public interface EventsService {
 
     /**
      * 特定网站监控
+     *
      * @return
      */
     List<EventsSpecificWebsites> getSpecificWebsites(String end);
 
     /**
      * 事件监测
+     *
      * @param end
      * @return
      */
@@ -55,6 +62,7 @@ public interface EventsService {
 
     /**
      * 事件封堵
+     *
      * @param end
      * @return
      */
@@ -62,6 +70,7 @@ public interface EventsService {
 
     /**
      * 音频监控
+     *
      * @param start
      * @param end
      * @return
@@ -70,6 +79,7 @@ public interface EventsService {
 
     /**
      * 视频监控
+     *
      * @param start
      * @param end
      * @return
@@ -78,6 +88,7 @@ public interface EventsService {
 
     /**
      * 图片监控
+     *
      * @param start
      * @param end
      * @return
@@ -85,7 +96,8 @@ public interface EventsService {
     List<EventsImageMonitor> getImageMonitor(String start, String end);
 
     /**
-     *VOIP监控
+     * VOIP监控
+     *
      * @param start
      * @param end
      * @return
@@ -94,6 +106,7 @@ public interface EventsService {
 
     /**
      * 网络行为预警
+     *
      * @param start
      * @param end
      * @return
@@ -102,6 +115,7 @@ public interface EventsService {
 
     /**
      * 目标行为网络监测
+     *
      * @param start
      * @param end
      * @return
@@ -110,6 +124,7 @@ public interface EventsService {
 
     /**
      * 部署设备数量
+     *
      * @param end
      * @return
      */
@@ -117,18 +132,29 @@ public interface EventsService {
 
     /**
      * 运行状态
+     *
      * @param start
      * @param end
      * @return
      */
-    List<EventsRunningState> getRunningState(String start,String end);
+    List<EventsRunningState> getRunningState(String start, String end);
 
     /**
      * HTTPS监控TOP10、IP监控TOP10、APP阻断TOP10、HTTP阻断TOP10、IP阻断TOP10
+     *
      * @param start
      * @param end
      * @param type
      * @return
      */
     List<EventsNameNumTime> getTypeMonitorReject(String start, String end, String type);
+
+    /**
+     * 端口信息
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    List<EventsPortInfo> getPortInfo(String start, String end);
 }
