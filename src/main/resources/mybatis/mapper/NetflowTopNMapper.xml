@@ -82,12 +82,21 @@
         ]]>
     </select>
     <!--时间：1小时内互联网流量TOP10-->
-    <select id="getNetFlowWaterTop10LastTime" resultType="java.util.Date">
+    <select id="getNetFlowWaterTop10LastTime_old" resultType="java.util.Date">
         <![CDATA[
         SELECT RECV_TIME
         FROM traffic_netflow_port_info
         WHERE RECV_TIME < #{end}
         ORDER BY RECV_TIME DESC
+        LIMIT 1
+        ]]>
+    </select>
+    <select id="getNetFlowWaterTop10LastTime" resultType="java.util.Date">
+        <![CDATA[
+        SELECT stat_time
+        FROM traffic_trans_statistic
+        WHERE stat_time < #{end}
+        ORDER BY stat_time DESC
         LIMIT 1
         ]]>
     </select>
