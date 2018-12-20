@@ -16,7 +16,8 @@ import java.util.Date;
 @Accessors(chain = true)
 public class EventsLetterCount {
     private String time;  // 时间
-    private String letter;    // 来函
+    private String letterNo;    // 来函编号
+    private String topic;    // 主题
     private long num;
 
     public void setTime(Date time) {

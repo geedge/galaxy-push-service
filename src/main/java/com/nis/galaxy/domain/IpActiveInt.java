@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class IpActiveInt {
     private String time;// 时间
+    private String type;//up OR down
     private String area;// 区域
     private String IP;// 活跃IP
     private long count;//  流量
