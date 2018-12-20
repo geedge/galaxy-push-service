@@ -27,8 +27,11 @@
         </collection>
     </resultMap>
     <!--网络流量监控_5min-->
+
+
     <select id="getNetWaterMonitor" resultType="com.nis.galaxy.domain.NetWaterMonitor">
         <![CDATA[
+
         SELECT ifnull(d.entrance_id,0) AS area,'INOCTETS' AS type,SUM(tt.incount) AS count,time
         FROM
             (SELECT IF((b.INOCTETS - a.INOCTETS ) >0  ,b.INOCTETS - a.INOCTETS ,b.INOCTETS) AS incount,b.ip2 AS ip,#{push} AS time
@@ -77,6 +80,8 @@
 	 ) d
 	ON d.manager_ip = tt.ip
     GROUP BY area
+
+
         ]]>
     </select>
     <!--时间:网络流量监控_5min-->
