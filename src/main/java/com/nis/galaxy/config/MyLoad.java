@@ -121,11 +121,7 @@ public class MyLoad {
         }
     }
 
-    @Scheduled(fixedRate = 999999999)
-    public void run() {
-        if (a++ > 1) {
-            return;
-        }
+    public void MyloadArea() {
         if (ConfigUtil.languageChose == 3) {
             listAreaDictInfo.put("1", new AreaDictInfo("1", "Астана"));
             listAreaDictInfo.put("2", new AreaDictInfo("1", "Алматы"));
@@ -137,6 +133,14 @@ public class MyLoad {
             listAreaDictInfo.put("2", new AreaDictInfo("2", "阿拉木图市"));
         }
         logger.info("目前地域表为：" + listAreaDictInfo);
+    }
+
+    @Scheduled(fixedRate = 999999999)
+    public void run() {
+        if (a++ > 1) {
+            return;
+        }
+        MyloadArea();
         MyLoadService();
         MyLoadProtocol();
         MyLoadTag();

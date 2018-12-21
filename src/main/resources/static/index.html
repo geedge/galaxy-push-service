@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8"/>
-    <title>Insert title here</title>
+    <title>配置参数修改、图片上传</title>
 </head>
 <body>
 <form action="/upImageData" enctype="multipart/form-data" method="POST">
@@ -18,7 +18,40 @@
         请选择上传的图片:
         <input type="file" name="myfile"/><br>
         <input type="submit" value="上传" style="width: 50px;height: 25px"/>
-    </h3><br>
+    </h3>
+    <br>
+</form>
+<!--
+<form action="/cfgDeviceParamData" enctype="multipart/form-data" method="post">
+    <h3>
+        地域名称
+        <select name="area" style="align-content: center">
+            <option value="Astana">Astana</option>
+            <option value="Almaty">Almaty</option>
+        </select><br/>
+        设备名称<br/>
+        <h6>
+            Server<input type="number" name="server"/><br/>
+            CoreSwtich<input type="number" name="coreSwtich"/><br/>
+            AccessSwitch<input type="number" name="accessSwitch"/><br/>
+            Asem<input type="number" name="asem"/><br/>
+            Adc<input type="number" name="adc"/><br/>
+            <input type="reset">
+            <input type="submit">
+        </h6>
+    </h3>
+</form>
+-->
+<form action="/cfgLanguageParam" enctype="multipart/form-data" method="get">
+    <h3>
+        语言选择<br/>
+        <h5>
+            <input type="radio" name="language" value="1"/>中文
+            <input type="radio" name="language" value="2" checked="checked"/>English
+            <input type="radio" name="language" value="3"/>Русский язык
+        </h5>
+        <input type="submit">
+    </h3>
 </form>
 </body>
 </html>
