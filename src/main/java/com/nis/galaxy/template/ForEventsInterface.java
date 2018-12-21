@@ -446,8 +446,8 @@ public class ForEventsInterface {
     /**
      * 硬件设备统计 24小时送一次数据
      */
-    @Scheduled(cron = "${24h.scheduled.cron.plan}")
-    @SchedulerLock(name = "device.num", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
+//    @Scheduled(cron = "${24h.scheduled.cron.plan}")
+//    @SchedulerLock(name = "device.num", lockAtLeastForString = "PT1H", lockAtMostForString = "PT2H")
     public void getDeviceNum() {
         if (!Boolean.parseBoolean(scheduledEventsEnable)) {
             return;
@@ -694,7 +694,7 @@ public class ForEventsInterface {
         getImageMonitor();
         getVoipMonitor();
 //        getDdosAlarm();
-        getDeviceNum();
+//        getDeviceNum();
 //        getRunningState();
 //        getTargetNetwork();
         getHttpsMonitor();
