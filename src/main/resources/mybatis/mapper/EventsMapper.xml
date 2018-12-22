@@ -243,15 +243,19 @@
     GROUP BY  event,time
     HAVING (ipNum+httpNum+mailNum+vedioNum+agentNum)>0;
     </select>
-    <!--HTTPS监控TOP10-->
+
     <select id="getHttpsMonitor" resultType="com.nis.galaxy.domain.EventsNameNumTime">
         <![CDATA[
-        SELECT cfg_id AS name,SUM(sum) AS num,#{push} AS time
+        SELECT b.name AS name ,a.num AS num,#{push} AS time FROM
+        (SELECT cfg_id AS name,SUM(sum) AS num
         FROM ntc_pz_report
         WHERE report_time > #{start}
             AND report_time < #{end}
             AND service = #{serviceId}
-        GROUP BY name;
+        GROUP BY name) a
+        LEFT JOIN
+	    (SELECT compile_id as compileId,cfg_desc as name FROM ui_cfg_index_info) b
+	    on a.name = b.compileId
         ]]>
     </select>
     <!--端口信息-->
