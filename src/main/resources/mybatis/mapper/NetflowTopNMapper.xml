@@ -39,7 +39,7 @@
     <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
         <![CDATA[
 
-        select entrance_id as area ,stat_time as time, IFNULL(SUM(c2s_byte_len+s2c_byte_len),0)/1024/1024 as count
+        select entrance_id as area ,stat_time as time, IFNULL(SUM(c2s_byte_len+s2c_byte_len),0) as count
         from traffic_trans_statistic where STAT_TIME>= #{start} and STAT_TIME<#{end}
         group by stat_time,entrance_id
 
