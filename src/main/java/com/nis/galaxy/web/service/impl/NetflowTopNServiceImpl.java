@@ -112,21 +112,21 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     @Override
     public List<NetFlowWaterPush> getNetFlowWaterTop10(String start, String end, int range) {
         Map<String, AreaDictInfo> listArea = listAreaDictInfo();
-        List<NetFlowWater> list = new ArrayList<>();
+//        List<NetFlowWater> list = new ArrayList<>();
         List<NetFlowWaterPush> resule = new ArrayList<>();
         long timeMillisStart = System.currentTimeMillis();
-        List<Entrance> entrance = new ArrayList<>();
+        /*List<Entrance> entrance = new ArrayList<>();
         try {
             entrance = netflowTopNDao.getIpEntranceRe();
         } catch (Exception ex) {
             logger.error("互联网流量TOP10\t获取局点异常\tserviceImpl", ex);
-        }
+        }*/
         try {
-            list = netflowTopNDao.getNetFlowWaterTop10(start, end);
+            resule = netflowTopNDao.getNetFlowWaterTop10(start, start, end);
         } catch (Exception e) {
             logger.error("互联网流量TOP10\t查询异常\tserviceImpl", e);
         }
-        if (ListUtils.isEmptyList(list) && ConfigUtil.recentData) {
+        if (ListUtils.isEmptyList(resule) && ConfigUtil.recentData) {
             logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t" + start + "至" + end + "\t期间无数据\t查询最近数据");
             try {
                 Date lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);
@@ -142,7 +142,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                     } else {
                         lastStart = DateUtils.getBeforeNminOfTime(lastEnd, -60 * 24);
                     }
-                    list = netflowTopNDao.getNetFlowWaterTop10(lastStart, lastEnd);
+                    resule = netflowTopNDao.getNetFlowWaterTop10(start, lastStart, lastEnd);
                 } else {
                     logger.warn("互联网流量TOP10\tTRAFFIC_NETFLOW_PORT_INFO\t无数据");
                 }
@@ -150,7 +150,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                 logger.error("互联网流量TOP10\t最近数据\t查询异常\tserviceImpl", e);
             }
         }
-        if (!ListUtils.isEmptyList(list)) {
+        /*if (!ListUtils.isEmptyList(list)) {
             int size = list.size();
             if (size == 1) {
                 long avg = 0;
@@ -198,7 +198,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                         if (tempSize > 1) {
                             avg = avg / (size - 1);
                         } else if (tempSize == 1) {
-                            avg = temp.get(0).getCount();
+                            avg = temp.get(0).getCount() / 300;
                         } else {
                             continue;
                         }
@@ -221,9 +221,24 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                     next.setArea(areaDictInfo.getItemValue());
                 }
             }
+        }*/
+        //映射地域
+        if (!ListUtils.isEmptyList(resule)) {
+            Iterator<NetFlowWaterPush> netFlowWaterPush = resule.iterator();
+            while (netFlowWaterPush.hasNext()) {
+                NetFlowWaterPush next = netFlowWaterPush.next();
+                String area = next.getArea();
+                AreaDictInfo areaDictInfo = listArea.get(area);
+                if (areaDictInfo == null) {
+                    netFlowWaterPush.remove();
+                    continue;
+                } else {
+                    next.setArea(areaDictInfo.getItemValue());
+                }
+            }
         }
         logger.info("互联网流量TOP10耗时：" + (System.currentTimeMillis() - timeMillisStart));
-        if (ListUtils.isEmptyList(list) && ConfigUtil.testData) {
+        if (ListUtils.isEmptyList(resule) && ConfigUtil.testData) {
             logger.info("互联网流量TOP10------->测试数据");
             if (ConfigUtil.languageChose == 3) {
                 resule.add(new NetFlowWaterPush(start, "Астана", (long) (Math.random() * 10000)));
@@ -235,14 +250,13 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
     }
 
     /**
-     * 1小时互联网流量TOP10
+     * 1小时互联网流量TOP10_test
      *
      * @param end
      * @return
      */
     @Override
     public List getNetflow1HourWaterflowTop10(String end) {
-        end = "2018-12-10 10:23:00";
         long startTimeMillis = System.currentTimeMillis();
         List<NetFlowWaterPush> result = new ArrayList<>();
         List<NetFlowWater> resultTemp = new ArrayList<>();
@@ -258,6 +272,27 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
             }
             List<NetFlowWater> temp = netflowTopNDao.getNetflow1HourWaterflowTop10(listMapParam);
             resultTemp.addAll(temp);
+        }
+        if (ListUtils.isEmptyList(resultTemp)) {
+            Date lastTime = netflowTopNDao.getNetFlowWaterTop10LastTime(end);
+            if (lastTime != null) {
+                end = DateUtils.formatDateTime(lastTime);
+                end = DateUtils.getRangeOf5min(end);
+                end = DateUtils.getAfter5min(end);
+                for (int j = 0; j < 2; j++) {
+                    List<Map<String, Date>> listMapParam = new ArrayList<>();
+                    for (int i = 0; i < 6; i++) {
+                        String start = DateUtils.getBeforeNminOfTime(end, -5);
+                        HashMap<String, Date> map = new HashMap<>();
+                        map.put("start", DateUtils.getDateOfString(start));
+                        map.put("end", DateUtils.getDateOfString(end));
+                        listMapParam.add(map);
+                        end = start;
+                    }
+                    List<NetFlowWater> temp = netflowTopNDao.getNetflow1HourWaterflowTop10(listMapParam);
+                    resultTemp.addAll(temp);
+                }
+            }
         }
         Map<String, AreaDictInfo> listAreaDictInfo = listAreaDictInfo();
         if (!ListUtils.isEmptyList(resultTemp)) {
@@ -308,7 +343,7 @@ public class NetflowTopNServiceImpl implements NetflowTopNService {
                     if (tempResultSize > 1) {
                         avg = avg / (size - 1);
                     } else if (tempResultSize == 1) {
-                        avg = tempAreaResult.get(0).getCount() / 1000;
+                        avg = tempAreaResult.get(0).getCount() / 300;
                     } else {
                         continue;
                     }

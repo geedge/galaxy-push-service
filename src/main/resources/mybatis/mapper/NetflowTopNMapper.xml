@@ -36,17 +36,14 @@
     </select>
 
 
-    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWater">
+    <select id="getNetFlowWaterTop10" resultType="com.nis.galaxy.domain.NetFlowWaterPush">
         <![CDATA[
-
-        select entrance_id as area ,stat_time as time, IFNULL(SUM(c2s_byte_len+s2c_byte_len),0) as count
+        select entrance_id as area ,#{push} as time, IFNULL(SUM(c2s_byte_len+s2c_byte_len),0) as count
         from traffic_trans_statistic where STAT_TIME>= #{start} and STAT_TIME<#{end}
-        group by stat_time,entrance_id
-
-
+        group by area
         ]]>
     </select>
-    <!--1小时互联网流量TOP10-->
+    <!--1小时互联网流量TOP10_test-->
     <select id="getNetflow1HourWaterflowTop10" resultType="com.nis.galaxy.domain.NetFlowWater" parameterType="java.util.List">
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=") UNION ALL (">
             <![CDATA[
